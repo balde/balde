@@ -6,6 +6,16 @@ AC_INIT([balde], m4_esyscmd([build-aux/git-version-gen .tarball-version]),
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
+# code changed: REVISION++.
+# interface changed: CURRENT++, REVISION=0.
+# interface changed (backwards compatible): AGE++, else AGE=0.
+CURRENT=0
+AGE=0
+REVISION=0
+
+LT_VERSION_INFO="$CURRENT:$REVISION:$AGE"
+AC_SUBST(LT_VERSION_INFO)
+
 AM_INIT_AUTOMAKE([foreign no-dist-gzip dist-xz subdir-objects])
 AC_CONFIG_HEADERS([config.h])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -31,7 +41,7 @@ AS_IF([test "x$enable_fastcgi" = "xyes"], [
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.34])
 
-AC_CONFIG_FILES([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile lib/Makefile])
 AC_OUTPUT
 
 AS_ECHO("

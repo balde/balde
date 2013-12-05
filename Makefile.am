@@ -1,4 +1,4 @@
-SUBDIRS = src
+SUBDIRS = lib
 ACLOCAL_AMFLAGS = -I m4
 
 EXTRA_DIST = \

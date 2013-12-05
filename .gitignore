@@ -21,6 +21,9 @@
 Makefile
 Makefile.in
 .deps
+.libs
+*.la
+*.lo
 /aclocal.m4
 /configure
 /config.*
