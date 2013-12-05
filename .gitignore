@@ -16,3 +16,19 @@
 *.exe
 *.out
 *.app
+
+# Autotools
+Makefile
+Makefile.in
+.deps
+/aclocal.m4
+/configure
+/config.*
+/autom4te.cache
+/libtool
+/stamp-h1
+
+# git-version-gen
+/build-aux/*
+!/build-aux/git-version-gen
+/.version
