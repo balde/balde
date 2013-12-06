@@ -1,19 +1,17 @@
+check_PROGRAMS = \
+	check_routing
+
 TESTS = \
-	test_routing
+	$(check_PROGRAMS)
 
-check_PROGRAMS = $(TESTS)
-
-test_routing_SOURCES = \
+check_routing_SOURCES = \
 	routing.c
 
-test_routing_CFLAGS = \
-	$(AM_CFLAGS) \
+AM_CFLAGS = \
+	$(all_includes) \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)
+	-I$(top_srcdir)/lib
 
-test_routing_LDADD = \
-	$(AM_LDADD) \
+AM_LDFLAGS = \
 	$(GLIB_LIBS) \
 	$(top_srcdir)/lib/libbalde.la
-
-
