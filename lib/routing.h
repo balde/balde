@@ -11,6 +11,6 @@
 
 #include <glib.h>
 
-GHashTable* balde_url_match(gchar *path, gchar *rule);
+gboolean balde_url_match(gchar *path, gchar *rule, GHashTable **matches);
 
 #endif /* _ROUTING_H */

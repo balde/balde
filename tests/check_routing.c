@@ -17,7 +17,8 @@
 void
 test_url_match(void)
 {
-    GHashTable *matches = balde_url_match("/lol/", "/lol/");
+    GHashTable *matches = NULL;
+    gboolean match = balde_url_match("/lol/", "/lol/", &matches);
     g_assert(matches != NULL);
     g_assert(g_hash_table_size(matches) == 0);
     g_hash_table_destroy(matches);
@@ -27,7 +28,8 @@ test_url_match(void)
 void
 test_url_match_with_variable(void)
 {
-    GHashTable *matches = balde_url_match("/lol/hehe/", "/lol/<asd>/");
+    GHashTable *matches = NULL;
+    gboolean match = balde_url_match("/lol/hehe/", "/lol/<asd>/", &matches);
     g_assert(matches != NULL);
     g_assert(g_hash_table_size(matches) == 1);
     g_assert_cmpstr(g_hash_table_lookup(matches, "asd"), ==, "hehe");
@@ -38,7 +40,8 @@ test_url_match_with_variable(void)
 void
 test_url_match_with_null_path(void)
 {
-    GHashTable *matches = balde_url_match(NULL, "/");
+    GHashTable *matches = NULL;
+    gboolean match = balde_url_match(NULL, "/", &matches);
     g_assert(matches != NULL);
     g_assert(g_hash_table_size(matches) == 0);
     g_hash_table_destroy(matches);
@@ -48,7 +51,8 @@ test_url_match_with_null_path(void)
 void
 test_url_match_with_empty_path(void)
 {
-    GHashTable *matches = balde_url_match("", "/");
+    GHashTable *matches = NULL;
+    gboolean match = balde_url_match("", "/", &matches);
     g_assert(matches != NULL);
     g_assert(g_hash_table_size(matches) == 0);
     g_hash_table_destroy(matches);
@@ -58,7 +62,8 @@ test_url_match_with_empty_path(void)
 void
 test_url_match_without_trailing_slash(void)
 {
-    GHashTable *matches = balde_url_match("/test/asd", "/test/asd");
+    GHashTable *matches = NULL;
+    gboolean match = balde_url_match("/test/asd", "/test/asd", &matches);
     g_assert(matches != NULL);
     g_assert(g_hash_table_size(matches) == 0);
     g_hash_table_destroy(matches);
@@ -68,7 +73,8 @@ test_url_match_without_trailing_slash(void)
 void
 test_url_match_without_trailing_slash_with_variable(void)
 {
-    GHashTable *matches = balde_url_match("/test/asd", "/test/<lol>");
+    GHashTable *matches = NULL;
+    gboolean match = balde_url_match("/test/asd", "/test/<lol>", &matches);
     g_assert(matches != NULL);
     g_assert(g_hash_table_size(matches) == 1);
     g_assert_cmpstr(g_hash_table_lookup(matches, "lol"), ==, "asd");
@@ -79,8 +85,9 @@ test_url_match_without_trailing_slash_with_variable(void)
 void
 test_url_match_with_multiple_matches(void)
 {
-    GHashTable *matches = balde_url_match("/test/foo/tset/bar/test/baz/",
-        "/test/<lol>/tset/<hehe>/test/<xd>/");
+    GHashTable *matches = NULL;
+    gboolean match = balde_url_match("/test/foo/tset/bar/test/baz/",
+        "/test/<lol>/tset/<hehe>/test/<xd>/", &matches);
     g_assert(matches != NULL);
     g_assert(g_hash_table_size(matches) == 3);
     g_assert_cmpstr(g_hash_table_lookup(matches, "lol"), ==, "foo");

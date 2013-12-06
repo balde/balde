@@ -13,11 +13,11 @@
 #include <glib.h>
 
 
-GHashTable*
-balde_url_match(gchar *path, gchar *rule)
+gboolean
+balde_url_match(gchar *path, gchar *rule, GHashTable **matches)
 {
     GError *_error = NULL;
-    GHashTable *matches = NULL;
+    gboolean match = TRUE;
     if (path == NULL || path[0] == '\0')
         path = "/";
     gchar **path_pieces = g_strsplit(path, "/", 0);
@@ -25,22 +25,24 @@ balde_url_match(gchar *path, gchar *rule)
     if (g_strv_length(path_pieces) != g_strv_length(rule_pieces))
         goto point1;
     GRegex *re_variables = g_regex_new("<([^>]+)>", 0, 0, &_error);
-    if (NULL != _error)
+    if (NULL != _error) {
+        match = FALSE;
         goto point2;
+    }
     GMatchInfo *match_info;
-    matches = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    *matches = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     for (guint i=0; rule_pieces[i] != NULL; i++) {
         g_regex_match(re_variables, rule_pieces[i], 0, &match_info);
         if (!g_match_info_matches(match_info)) {
             if (0 != g_strcmp0(rule_pieces[i], path_pieces[i])) {
-                g_hash_table_destroy(matches);
-                matches = NULL;
+                g_hash_table_destroy(*matches);
+                match = FALSE;
                 goto point3;
             }
             continue;
         }
         gchar* key = g_match_info_fetch(match_info, 1);
-        g_hash_table_insert(matches, key, g_strdup(path_pieces[i]));
+        g_hash_table_insert(*matches, key, g_strdup(path_pieces[i]));
     }
 point3:
     g_match_info_free(match_info);
@@ -49,5 +51,5 @@ point2:
     g_strfreev(rule_pieces);
     g_strfreev(path_pieces);
 point1:
-    return matches;
+    return match;
 }
