@@ -14,7 +14,7 @@
 
 
 GHashTable*
-url_match(gchar *path, gchar *rule)
+balde_url_match(gchar *path, gchar *rule)
 {
     GError *_error = NULL;
     GHashTable *matches = NULL;
