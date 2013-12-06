@@ -1,8 +1,6 @@
 lib_LTLIBRARIES = libbalde.la
 
 libbalde_la_SOURCES = \
-	balde.c \
-	balde.h \
 	routing.c \
 	routing.h
 
