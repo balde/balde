@@ -11,10 +11,11 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
+#include "routing.h"
 
 
 gboolean
-balde_url_match(gchar *path, gchar *rule, GHashTable **matches)
+balde_url_match(gchar *path, const gchar *rule, GHashTable **matches)
 {
     GError *_error = NULL;
     gboolean match = FALSE;
@@ -34,6 +35,7 @@ balde_url_match(gchar *path, gchar *rule, GHashTable **matches)
         if (!g_match_info_matches(match_info)) {
             if (0 != g_strcmp0(rule_pieces[i], path_pieces[i])) {
                 g_hash_table_destroy(*matches);
+                *matches = NULL;
                 match = FALSE;
                 goto point3;
             }
@@ -52,4 +54,15 @@ point2:
     g_strfreev(path_pieces);
 point1:
     return match;
+}
+
+
+gchar*
+balde_dispatch_from_path(const balde_url_rule_t *rules, gchar *path,
+    GHashTable **matches)
+{
+    for (guint i=0; rules[i].endpoint != NULL; i++)
+        if (balde_url_match(path, rules[i].rule, matches))
+            return g_strdup(rules[i].endpoint);
+    return NULL;
 }

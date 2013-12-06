@@ -14,6 +14,14 @@
 #include "routing.h"
 
 
+const balde_url_rule_t rules[] = {
+    {"home", "/"},
+    {"user", "/user/<username>/"},
+    {"customer", "/customer/<username>/contracts/"},
+    {NULL, NULL}
+};
+
+
 void
 test_url_match(void)
 {
@@ -103,6 +111,7 @@ test_url_no_match(void)
     GHashTable *matches = NULL;
     gboolean match = balde_url_match("/test/foo/", "/test/fool/", &matches);
     g_assert(!match);
+    g_assert(matches == NULL);
 }
 
 
@@ -112,8 +121,31 @@ test_url_no_match2(void)
     GHashTable *matches = NULL;
     gboolean match = balde_url_match("/test/foo/", "/test/", &matches);
     g_assert(!match);
+    g_assert(matches == NULL);
 }
 
+
+void
+test_url_rule(void)
+{
+    GHashTable *matches = NULL;
+    gchar* endpoint = balde_dispatch_from_path(rules, "/user/arcoiro/",
+        &matches);
+    g_assert_cmpstr(endpoint, ==, "user");
+    g_assert_cmpstr(g_hash_table_lookup(matches, "username"), ==, "arcoiro");
+    g_hash_table_destroy(matches);
+}
+
+
+void
+test_url_rule_not_found(void)
+{
+    GHashTable *matches = NULL;
+    gchar* endpoint = balde_dispatch_from_path(rules, "/bola/arcoiro/",
+        &matches);
+    g_assert(endpoint == NULL);
+    g_assert(matches == NULL);
+}
 
 
 int
@@ -137,5 +169,8 @@ main(int argc, char** argv)
         test_url_no_match);
     g_test_add_func("/routing/url_no_match2",
         test_url_no_match2);
+    g_test_add_func("/routing/url_rule", test_url_rule);
+    g_test_add_func("/routing/url_rule_not_found",
+        test_url_rule_not_found);
     return g_test_run();
 }
