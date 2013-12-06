@@ -106,6 +106,16 @@ test_url_no_match(void)
 }
 
 
+void
+test_url_no_match2(void)
+{
+    GHashTable *matches = NULL;
+    gboolean match = balde_url_match("/test/foo/", "/test/", &matches);
+    g_assert(!match);
+}
+
+
+
 int
 main(int argc, char** argv)
 {
@@ -125,5 +135,7 @@ main(int argc, char** argv)
         test_url_match_with_multiple_matches);
     g_test_add_func("/routing/url_no_match",
         test_url_no_match);
+    g_test_add_func("/routing/url_no_match2",
+        test_url_no_match2);
     return g_test_run();
 }

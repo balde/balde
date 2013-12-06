@@ -17,7 +17,7 @@ gboolean
 balde_url_match(gchar *path, gchar *rule, GHashTable **matches)
 {
     GError *_error = NULL;
-    gboolean match = TRUE;
+    gboolean match = FALSE;
     if (path == NULL || path[0] == '\0')
         path = "/";
     gchar **path_pieces = g_strsplit(path, "/", 0);
@@ -25,10 +25,8 @@ balde_url_match(gchar *path, gchar *rule, GHashTable **matches)
     if (g_strv_length(path_pieces) != g_strv_length(rule_pieces))
         goto point1;
     GRegex *re_variables = g_regex_new("<([^>]+)>", 0, 0, &_error);
-    if (NULL != _error) {
-        match = FALSE;
+    if (NULL != _error)
         goto point2;
-    }
     GMatchInfo *match_info;
     *matches = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     for (guint i=0; rule_pieces[i] != NULL; i++) {
@@ -39,10 +37,12 @@ balde_url_match(gchar *path, gchar *rule, GHashTable **matches)
                 match = FALSE;
                 goto point3;
             }
-            continue;
         }
-        gchar* key = g_match_info_fetch(match_info, 1);
-        g_hash_table_insert(*matches, key, g_strdup(path_pieces[i]));
+        else {
+            gchar* key = g_match_info_fetch(match_info, 1);
+            g_hash_table_insert(*matches, key, g_strdup(path_pieces[i]));
+        }
+        match = TRUE;
     }
 point3:
     g_match_info_free(match_info);
