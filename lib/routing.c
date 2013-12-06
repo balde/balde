@@ -18,6 +18,8 @@ url_match(gchar *path, gchar *rule)
 {
     GError *_error = NULL;
     GHashTable *matches = NULL;
+    if (path == NULL || path[0] == '\0')
+        path = "/";
     gchar **path_pieces = g_strsplit(path, "/", 0);
     gchar **rule_pieces = g_strsplit(rule, "/", 0);
     if (g_strv_length(path_pieces) != g_strv_length(rule_pieces))
@@ -37,7 +39,7 @@ url_match(gchar *path, gchar *rule)
             }
             continue;
         }
-        gchar* key = g_match_info_fetch(match_info, 0);
+        gchar* key = g_match_info_fetch(match_info, 1);
         g_hash_table_insert(matches, key, g_strdup(path_pieces[i]));
     }
 point3:

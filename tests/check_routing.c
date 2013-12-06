@@ -24,10 +24,88 @@ test_url_match(void)
 }
 
 
+void
+test_url_match_with_variable(void)
+{
+    GHashTable *matches = url_match("/lol/hehe/", "/lol/<asd>/");
+    g_assert(matches != NULL);
+    g_assert(g_hash_table_size(matches) == 1);
+    g_assert_cmpstr(g_hash_table_lookup(matches, "asd"), ==, "hehe");
+    g_hash_table_destroy(matches);
+}
+
+
+void
+test_url_match_with_null_path(void)
+{
+    GHashTable *matches = url_match(NULL, "/");
+    g_assert(matches != NULL);
+    g_assert(g_hash_table_size(matches) == 0);
+    g_hash_table_destroy(matches);
+}
+
+
+void
+test_url_match_with_empty_path(void)
+{
+    GHashTable *matches = url_match("", "/");
+    g_assert(matches != NULL);
+    g_assert(g_hash_table_size(matches) == 0);
+    g_hash_table_destroy(matches);
+}
+
+
+void
+test_url_match_without_trailing_slash(void)
+{
+    GHashTable *matches = url_match("/test/asd", "/test/asd");
+    g_assert(matches != NULL);
+    g_assert(g_hash_table_size(matches) == 0);
+    g_hash_table_destroy(matches);
+}
+
+
+void
+test_url_match_without_trailing_slash_with_variable(void)
+{
+    GHashTable *matches = url_match("/test/asd", "/test/<lol>");
+    g_assert(matches != NULL);
+    g_assert(g_hash_table_size(matches) == 1);
+    g_assert_cmpstr(g_hash_table_lookup(matches, "lol"), ==, "asd");
+    g_hash_table_destroy(matches);
+}
+
+
+void
+test_url_match_with_multiple_matches(void)
+{
+    GHashTable *matches = url_match("/test/foo/tset/bar/test/baz/",
+        "/test/<lol>/tset/<hehe>/test/<xd>/");
+    g_assert(matches != NULL);
+    g_assert(g_hash_table_size(matches) == 3);
+    g_assert_cmpstr(g_hash_table_lookup(matches, "lol"), ==, "foo");
+    g_assert_cmpstr(g_hash_table_lookup(matches, "hehe"), ==, "bar");
+    g_assert_cmpstr(g_hash_table_lookup(matches, "xd"), ==, "baz");
+    g_hash_table_destroy(matches);
+}
+
+
 int
 main(int argc, char** argv)
 {
     g_test_init(&argc, &argv, NULL);
     g_test_add_func("/routing/url_match", test_url_match);
+    g_test_add_func("/routing/url_match_with_variable",
+        test_url_match_with_variable);
+    g_test_add_func("/routing/url_match_with_null_path",
+        test_url_match_with_null_path);
+    g_test_add_func("/routing/url_match_with_empty_path",
+        test_url_match_with_empty_path);
+    g_test_add_func("/routing/url_match_without_trailing_slash",
+        test_url_match_without_trailing_slash);
+    g_test_add_func("/routing/url_match_without_trailing_slash_with_variable",
+        test_url_match_without_trailing_slash_with_variable);
+    g_test_add_func("/routing/url_match_with_multiple_matches",
+        test_url_match_with_multiple_matches);
     return g_test_run();
 }
