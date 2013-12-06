@@ -1,13 +1,12 @@
 lib_LTLIBRARIES = libbalde.la
 
 libbalde_la_SOURCES = \
-	routing.c \
-	routing.h
+	routing.c
 
 libbalde_la_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)
+	-I$(top_srcdir)/include
 
 libbalde_la_LDFLAGS = \
 	$(AM_LDADD) \

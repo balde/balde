@@ -6,8 +6,8 @@
  * See the file COPYING.
  */
 
-#ifndef _ROUTING_H
-#define _ROUTING_H
+#ifndef _BALDE_ROUTING_H
+#define _BALDE_ROUTING_H
 
 #include <glib.h>
 
@@ -20,4 +20,4 @@ gboolean balde_url_match(gchar *path, const gchar *rule, GHashTable **matches);
 gchar* balde_dispatch_from_path(const balde_url_rule_t *rules,
     gchar *path, GHashTable **matches);
 
-#endif /* _ROUTING_H */
+#endif /* _BALDE_ROUTING_H */

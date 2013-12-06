@@ -41,7 +41,13 @@ AS_IF([test "x$enable_fastcgi" = "xyes"], [
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.34])
 
-AC_CONFIG_FILES([Makefile lib/Makefile tests/Makefile])
+AC_CONFIG_FILES([
+    Makefile
+    include/Makefile
+    include/balde/Makefile
+    lib/Makefile
+    tests/Makefile
+])
 AC_OUTPUT
 
 AS_ECHO("

@@ -1,4 +1,8 @@
-SUBDIRS = lib tests
+SUBDIRS = \
+	include \
+	lib \
+	tests
+
 ACLOCAL_AMFLAGS = -I m4
 
 EXTRA_DIST = \
