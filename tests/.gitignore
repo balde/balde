@@ -1,2 +1,2 @@
-/test_*
 /check_*
+!/check_*.c

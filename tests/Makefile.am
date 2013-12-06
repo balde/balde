@@ -5,7 +5,7 @@ TESTS = \
 	$(check_PROGRAMS)
 
 check_routing_SOURCES = \
-	routing.c
+	check_routing.c
 
 AM_CFLAGS = \
 	$(all_includes) \
