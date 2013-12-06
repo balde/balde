@@ -11,7 +11,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include "routing.h"
+#include "../lib/routing.h"
 
 
 const balde_url_rule_t rules[] = {

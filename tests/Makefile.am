@@ -10,7 +10,7 @@ check_routing_SOURCES = \
 AM_CFLAGS = \
 	$(all_includes) \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/lib
+	-I$(top_srcdir)
 
 AM_LDFLAGS = \
 	$(GLIB_LIBS) \
