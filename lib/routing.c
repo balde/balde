@@ -26,8 +26,10 @@ balde_url_match(gchar *path, const gchar *rule, GHashTable **matches)
     if (g_strv_length(path_pieces) != g_strv_length(rule_pieces))
         goto point1;
     GRegex *re_variables = g_regex_new("<([^>]+)>", 0, 0, &_error);
-    if (NULL != _error)
+    if (NULL != _error) {
+        g_error_free(_error);
         goto point2;
+    }
     GMatchInfo *match_info;
     *matches = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     for (guint i=0; rule_pieces[i] != NULL; i++) {
