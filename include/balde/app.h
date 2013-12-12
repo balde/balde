@@ -6,10 +6,18 @@
  * See the file COPYING.
  */
 
-#ifndef _BALDE_H
-#define _BALDE_H
+#ifndef _BALDE_APP_H
+#define _BALDE_APP_H
 
-#include <balde/app.h>
-#include <balde/routing.h>
+#include <glib.h>
 
-#endif /* _BALDE_H */
+typedef struct {
+	GHashTable *views;
+	GHashTable *config;
+	GError *error;
+} balde_app;
+
+balde_app* balde_app_init(void);
+void balde_app_free(balde_app *app);
+
+#endif /* _BALDE_APP_H */

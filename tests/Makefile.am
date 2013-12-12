@@ -1,8 +1,12 @@
 check_PROGRAMS = \
+	check_app \
 	check_routing
 
 TESTS = \
 	$(check_PROGRAMS)
+
+check_app_SOURCES = \
+	check_app.c
 
 check_routing_SOURCES = \
 	check_routing.c

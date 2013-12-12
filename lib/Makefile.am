@@ -1,6 +1,7 @@
 lib_LTLIBRARIES = libbalde.la
 
 libbalde_la_SOURCES = \
+	app.c \
 	routing.c
 
 libbalde_la_CFLAGS = \
