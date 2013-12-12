@@ -1,3 +1,4 @@
 pkginclude_HEADERS = \
 	app.h \
-	routing.h
+	routing.h \
+	wrappers.h

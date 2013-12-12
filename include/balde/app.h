@@ -10,14 +10,27 @@
 #define _BALDE_APP_H
 
 #include <glib.h>
+#include <balde/app.h>
+#include <balde/routing.h>
+#include <balde/wrappers.h>
 
 typedef struct {
-	GHashTable *views;
-	GHashTable *config;
-	GError *error;
-} balde_app;
+    GSList *views;
+    GHashTable *config;
+    GError *error;
+} balde_app_t;
 
-balde_app* balde_app_init(void);
-void balde_app_free(balde_app *app);
+typedef balde_response_t* (*balde_view_func_t) (balde_app_t*, balde_request_t*);
+
+typedef struct {
+    balde_url_rule_t *url_rule;
+    balde_view_func_t view_func;
+} balde_view_t;
+
+balde_app_t* balde_app_init(void);
+void balde_app_free_views(balde_view_t *view);
+void balde_app_free(balde_app_t *app);
+void balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint,
+    const gchar *rule, balde_view_func_t view_func);
 
 #endif /* _BALDE_APP_H */
