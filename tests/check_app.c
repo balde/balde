@@ -46,7 +46,7 @@ test_app_add_url_rule(void)
     balde_app_t *app = balde_app_init();
     balde_app_add_url_rule(app, "arcoiro", "/arcoiro/", &arcoiro_view);
     g_assert(g_slist_length(app->views) == 1);
-    balde_view_t *view = g_slist_next(app->views)->data;
+    balde_view_t *view = app->views->data;
     g_assert(view != NULL);
     g_assert(view->url_rule != NULL);
     g_assert_cmpstr(view->url_rule->endpoint, ==, "arcoiro");

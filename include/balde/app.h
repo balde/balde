@@ -32,5 +32,6 @@ void balde_app_free_views(balde_view_t *view);
 void balde_app_free(balde_app_t *app);
 void balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint,
     const gchar *rule, balde_view_func_t view_func);
+void balde_app_run(balde_app_t *app);
 
 #endif /* _BALDE_APP_H */

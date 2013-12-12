@@ -11,7 +11,10 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
+#include <locale.h>
 #include <balde/app.h>
+#include <balde/cgi.h>
+#include <balde/routing.h>
 
 
 balde_app_t*
@@ -56,4 +59,21 @@ balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rul
     view->url_rule->rule = rule;
     view->view_func = view_func;
     app->views = g_slist_append(app->views, view);
+}
+
+
+void
+balde_app_run(balde_app_t *app)
+{
+    setlocale(LC_ALL, "");
+    g_set_print_handler(balde_stdout_handler);
+    g_set_printerr_handler(balde_stderr_handler);
+
+BEGIN_LOOP
+
+
+
+END_LOOP
+
+    balde_app_free(app);
 }

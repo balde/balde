@@ -2,6 +2,7 @@ lib_LTLIBRARIES = libbalde.la
 
 libbalde_la_SOURCES = \
 	app.c \
+	cgi.c \
 	routing.c \
 	wrappers.c
 

@@ -6,12 +6,23 @@
  * See the file COPYING.
  */
 
-#ifndef _BALDE_H
-#define _BALDE_H
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif /* HAVE_CONFIG_H */
 
-#include <balde/app.h>
+#include <glib.h>
 #include <balde/cgi.h>
-#include <balde/routing.h>
-#include <balde/wrappers.h>
 
-#endif /* _BALDE_H */
+
+void
+balde_stdout_handler(const gchar *str)
+{
+    fprintf(stdout, "%s", (char*) str);
+}
+
+
+void
+balde_stderr_handler(const gchar *str)
+{
+    fprintf(stderr, "%s", (char*) str);
+}
