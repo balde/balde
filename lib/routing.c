@@ -11,6 +11,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
+#include <balde/app.h>
 #include <balde/routing.h>
 
 
@@ -60,11 +61,12 @@ point1:
 
 
 gchar*
-balde_dispatch_from_path(const balde_url_rule_t *rules, gchar *path,
-    GHashTable **matches)
+balde_dispatch_from_path(GSList *views, gchar *path, GHashTable **matches)
 {
-    for (guint i=0; rules[i].endpoint != NULL; i++)
-        if (balde_url_match(path, rules[i].rule, matches))
-            return g_strdup(rules[i].endpoint);
+    for (GSList *tmp = views; tmp != NULL; tmp = g_slist_next(tmp)) {
+        balde_view_t *view = tmp->data;
+        if (balde_url_match(path, view->url_rule->rule, matches))
+            return g_strdup(view->url_rule->endpoint);
+    }
     return NULL;
 }

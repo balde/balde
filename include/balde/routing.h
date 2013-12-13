@@ -17,7 +17,6 @@ typedef struct {
 } balde_url_rule_t;
 
 gboolean balde_url_match(gchar *path, const gchar *rule, GHashTable **matches);
-gchar* balde_dispatch_from_path(const balde_url_rule_t *rules,
-    gchar *path, GHashTable **matches);
+gchar* balde_dispatch_from_path(GSList *views, gchar *path, GHashTable **matches);
 
 #endif /* _BALDE_ROUTING_H */

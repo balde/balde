@@ -11,15 +11,39 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
+#include <balde/app.h>
 #include <balde/routing.h>
 
 
-const balde_url_rule_t rules[] = {
+static balde_url_rule_t rules[] = {
     {"home", "/"},
     {"user", "/user/<username>/"},
     {"customer", "/customer/<username>/contracts/"},
     {NULL, NULL}
 };
+
+
+GSList*
+get_test_views(void)
+{
+    GSList *views = NULL;
+    balde_view_t *view;
+    for (guint i=0; rules[i].endpoint != NULL; i++) {
+        view = g_new(balde_view_t, 1);
+        view->url_rule = &rules[i];
+        view->view_func = NULL;
+        views = g_slist_append(views, view);
+    }
+    return views;
+}
+
+
+void
+free_test_views(GSList* views)
+{
+    for (GSList *tmp = views; tmp != NULL; tmp = g_slist_next(tmp))
+        g_free(tmp->data);
+}
 
 
 void
@@ -128,23 +152,27 @@ test_url_no_match2(void)
 void
 test_url_rule(void)
 {
+    GSList *views = get_test_views();
     GHashTable *matches = NULL;
-    gchar* endpoint = balde_dispatch_from_path(rules, "/user/arcoiro/",
+    gchar* endpoint = balde_dispatch_from_path(views, "/user/arcoiro/",
         &matches);
     g_assert_cmpstr(endpoint, ==, "user");
     g_assert_cmpstr(g_hash_table_lookup(matches, "username"), ==, "arcoiro");
     g_hash_table_destroy(matches);
+    free_test_views(views);
 }
 
 
 void
 test_url_rule_not_found(void)
 {
+    GSList *views = get_test_views();
     GHashTable *matches = NULL;
-    gchar* endpoint = balde_dispatch_from_path(rules, "/bola/arcoiro/",
+    gchar* endpoint = balde_dispatch_from_path(views, "/bola/arcoiro/",
         &matches);
     g_assert(endpoint == NULL);
     g_assert(matches == NULL);
+    free_test_views(views);
 }
 
 
