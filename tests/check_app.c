@@ -51,8 +51,37 @@ test_app_add_url_rule(void)
     g_assert(view->url_rule != NULL);
     g_assert_cmpstr(view->url_rule->endpoint, ==, "arcoiro");
     g_assert_cmpstr(view->url_rule->rule, ==, "/arcoiro/");
+    i = 0;
     view->view_func(app, NULL);
     g_assert(i == 1);
+    balde_app_free(app);
+}
+
+
+void
+test_app_get_view_from_endpoint(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_app_add_url_rule(app, "arcoiro", "/arcoiro/", &arcoiro_view);
+    balde_view_t *view = balde_app_get_view_from_endpoint(app, "arcoiro");
+    g_assert(view != NULL);
+    g_assert(view->url_rule != NULL);
+    g_assert_cmpstr(view->url_rule->endpoint, ==, "arcoiro");
+    g_assert_cmpstr(view->url_rule->rule, ==, "/arcoiro/");
+    i = 0;
+    view->view_func(app, NULL);
+    g_assert(i == 1);
+    balde_app_free(app);
+}
+
+
+void
+test_app_get_view_from_endpoint_not_found(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_app_add_url_rule(app, "arcoiro", "/arcoiro/", &arcoiro_view);
+    balde_view_t *view = balde_app_get_view_from_endpoint(app, "bola");
+    g_assert(view == NULL);
     balde_app_free(app);
 }
 
@@ -62,5 +91,9 @@ main(int argc, char** argv)
 {
     g_test_init(&argc, &argv, NULL);
     g_test_add_func("/app/init", test_app_init);
+    g_test_add_func("/app/add_url_rule", test_app_add_url_rule);
+    g_test_add_func("/app/get_view_from_endpoint", test_app_get_view_from_endpoint);
+    g_test_add_func("/app/get_view_from_endpoint_not_found",
+        test_app_get_view_from_endpoint_not_found);
     return g_test_run();
 }
