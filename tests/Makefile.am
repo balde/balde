@@ -1,5 +1,6 @@
 check_PROGRAMS = \
 	check_app \
+	check_exceptions \
 	check_routing
 
 TESTS = \
@@ -7,6 +8,9 @@ TESTS = \
 
 check_app_SOURCES = \
 	check_app.c
+
+check_exceptions_SOURCES = \
+	check_exceptions.c
 
 check_routing_SOURCES = \
 	check_routing.c
