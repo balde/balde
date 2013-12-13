@@ -1,0 +1,9 @@
+language: c
+
+compiler:
+    - gcc
+    - clang
+
+install: sudo apt-get install libglib2.0-dev
+
+script: ./autogen.sh && ./configure && make check
