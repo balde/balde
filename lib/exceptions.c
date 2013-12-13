@@ -17,14 +17,14 @@
 
 const static balde_http_exception_t exceptions[] = {
     {
-        code: 400,
+        code: BALDE_HTTP_BAD_REQUEST,  // 400
         name: "Bad Request",
         description:
             "The browser (or proxy) sent a request that this server could "
             "not understand."
     },
     {
-        code: 401,
+        code: BALDE_HTTP_UNAUTHORIZED,  // 401
         name: "Unauthorized",
         description:
             "The server could not verify that you are authorized to access the "
@@ -33,27 +33,27 @@ const static balde_http_exception_t exceptions[] = {
             "the credentials required."
     },
     {
-        code: 403,
+        code: BALDE_HTTP_FORBIDDEN,  // 403
         name: "Forbidden",
         description:
             "You don't have the permission to access the requested resource. It "
             "is either read-protected or not readable by the server."
     },
     {
-        code: 404,
+        code: BALDE_HTTP_NOT_FOUND,  // 404
         name: "Not Found",
         description:
             "The requested URL was not found on the server. If you entered the "
             "URL manually please check your spelling and try again."
     },
     {
-        code: 405,
+        code: BALDE_HTTP_METHOD_NOT_ALLOWED,  // 405
         name: "Method Not Allowed",
         description:
             "The method is not allowed for the requested URL."
     },
     {
-        code: 406,
+        code: BALDE_HTTP_NOT_ACCEPTABLE,  // 406
         name: "Not Acceptable",
         description:
             "The resource identified by the request is only capable of generating "
@@ -61,21 +61,21 @@ const static balde_http_exception_t exceptions[] = {
             "according to the accept headers sent in the request."
     },
     {
-        code: 408,
+        code: BALDE_HTTP_REQUEST_TIMEOUT,  // 408
         name: "Request Timeout",
         description:
             "The server closed the network connection because the browser didn't "
             "finish the request within the specified time."
     },
     {
-        code: 409,
+        code: BALDE_HTTP_CONFLICT,  // 409
         name: "Conflict",
         description:
             "A conflict happened while processing the request. The resource might "
             "have been modified while the request was being processed."
     },
     {
-        code: 410,
+        code: BALDE_HTTP_GONE,  // 410
         name: "Gone",
         description:
             "The requested URL is no longer available on this server and there is "
@@ -83,81 +83,81 @@ const static balde_http_exception_t exceptions[] = {
             "please contact the author of this page."
     },
     {
-        code: 411,
+        code: BALDE_HTTP_LENGTH_REQUIRED,  // 411
         name: "Length Required",
         description:
             "A request with this method requires a valid Content-Length header."
     },
     {
-        code: 412,
+        code: BALDE_HTTP_PRECONDITION_FAILED,  // 412
         name: "Precondition Failed",
         description:
             "The precondition on the request for the URL failed positive evaluation."
     },
     {
-        code: 413,
+        code: BALDE_HTTP_REQUEST_ENTITY_TOO_LARGE,  // 413
         name: "Request Entity Too Large",
         description:
             "The data value transmitted exceeds the capacity limit."
     },
     {
-        code: 414,
+        code: BALDE_HTTP_REQUEST_URI_TOO_LONG,  // 414
         name: "Request URI Too Long",
         description:
             "The length of the requested URL exceeds the capacity limit for this "
             "server. The request cannot be processed."
     },
     {
-        code: 415,
+        code: BALDE_HTTP_UNSUPPORTED_MEDIA_TYPE,  // 415
         name: "Unsupported Media Type",
         description:
             "The server does not support the media type transmitted in the request."
     },
     {
-        code: 416,
+        code: BALDE_HTTP_REQUESTED_RANGE_NOT_SATISFIABLE,  // 416
         name: "Requested Range Not Satisfiable",
         description:
             "The server cannot provide the requested range."
     },
     {
-        code: 417,
+        code: BALDE_HTTP_EXPECTATION_FAILED,  // 417
         name: "Expectation Failed",
         description:
             "The server could not meet the requirements of the Expect header"
     },
     {
-        code: 418,
+        code: BALDE_HTTP_I_M_A_TEAPOT,  // 418
         name: "I'm a teapot",
         description: "This server is a teapot, not a coffee machine"
     },
     {
-        code: 422,
+        code: BALDE_HTTP_UNPROCESSABLE_ENTITY,  // 422
         name: "Unprocessable Entity",
         description:
             "The request was well-formed but was unable to be followed due to "
             "semantic errors."
     },
     {
-        code: 428,
+        code: BALDE_HTTP_PRECONDITION_REQUIRED,  // 428
         name: "Precondition Required",
         description:
             "This request is required to be conditional; try using \"If-Match\" "
             "or \"If-Unmodified-Since\"."
     },
     {
-        code: 429,
+        code: BALDE_HTTP_TOO_MANY_REQUESTS,  // 429
         name: "Too Many Requests",
         description:
             "This user has exceeded an allotted request count. Try again later."
     },
     {
-        code: 431,
+        code: BALDE_HTTP_REQUEST_HEADER_FIELDS_TOO_LARGE,  // 431
         name: "Request Header Fields Too Large",
         description:
             "One or more header fields exceeds the maximum size."
     },
     {
-        code: 500,
+        code: BALDE_HTTP_INTERNAL_SERVER_ERROR,  // 500
         name: "Internal Server Error",
         description:
             "The server encountered an internal error and was unable to complete "
@@ -165,19 +165,19 @@ const static balde_http_exception_t exceptions[] = {
             "in the application."
     },
     {
-        code: 501,
+        code: BALDE_HTTP_NOT_IMPLEMENTED,  // 501
         name: "Not Implemented",
         description:
             "The server does not support the action requested by the browser."
     },
     {
-        code: 502,
+        code: BALDE_HTTP_BAD_GATEWAY,  // 502
         name: "Bad Gateway",
         description:
             "The proxy server received an invalid response from an upstream server."
     },
     {
-        code: 503,
+        code: BALDE_HTTP_SERVICE_UNAVAILABLE,  // 503
         name: "Service Unavailable",
         description:
             "The server is temporarily unable to service your request due to "
