@@ -9,7 +9,7 @@ env:
 
 before_install:
   - wget http://ftp.gnome.org/pub/gnome/sources/glib/2.34/glib-$GLIB_VERSION.tar.xz
-  - tar -xvf glib-$GLIB_VERSION.tar.xz ~
+  - tar -xvf glib-$GLIB_VERSION.tar.xz -C ~
   - mkdir -p ~/glib/build
   - pushd ~/glib/build > /dev/null && ~/glib-$GLIB_VERSION/configure && popd > /dev/null
   - make -C ~/glib/build
