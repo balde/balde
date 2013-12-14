@@ -14,6 +14,7 @@
 #include <locale.h>
 #include <balde/app.h>
 #include <balde/cgi.h>
+#include <balde/exceptions.h>
 #include <balde/routing.h>
 #include <balde/wrappers.h>
 
@@ -82,9 +83,46 @@ balde_app_run(balde_app_t *app)
     g_set_print_handler(balde_stdout_handler);
     g_set_printerr_handler(balde_stderr_handler);
 
+    balde_response_t *response;
+    balde_response_t *error_response;
+    GHashTable *matches;
+
 BEGIN_LOOP
 
+    // render error, if any
+    error_response = balde_make_response_from_exception(app->error);
+    if (error_response != NULL) {
+        balde_response_print(error_response);
+        balde_response_free(error_response);
+        g_error_free(app->error);
+        app->error = NULL;
+        continue;
+    }
 
+    // get the view
+    gchar *endpoint = balde_dispatch_from_path(app->views,
+        (gchar*) g_getenv("PATH_INFO"), &matches);
+    if (endpoint == NULL) {  // no view found! :(
+        balde_abort(app, 404);
+    }
+    else {
+        // run the view
+        balde_view_t *view = balde_app_get_view_from_endpoint(app, endpoint);
+        response = view->view_func(app, NULL);
+    }
+
+    // get errors
+    error_response = balde_make_response_from_exception(app->error);
+    if (error_response != NULL) {
+        balde_response_print(error_response);
+        balde_response_free(error_response);
+        g_error_free(app->error);
+        app->error = NULL;
+        continue;
+    }
+
+    balde_response_print(response);
+    balde_response_free(response);
 
 END_LOOP
 

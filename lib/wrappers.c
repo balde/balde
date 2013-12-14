@@ -123,3 +123,10 @@ balde_response_render(balde_response_t *response)
     g_string_append(str, response->body->str);
     return g_string_free(str, FALSE);
 }
+
+
+void
+balde_response_print(balde_response_t *response)
+{
+    g_print("%s", balde_response_render(response));
+}
