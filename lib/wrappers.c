@@ -86,3 +86,40 @@ balde_make_response_from_exception(GError *error)
     balde_response_set_header(response, "Content-Type", "text/plain; charset=utf-8");
     return response;
 }
+
+
+void
+balde_fix_header_name(gchar *name)
+{
+    for (guint i = 0; name[i] != '\0'; i++)
+        if (i == 0 || name[i - 1] == '-')
+            name[i] = g_ascii_toupper(name[i]);
+}
+
+
+void
+balde_header_render(gchar *key, gchar *value, GString *str)
+{
+    balde_fix_header_name(key);
+    g_string_append_printf(str, "%s: %s\r\n", key, value);
+}
+
+
+gchar*
+balde_response_render(balde_response_t *response)
+{
+    if (response == NULL)
+        return NULL;
+    GString *str = g_string_new("");
+    if (response->status_code != 200)
+        g_string_append_printf(str, "Status: %d %s\r\n", response->status_code,
+            balde_exception_get_name_from_code(response->status_code));
+    gchar *len = g_strdup_printf("%zu", strlen(response->body->str));
+    // we shouldn't trust response->body->len
+    balde_response_set_header(response, "Content-Length", len);
+    g_free(len);
+    g_hash_table_foreach(response->headers, (GHFunc) balde_header_render, str);
+    g_string_append(str, "\r\n");
+    g_string_append(str, response->body->str);
+    return g_string_free(str, FALSE);
+}

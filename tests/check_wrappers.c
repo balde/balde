@@ -98,6 +98,45 @@ test_response_append_body(void)
 }
 
 
+void
+test_fix_header_name(void)
+{
+    gchar foo[] = "content-type-lol";
+    balde_fix_header_name(foo);
+    g_assert_cmpstr(foo, ==, "Content-Type-Lol");
+}
+
+
+void
+test_response_render(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    gchar *out = balde_response_render(res);
+    g_assert_cmpstr(out, ==,
+        "Content-Type: text/html; charset=utf-8\r\nContent-Length: 3\r\n\r\nlol");
+}
+
+
+void
+test_response_render_exception(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_abort(app, 404);
+    balde_response_t *res = balde_make_response_from_exception(app->error);
+    g_assert(res != NULL);
+    gchar *out = balde_response_render(res);
+    g_assert_cmpstr(out, ==,
+        "Status: 404 Not Found\r\n"
+        "Content-Type: text/plain; charset=utf-8\r\n"
+        "Content-Length: 143\r\n"
+        "\r\n"
+        "Error: 404 Not Found\n\nThe requested URL was not found on the server. "
+        "If you entered the URL manually please check your spelling and try again.\n");
+    balde_response_free(res);
+    balde_app_free(app);
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -113,5 +152,9 @@ main(int argc, char** argv)
         test_response_set_headers);
     g_test_add_func("/wrappers/response_append_body",
         test_response_append_body);
+    g_test_add_func("/wrappers/fix_header_name", test_fix_header_name);
+    g_test_add_func("/wrappers/response_render", test_response_render);
+    g_test_add_func("/wrappers/response_render_exception",
+        test_response_render_exception);
     return g_test_run();
 }

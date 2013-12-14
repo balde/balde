@@ -15,6 +15,7 @@
 #include <balde/app.h>
 #include <balde/cgi.h>
 #include <balde/routing.h>
+#include <balde/wrappers.h>
 
 
 balde_app_t*

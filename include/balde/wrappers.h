@@ -27,5 +27,8 @@ void balde_response_append_body(balde_response_t *response, gchar *content);
 balde_response_t* balde_make_response(gchar *content);
 void balde_response_free(balde_response_t *response);
 balde_response_t* balde_make_response_from_exception(GError *error);
+void balde_fix_header_name(gchar *name);
+void balde_header_render(gchar *key, gchar *value, GString *str);
+gchar* balde_response_render(balde_response_t *response);
 
 #endif /* _BALDE_WRAPPERS_H */
