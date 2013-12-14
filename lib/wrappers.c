@@ -134,3 +134,27 @@ balde_response_print(balde_response_t *response)
     g_print("%s", resp);
     g_free(resp);
 }
+
+
+GHashTable*
+balde_request_headers(void)
+{
+    gchar **headers = g_listenv();
+    GHashTable *rv = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    for (guint i = 0; headers[i] != NULL; i++) {
+        if (g_str_has_prefix(headers[i], "HTTP_")) {
+            gchar *key = g_new(gchar, strlen(headers[i]) - 4);
+            guint j;
+            for (j = 0; headers[i][j+5] != '\0'; j++) {
+                key[j] = headers[i][j+5];
+                if (key[j] == '_')
+                    key[j] = '-';
+                key[j] = g_ascii_tolower(key[j]);
+            }
+            key[j] = '\0';
+            g_hash_table_insert(rv, key, g_strdup(g_getenv(headers[i])));
+        }
+    }
+    g_strfreev(headers);
+    return rv;
+}

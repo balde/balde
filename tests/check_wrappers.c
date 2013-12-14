@@ -140,6 +140,20 @@ test_response_render_exception(void)
 }
 
 
+void
+test_request_headers(void)
+{
+    g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
+    g_setenv("HTTP_XD_KKK", "asdf", TRUE);
+    // FIXME: this thing is too weak :(
+    GHashTable *headers = balde_request_headers();
+    g_assert(g_hash_table_size(headers) == 2);
+    g_assert_cmpstr(g_hash_table_lookup(headers, "lol-hehe"), ==, "12345");
+    g_assert_cmpstr(g_hash_table_lookup(headers, "xd-kkk"), ==, "asdf");
+    g_hash_table_destroy(headers);
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -159,5 +173,6 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/response_render", test_response_render);
     g_test_add_func("/wrappers/response_render_exception",
         test_response_render_exception);
+    g_test_add_func("/wrappers/request_headers", test_request_headers);
     return g_test_run();
 }
