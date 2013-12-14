@@ -1,3 +1,5 @@
+if BUILD_EXAMPLES
+
 noinst_PROGRAMS = \
 	hello
 
@@ -12,3 +14,5 @@ AM_CFLAGS = \
 AM_LDFLAGS = \
 	$(GLIB_LIBS) \
 	$(top_builddir)/lib/libbalde.la
+
+endif
