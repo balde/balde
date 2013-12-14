@@ -114,6 +114,8 @@ test_response_render(void)
     gchar *out = balde_response_render(res);
     g_assert_cmpstr(out, ==,
         "Content-Type: text/html; charset=utf-8\r\nContent-Length: 3\r\n\r\nlol");
+    g_free(out);
+    balde_response_free(res);
 }
 
 
@@ -132,6 +134,7 @@ test_response_render_exception(void)
         "\r\n"
         "Error: 404 Not Found\n\nThe requested URL was not found on the server. "
         "If you entered the URL manually please check your spelling and try again.\n");
+    g_free(out);
     balde_response_free(res);
     balde_app_free(app);
 }

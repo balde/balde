@@ -43,6 +43,7 @@ free_test_views(GSList* views)
 {
     for (GSList *tmp = views; tmp != NULL; tmp = g_slist_next(tmp))
         g_free(tmp->data);
+    g_slist_free(views);
 }
 
 
@@ -158,6 +159,7 @@ test_url_rule(void)
         &matches);
     g_assert_cmpstr(endpoint, ==, "user");
     g_assert_cmpstr(g_hash_table_lookup(matches, "username"), ==, "arcoiro");
+    g_free(endpoint);
     g_hash_table_destroy(matches);
     free_test_views(views);
 }

@@ -40,7 +40,8 @@ balde_url_match(gchar *path, const gchar *rule, GHashTable **matches)
                 g_hash_table_destroy(*matches);
                 *matches = NULL;
                 match = FALSE;
-                goto point3;
+                g_match_info_free(match_info);
+                goto point2;
             }
         }
         else {
@@ -48,14 +49,13 @@ balde_url_match(gchar *path, const gchar *rule, GHashTable **matches)
             g_hash_table_insert(*matches, key, g_strdup(path_pieces[i]));
         }
         match = TRUE;
+        g_match_info_free(match_info);
     }
-point3:
-    g_match_info_free(match_info);
-    g_regex_unref(re_variables);
 point2:
+    g_regex_unref(re_variables);
+point1:
     g_strfreev(rule_pieces);
     g_strfreev(path_pieces);
-point1:
     return match;
 }
 

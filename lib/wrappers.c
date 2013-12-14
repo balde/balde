@@ -79,8 +79,10 @@ balde_make_response_from_exception(GError *error)
     }
     else
         new_description = g_strdup(balde_exception_get_description_from_code(status_code));
-    balde_response_t *response = balde_make_response(g_strdup_printf(
-        "Error: %d %s\n\n%s\n", status_code, name, new_description));
+    gchar *content = g_strdup_printf(
+        "Error: %d %s\n\n%s\n", status_code, name, new_description);
+    balde_response_t *response = balde_make_response(content);
+    g_free(content);
     g_free(new_description);
     response->status_code = status_code;
     balde_response_set_header(response, "Content-Type", "text/plain; charset=utf-8");
