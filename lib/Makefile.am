@@ -14,4 +14,5 @@ libbalde_la_CFLAGS = \
 
 libbalde_la_LDFLAGS = \
 	$(AM_LDADD) \
+	$(GLIB_LIBS) \
 	-version-info $(LT_VERSION_INFO)
