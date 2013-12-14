@@ -83,39 +83,40 @@ balde_app_run(balde_app_t *app)
     g_set_print_handler(balde_stdout_handler);
     g_set_printerr_handler(balde_stderr_handler);
 
+    balde_request_t *request;
     balde_response_t *response;
     balde_response_t *error_response;
-    GHashTable *matches;
+    gchar *endpoint;
 
 BEGIN_LOOP
 
-    // render error, if any
-    error_response = balde_make_response_from_exception(app->error);
-    if (error_response != NULL) {
+    // render startup error, if any
+    if (app->error != NULL) {
+        error_response = balde_make_response_from_exception(app->error);
         balde_response_print(error_response);
         balde_response_free(error_response);
-        g_error_free(app->error);
-        app->error = NULL;
         continue;
     }
 
+    request = balde_make_request();
+
     // get the view
-    gchar *endpoint = balde_dispatch_from_path(app->views,
-        (gchar*) g_getenv("PATH_INFO"), &matches);
+    endpoint = balde_dispatch_from_path(app->views,
+        request->path, &(request->view_args));
     if (endpoint == NULL) {  // no view found! :(
         balde_abort(app, 404);
     }
     else {
         // run the view
         balde_view_t *view = balde_app_get_view_from_endpoint(app, endpoint);
-        response = view->view_func(app, NULL);
+        response = view->view_func(app, request);
         g_free(endpoint);
-        g_hash_table_destroy(matches);
     }
 
-    // get errors
-    error_response = balde_make_response_from_exception(app->error);
-    if (error_response != NULL) {
+    balde_request_free(request);
+
+    if (app->error != NULL) {
+        error_response = balde_make_response_from_exception(app->error);
         balde_response_print(error_response);
         balde_response_free(error_response);
         g_error_free(app->error);

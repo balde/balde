@@ -158,3 +158,27 @@ balde_request_headers(void)
     g_strfreev(headers);
     return rv;
 }
+
+
+balde_request_t*
+balde_make_request(void)
+{
+    balde_request_t *request = g_new(balde_request_t, 1);
+    request->path = g_strdup(g_getenv("PATH_INFO"));
+    request->headers = balde_request_headers();
+    request->view_args = NULL;
+    return request;
+}
+
+
+void
+balde_request_free(balde_request_t *request)
+{
+    if (request == NULL)
+        return;
+    g_free(request->path);
+    g_hash_table_destroy(request->headers);
+    if (request->view_args != NULL)
+        g_hash_table_destroy(request->view_args);
+    g_free(request);
+}

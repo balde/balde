@@ -12,6 +12,7 @@
 #include <glib.h>
 
 typedef struct {
+    GHashTable *view_args;
     GHashTable *headers;
     gchar* path;
 } balde_request_t;
@@ -32,5 +33,7 @@ void balde_header_render(gchar *key, gchar *value, GString *str);
 gchar* balde_response_render(balde_response_t *response);
 void balde_response_print(balde_response_t *response);
 GHashTable* balde_request_headers(void);
+balde_request_t* balde_make_request(void);
+void balde_request_free(balde_request_t *request);
 
 #endif /* _BALDE_WRAPPERS_H */
