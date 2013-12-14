@@ -22,4 +22,10 @@ typedef struct {
     GString *body;
 } balde_response_t;
 
+void balde_response_set_header(balde_response_t *response, gchar *name, gchar *value);
+void balde_response_append_body(balde_response_t *response, gchar *content);
+balde_response_t* balde_make_response(gchar *content);
+void balde_response_free(balde_response_t *response);
+balde_response_t* balde_make_response_from_exception(GError *error);
+
 #endif /* _BALDE_WRAPPERS_H */
