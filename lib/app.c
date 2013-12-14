@@ -109,6 +109,8 @@ BEGIN_LOOP
         // run the view
         balde_view_t *view = balde_app_get_view_from_endpoint(app, endpoint);
         response = view->view_func(app, NULL);
+        g_free(endpoint);
+        g_hash_table_destroy(matches);
     }
 
     // get errors
@@ -126,5 +128,4 @@ BEGIN_LOOP
 
 END_LOOP
 
-    balde_app_free(app);
 }

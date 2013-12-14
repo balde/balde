@@ -130,5 +130,7 @@ balde_response_render(balde_response_t *response)
 void
 balde_response_print(balde_response_t *response)
 {
-    g_print("%s", balde_response_render(response));
+    gchar *resp = balde_response_render(response);
+    g_print("%s", resp);
+    g_free(resp);
 }

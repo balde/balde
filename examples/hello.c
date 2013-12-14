@@ -8,9 +8,11 @@ hello(balde_app_t *app, balde_request_t *request)
 }
 
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
     balde_app_t *app = balde_app_init();
     balde_app_add_url_rule(app, "hello", "/", hello);
     balde_app_run(app);
+    balde_app_free(app);
 }
