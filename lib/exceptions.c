@@ -13,6 +13,7 @@
 #include <glib.h>
 #include <balde/app.h>
 #include <balde/exceptions.h>
+#include <balde/wrappers.h>
 
 
 const static balde_http_exception_t exceptions[] = {
@@ -215,11 +216,21 @@ balde_exception_get_description_from_code(balde_http_exception_code_t code)
 
 
 void
-balde_abort(balde_app_t *app, balde_http_exception_code_t code)
+balde_abort_set_error(balde_app_t *app, balde_http_exception_code_t code)
 {
     g_propagate_error(&(app->error),
         g_error_new(balde_http_exception_quark(), code,
             "%d %s: %s", code,
             balde_exception_get_name_from_code(code),
             balde_exception_get_description_from_code(code)));
+}
+
+
+balde_response_t*
+balde_abort(balde_app_t *app, balde_http_exception_code_t code)
+{
+    balde_abort_set_error(app, code);
+    if (app->error != NULL)
+        return balde_make_response_from_exception(app->error);
+    return NULL;
 }

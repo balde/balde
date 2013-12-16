@@ -10,6 +10,7 @@
 #define _BALDE_EXCEPTIONS_H
 
 #include <glib.h>
+#include <balde/wrappers.h>
 
 typedef enum {
     BALDE_HTTP_BAD_REQUEST = 400,
@@ -47,6 +48,7 @@ typedef struct {
 
 const gchar* balde_exception_get_name_from_code(balde_http_exception_code_t code);
 const gchar* balde_exception_get_description_from_code(balde_http_exception_code_t code);
-void balde_abort(balde_app_t *app, balde_http_exception_code_t code);
+void balde_abort_set_error(balde_app_t *app, balde_http_exception_code_t code);
+balde_response_t* balde_abort(balde_app_t *app, balde_http_exception_code_t code);
 
 #endif /* _BALDE_EXCEPTIONS_H */

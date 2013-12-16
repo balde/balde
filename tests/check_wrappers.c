@@ -34,7 +34,7 @@ void
 test_make_response_from_exception(void)
 {
     balde_app_t *app = balde_app_init();
-    balde_abort(app, 404);
+    balde_abort_set_error(app, 404);
     balde_response_t *res = balde_make_response_from_exception(app->error);
     g_assert(res != NULL);
     g_assert(res->status_code == 404);
@@ -61,7 +61,7 @@ void
 test_make_response_from_external_exception(void)
 {
     balde_app_t *app = balde_app_init();
-    balde_abort(app, 1024);
+    balde_abort_set_error(app, 1024);
     balde_response_t *res = balde_make_response_from_exception(app->error);
     g_assert(res != NULL);
     g_assert(res->status_code == 500);
@@ -123,7 +123,7 @@ void
 test_response_render_exception(void)
 {
     balde_app_t *app = balde_app_init();
-    balde_abort(app, 404);
+    balde_abort_set_error(app, 404);
     balde_response_t *res = balde_make_response_from_exception(app->error);
     g_assert(res != NULL);
     gchar *out = balde_response_render(res);

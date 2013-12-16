@@ -104,7 +104,7 @@ BEGIN_LOOP
     endpoint = balde_dispatch_from_path(app->views,
         request->path, &(request->view_args));
     if (endpoint == NULL) {  // no view found! :(
-        balde_abort(app, 404);
+        response = balde_abort(app, 404);
     }
     else {
         // run the view
