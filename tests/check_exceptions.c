@@ -13,6 +13,7 @@
 #include <glib.h>
 #include <balde/app.h>
 #include <balde/exceptions.h>
+#include <balde/wrappers.c>
 
 
 void
