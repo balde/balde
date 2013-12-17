@@ -154,6 +154,35 @@ test_request_headers(void)
 }
 
 
+void
+test_make_request(void)
+{
+    g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
+    g_setenv("HTTP_XD_KKK", "asdf", TRUE);
+    g_setenv("PATH_INFO", "/", TRUE);
+    // FIXME: this thing is too weak :(
+    balde_request_t *request = balde_make_request();
+    g_assert_cmpstr(request->path, ==, "/");
+    g_assert(g_hash_table_size(request->headers) == 2);
+    g_assert(request->view_args == NULL);
+    balde_request_free(request);
+}
+
+
+void
+test_request_get_header(void)
+{
+    g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
+    g_setenv("HTTP_XD_KKK", "asdf", TRUE);
+    // FIXME: this thing is too weak :(
+    balde_request_t *request = balde_make_request();
+    g_assert_cmpstr(balde_request_get_header(request, "Lol-Hehe"), ==, "12345");
+    g_assert_cmpstr(balde_request_get_header(request, "XD-KKK"), ==, "asdf");
+    g_assert(balde_request_get_header(request, "foo") == NULL);
+    balde_request_free(request);
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -174,5 +203,7 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/response_render_exception",
         test_response_render_exception);
     g_test_add_func("/wrappers/request_headers", test_request_headers);
+    g_test_add_func("/wrappers/make_request", test_make_request);
+    g_test_add_func("/wrappers/request_get_header", test_request_get_header);
     return g_test_run();
 }

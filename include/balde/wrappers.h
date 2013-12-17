@@ -34,6 +34,7 @@ gchar* balde_response_render(balde_response_t *response);
 void balde_response_print(balde_response_t *response);
 GHashTable* balde_request_headers(void);
 balde_request_t* balde_make_request(void);
+gchar* balde_request_get_header(balde_request_t *request, gchar *name);
 void balde_request_free(balde_request_t *request);
 
 #endif /* _BALDE_WRAPPERS_H */

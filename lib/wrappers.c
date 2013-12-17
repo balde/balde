@@ -171,6 +171,20 @@ balde_make_request(void)
 }
 
 
+gchar*
+balde_request_get_header(balde_request_t *request, gchar *name)
+{
+    gchar *l_name = g_strdup(name);
+    guint i;
+    for (i = 0; name[i] != '\0'; i++)
+        l_name[i] = g_ascii_tolower(l_name[i]);
+    l_name[i] = '\0';
+    gchar *value = g_hash_table_lookup(request->headers, l_name);
+    g_free(l_name);
+    return value;
+}
+
+
 void
 balde_request_free(balde_request_t *request)
 {
