@@ -61,11 +61,13 @@ point1:
 
 
 gchar*
-balde_dispatch_from_path(GSList *views, gchar *path, GHashTable **matches)
+balde_dispatch_from_path(GSList *views, gchar *path, const gchar *method,
+    GHashTable **matches)
 {
     for (GSList *tmp = views; tmp != NULL; tmp = g_slist_next(tmp)) {
         balde_view_t *view = tmp->data;
-        if (balde_url_match(path, view->url_rule->rule, matches))
+        if (balde_url_match(path, view->url_rule->rule, matches) &&
+                g_strcmp0(method, view->url_rule->method) == 0)
             return g_strdup(view->url_rule->endpoint);
     }
     return NULL;

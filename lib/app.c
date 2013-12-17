@@ -102,7 +102,7 @@ BEGIN_LOOP
 
     // get the view
     endpoint = balde_dispatch_from_path(app->views,
-        request->path, &(request->view_args));
+        request->path, request->method, &(request->view_args));
     if (endpoint == NULL) {  // no view found! :(
         response = balde_abort(app, 404);
     }

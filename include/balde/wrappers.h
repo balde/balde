@@ -14,7 +14,8 @@
 typedef struct {
     GHashTable *view_args;
     GHashTable *headers;
-    gchar* path;
+    gchar *path;
+    gchar *method;
 } balde_request_t;
 
 typedef struct {

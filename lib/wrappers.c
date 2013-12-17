@@ -164,7 +164,14 @@ balde_request_t*
 balde_make_request(void)
 {
     balde_request_t *request = g_new(balde_request_t, 1);
-    request->path = g_strdup(g_getenv("PATH_INFO"));
+    const gchar *path = g_getenv("PATH_INFO");
+    if (path == NULL)
+        path = "/";
+    request->path = g_strdup(path);
+    const gchar *method = g_getenv("REQUEST_METHOD");
+    if (method == NULL)
+        method = "GET";
+    request->method = g_strdup(method);
     request->headers = balde_request_headers();
     request->view_args = NULL;
     return request;
@@ -191,6 +198,7 @@ balde_request_free(balde_request_t *request)
     if (request == NULL)
         return;
     g_free(request->path);
+    g_free(request->method);
     g_hash_table_destroy(request->headers);
     if (request->view_args != NULL)
         g_hash_table_destroy(request->view_args);

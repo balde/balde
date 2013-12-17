@@ -16,10 +16,10 @@
 
 
 static balde_url_rule_t rules[] = {
-    {"home", "/"},
-    {"user", "/user/<username>/"},
-    {"customer", "/customer/<username>/contracts/"},
-    {NULL, NULL}
+    {"home", "/", "GET"},
+    {"user", "/user/<username>/", "POST"},
+    {"customer", "/customer/<username>/contracts/", "GET"},
+    {NULL, NULL, NULL}
 };
 
 
@@ -156,10 +156,13 @@ test_url_rule(void)
     GSList *views = get_test_views();
     GHashTable *matches = NULL;
     gchar* endpoint = balde_dispatch_from_path(views, "/user/arcoiro/",
-        &matches);
+        "POST", &matches);
     g_assert_cmpstr(endpoint, ==, "user");
     g_assert_cmpstr(g_hash_table_lookup(matches, "username"), ==, "arcoiro");
     g_free(endpoint);
+    g_hash_table_destroy(matches);
+    g_assert(balde_dispatch_from_path(views, "/user/arcoiro/", "GET",
+        &matches) == NULL);
     g_hash_table_destroy(matches);
     free_test_views(views);
 }
@@ -171,7 +174,7 @@ test_url_rule_not_found(void)
     GSList *views = get_test_views();
     GHashTable *matches = NULL;
     gchar* endpoint = balde_dispatch_from_path(views, "/bola/arcoiro/",
-        &matches);
+        "GET", &matches);
     g_assert(endpoint == NULL);
     g_assert(matches == NULL);
     free_test_views(views);

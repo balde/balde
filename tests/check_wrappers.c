@@ -163,6 +163,7 @@ test_make_request(void)
     // FIXME: this thing is too weak :(
     balde_request_t *request = balde_make_request();
     g_assert_cmpstr(request->path, ==, "/");
+    g_assert_cmpstr(request->method, ==, "GET");
     g_assert(g_hash_table_size(request->headers) == 2);
     g_assert(request->view_args == NULL);
     balde_request_free(request);
