@@ -44,13 +44,14 @@ void
 test_app_add_url_rule(void)
 {
     balde_app_t *app = balde_app_init();
-    balde_app_add_url_rule(app, "arcoiro", "/arcoiro/", &arcoiro_view);
+    balde_app_add_url_rule(app, "arcoiro", "/arcoiro/", "POST", &arcoiro_view);
     g_assert(g_slist_length(app->views) == 1);
     balde_view_t *view = app->views->data;
     g_assert(view != NULL);
     g_assert(view->url_rule != NULL);
     g_assert_cmpstr(view->url_rule->endpoint, ==, "arcoiro");
     g_assert_cmpstr(view->url_rule->rule, ==, "/arcoiro/");
+    g_assert_cmpstr(view->url_rule->method, ==, "POST");
     i = 0;
     view->view_func(app, NULL);
     g_assert(i == 1);
@@ -62,12 +63,13 @@ void
 test_app_get_view_from_endpoint(void)
 {
     balde_app_t *app = balde_app_init();
-    balde_app_add_url_rule(app, "arcoiro", "/arcoiro/", &arcoiro_view);
+    balde_app_add_url_rule(app, "arcoiro", "/arcoiro/", "GET", &arcoiro_view);
     balde_view_t *view = balde_app_get_view_from_endpoint(app, "arcoiro");
     g_assert(view != NULL);
     g_assert(view->url_rule != NULL);
     g_assert_cmpstr(view->url_rule->endpoint, ==, "arcoiro");
     g_assert_cmpstr(view->url_rule->rule, ==, "/arcoiro/");
+    g_assert_cmpstr(view->url_rule->method, ==, "GET");
     i = 0;
     view->view_func(app, NULL);
     g_assert(i == 1);
@@ -79,7 +81,7 @@ void
 test_app_get_view_from_endpoint_not_found(void)
 {
     balde_app_t *app = balde_app_init();
-    balde_app_add_url_rule(app, "arcoiro", "/arcoiro/", &arcoiro_view);
+    balde_app_add_url_rule(app, "arcoiro", "/arcoiro/", "GET", &arcoiro_view);
     balde_view_t *view = balde_app_get_view_from_endpoint(app, "bola");
     g_assert(view == NULL);
     balde_app_free(app);

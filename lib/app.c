@@ -53,12 +53,13 @@ balde_app_free(balde_app_t *app)
 
 void
 balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rule,
-    balde_view_func_t view_func)
+    const gchar *method, balde_view_func_t view_func)
 {
     balde_view_t *view = g_new(balde_view_t, 1);
     view->url_rule = g_new(balde_url_rule_t, 1);
     view->url_rule->endpoint = endpoint;
     view->url_rule->rule = rule;
+    view->url_rule->method = method;
     view->view_func = view_func;
     app->views = g_slist_append(app->views, view);
 }
