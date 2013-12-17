@@ -76,6 +76,7 @@ test_abort(void)
     g_assert(res->status_code == 404);
     g_assert_cmpstr(g_hash_table_lookup(res->headers, "content-type"), ==,
         "text/plain; charset=utf-8");
+    balde_response_free(res);
     balde_app_free(app);
 }
 
