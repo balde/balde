@@ -51,6 +51,7 @@ PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.34])
 
 AC_CONFIG_FILES([
     Makefile
+    bin/Makefile
     examples/Makefile
     include/Makefile
     include/balde/Makefile
