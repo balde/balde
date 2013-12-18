@@ -12,7 +12,6 @@
 
 #include <glib.h>
 #include <string.h>
-#include <balde/app.h>
 #include <balde/exceptions.h>
 #include <balde/wrappers.h>
 

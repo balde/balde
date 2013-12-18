@@ -10,6 +10,7 @@
 #define _BALDE_EXCEPTIONS_H
 
 #include <glib.h>
+#include <balde/app.h>
 #include <balde/wrappers.h>
 
 typedef enum {
