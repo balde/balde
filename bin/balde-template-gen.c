@@ -43,16 +43,18 @@ generate_source(const gchar *template_name, const gchar *template_source)
         "#include <glib.h>\n"
         "#include <stdarg.h>\n"
         "\n"
+        "const gchar *balde_template_%s_format = \"%s\";\n"
+        "\n"
         "void\n"
         "balde_template_%s(balde_response_t *response, ...)\n"
         "{\n"
         "    va_list args;\n"
         "    va_start(args, response);\n"
-        "    gchar *rv = g_strdup_vprintf(\"%s\", args);\n"
+        "    gchar *rv = g_strdup_vprintf(balde_template_%s_format, args);\n"
         "    balde_response_append_body(response, rv);\n"
         "    g_free(rv);\n"
         "    va_end(args);\n"
-        "}\n", template_name, escaped_source);
+        "}\n", template_name, escaped_source, template_name, template_name);
     g_free(escaped_source);
     return rv;
 }
@@ -69,9 +71,10 @@ generate_header(const gchar *template_name)
         "\n"
         "#include <balde.h>\n"
         "\n"
+        "const gchar *balde_template_%s_format;\n"
         "void balde_template_%s(balde_response_t *response, ...);\n"
         "\n"
-        "#endif\n", template_name, template_name, template_name);
+        "#endif\n", template_name, template_name, template_name, template_name);
 }
 
 
