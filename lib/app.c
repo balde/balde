@@ -108,23 +108,30 @@ BEGIN_LOOP
     with_body = ! (request->method & BALDE_HTTP_HEAD);
 
     // get the view
-    endpoint = balde_dispatch_from_path(app->views,
-        request->path, request->method, &(request->view_args));
+    endpoint = balde_dispatch_from_path(app->views, request->path,
+        &(request->view_args));
     if (endpoint == NULL) {  // no view found! :(
-        balde_abort_set_error(app,
-            request->method == BALDE_HTTP_NONE ? 405 : 404);
+        balde_abort_set_error(app, 404);
     }
     else {
-        // run the view
+        // validate http method
         balde_view_t *view = balde_app_get_view_from_endpoint(app, endpoint);
-        if (request->method == BALDE_HTTP_OPTIONS) {
-            response = balde_make_response("");
-            gchar *allow = balde_list_allowed_methods(view->url_rule->method);
-            balde_response_set_header(response, "Allow", allow);
-            g_free(allow);
+        if (request->method & view->url_rule->method) {
+            // answer OPTIONS automatically
+            if (request->method == BALDE_HTTP_OPTIONS) {
+                response = balde_make_response("");
+                gchar *allow = balde_list_allowed_methods(view->url_rule->method);
+                balde_response_set_header(response, "Allow", allow);
+                g_free(allow);
+            }
+            // run the view
+            else {
+                response = view->view_func(app, request);
+            }
         }
+        // method not allowed
         else {
-            response = view->view_func(app, request);
+            balde_abort_set_error(app, 405);
         }
         g_free(endpoint);
     }

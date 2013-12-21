@@ -156,14 +156,10 @@ test_url_rule(void)
 {
     GSList *views = get_test_views();
     GHashTable *matches = NULL;
-    gchar* endpoint = balde_dispatch_from_path(views, "/user/arcoiro/",
-        BALDE_HTTP_POST, &matches);
+    gchar* endpoint = balde_dispatch_from_path(views, "/user/arcoiro/", &matches);
     g_assert_cmpstr(endpoint, ==, "user");
     g_assert_cmpstr(g_hash_table_lookup(matches, "username"), ==, "arcoiro");
     g_free(endpoint);
-    g_hash_table_destroy(matches);
-    g_assert(balde_dispatch_from_path(views, "/user/arcoiro/", BALDE_HTTP_GET,
-        &matches) == NULL);
     g_hash_table_destroy(matches);
     free_test_views(views);
 }
@@ -174,8 +170,7 @@ test_url_rule_not_found(void)
 {
     GSList *views = get_test_views();
     GHashTable *matches = NULL;
-    gchar* endpoint = balde_dispatch_from_path(views, "/bola/arcoiro/",
-        BALDE_HTTP_GET, &matches);
+    gchar* endpoint = balde_dispatch_from_path(views, "/bola/arcoiro/", &matches);
     g_assert(endpoint == NULL);
     g_assert(matches == NULL);
     free_test_views(views);
@@ -188,13 +183,7 @@ test_url_rule_with_multiple_methods(void)
     GSList *views = get_test_views();
     GHashTable *matches = NULL;
     gchar* endpoint;
-    endpoint = balde_dispatch_from_path(views, "/policies/", BALDE_HTTP_POST,
-        &matches);
-    g_assert_cmpstr(endpoint, ==, "policy");
-    g_free(endpoint);
-    g_hash_table_destroy(matches);
-    endpoint = balde_dispatch_from_path(views, "/policies/", BALDE_HTTP_GET,
-        &matches);
+    endpoint = balde_dispatch_from_path(views, "/policies/", &matches);
     g_assert_cmpstr(endpoint, ==, "policy");
     g_free(endpoint);
     g_hash_table_destroy(matches);
