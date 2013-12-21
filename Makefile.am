@@ -1,9 +1,9 @@
 SUBDIRS = \
 	lib \
 	include \
+	bin \
 	examples \
-	tests \
-	bin
+	tests
 
 ACLOCAL_AMFLAGS = -I m4
 
