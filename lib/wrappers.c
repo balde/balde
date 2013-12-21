@@ -168,9 +168,20 @@ balde_make_request(void)
         path = "/";
     request->path = g_strdup(path);
     const gchar *method = g_getenv("REQUEST_METHOD");
-    if (method == NULL)
-        method = "GET";
-    request->method = g_strdup(method);
+    if (g_strcmp0(method, "OPTIONS") == 0)
+        request->method = BALDE_HTTP_OPTIONS;
+    else if (g_strcmp0(method, "GET") == 0)
+        request->method = BALDE_HTTP_GET;
+    else if (g_strcmp0(method, "HEAD") == 0)
+        request->method = BALDE_HTTP_HEAD;
+    else if (g_strcmp0(method, "POST") == 0)
+        request->method = BALDE_HTTP_POST;
+    else if (g_strcmp0(method, "PUT") == 0)
+        request->method = BALDE_HTTP_PUT;
+    else if (g_strcmp0(method, "DELETE") == 0)
+        request->method = BALDE_HTTP_DELETE;
+    else
+        request->method = BALDE_HTTP_NONE;
     request->headers = balde_request_headers();
     request->view_args = NULL;
     return request;
@@ -197,7 +208,6 @@ balde_request_free(balde_request_t *request)
     if (request == NULL)
         return;
     g_free(request->path);
-    g_free(request->method);
     g_hash_table_destroy(request->headers);
     if (request->view_args != NULL)
         g_hash_table_destroy(request->view_args);

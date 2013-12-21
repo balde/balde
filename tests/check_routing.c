@@ -16,10 +16,11 @@
 
 
 static balde_url_rule_t rules[] = {
-    {"home", "/", "GET"},
-    {"user", "/user/<username>/", "POST"},
-    {"customer", "/customer/<username>/contracts/", "GET"},
-    {NULL, NULL, NULL}
+    {"home", "/", BALDE_HTTP_GET},
+    {"user", "/user/<username>/", BALDE_HTTP_POST},
+    {"customer", "/customer/<username>/contracts/", BALDE_HTTP_GET},
+    {"policy", "/policies/", BALDE_HTTP_GET | BALDE_HTTP_POST},
+    {NULL, NULL, 0}
 };
 
 
@@ -156,12 +157,12 @@ test_url_rule(void)
     GSList *views = get_test_views();
     GHashTable *matches = NULL;
     gchar* endpoint = balde_dispatch_from_path(views, "/user/arcoiro/",
-        "POST", &matches);
+        BALDE_HTTP_POST, &matches);
     g_assert_cmpstr(endpoint, ==, "user");
     g_assert_cmpstr(g_hash_table_lookup(matches, "username"), ==, "arcoiro");
     g_free(endpoint);
     g_hash_table_destroy(matches);
-    g_assert(balde_dispatch_from_path(views, "/user/arcoiro/", "GET",
+    g_assert(balde_dispatch_from_path(views, "/user/arcoiro/", BALDE_HTTP_GET,
         &matches) == NULL);
     g_hash_table_destroy(matches);
     free_test_views(views);
@@ -174,9 +175,29 @@ test_url_rule_not_found(void)
     GSList *views = get_test_views();
     GHashTable *matches = NULL;
     gchar* endpoint = balde_dispatch_from_path(views, "/bola/arcoiro/",
-        "GET", &matches);
+        BALDE_HTTP_GET, &matches);
     g_assert(endpoint == NULL);
     g_assert(matches == NULL);
+    free_test_views(views);
+}
+
+
+void
+test_url_rule_with_multiple_methods(void)
+{
+    GSList *views = get_test_views();
+    GHashTable *matches = NULL;
+    gchar* endpoint;
+    endpoint = balde_dispatch_from_path(views, "/policies/", BALDE_HTTP_POST,
+        &matches);
+    g_assert_cmpstr(endpoint, ==, "policy");
+    g_free(endpoint);
+    g_hash_table_destroy(matches);
+    endpoint = balde_dispatch_from_path(views, "/policies/", BALDE_HTTP_GET,
+        &matches);
+    g_assert_cmpstr(endpoint, ==, "policy");
+    g_free(endpoint);
+    g_hash_table_destroy(matches);
     free_test_views(views);
 }
 
@@ -205,5 +226,7 @@ main(int argc, char** argv)
     g_test_add_func("/routing/url_rule", test_url_rule);
     g_test_add_func("/routing/url_rule_not_found",
         test_url_rule_not_found);
+    g_test_add_func("/routing/url_rule_with_multiple_methods",
+        test_url_rule_with_multiple_methods);
     return g_test_run();
 }

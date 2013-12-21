@@ -53,7 +53,7 @@ balde_app_free(balde_app_t *app)
 
 void
 balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rule,
-    const gchar *method, balde_view_func_t view_func)
+    const balde_http_method_t method, balde_view_func_t view_func)
 {
     balde_view_t *view = g_new(balde_view_t, 1);
     view->url_rule = g_new(balde_url_rule_t, 1);

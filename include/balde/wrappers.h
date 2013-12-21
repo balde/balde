@@ -10,12 +10,13 @@
 #define _BALDE_WRAPPERS_H
 
 #include <glib.h>
+#include <balde/routing.h>
 
 typedef struct {
     GHashTable *view_args;
     GHashTable *headers;
     gchar *path;
-    gchar *method;
+    balde_http_method_t method;
 } balde_request_t;
 
 typedef struct {
