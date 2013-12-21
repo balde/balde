@@ -69,11 +69,11 @@ test_abort(void)
     balde_app_t *app = balde_app_init();
     g_assert(app != NULL);
     balde_response_t *res = balde_abort(app, 404);
-    g_assert(app->error->code == 404);
-    g_assert_cmpstr(app->error->message, ==,
-        "404 Not Found: The requested URL was not found on the server. If you "
-        "entered the URL manually please check your spelling and try again.");
     g_assert(res->status_code == 404);
+    g_assert_cmpstr(res->body->str, ==,
+        "Error: 404 Not Found\n\n"
+        "The requested URL was not found on the server. If you entered the URL "
+        "manually please check your spelling and try again.\n");
     g_assert_cmpstr(g_hash_table_lookup(res->headers, "content-type"), ==,
         "text/plain; charset=utf-8");
     balde_response_free(res);

@@ -230,7 +230,11 @@ balde_response_t*
 balde_abort(balde_app_t *app, balde_http_exception_code_t code)
 {
     balde_abort_set_error(app, code);
-    if (app->error != NULL)
-        return balde_make_response_from_exception(app->error);
-    return NULL;
+    balde_response_t* response = NULL;
+    if (app->error != NULL) {
+        response = balde_make_response_from_exception(app->error);
+        g_error_free(app->error);
+        app->error = NULL;
+    }
+    return response;
 }
