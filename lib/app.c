@@ -59,7 +59,9 @@ balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rul
     view->url_rule = g_new(balde_url_rule_t, 1);
     view->url_rule->endpoint = endpoint;
     view->url_rule->rule = rule;
-    view->url_rule->method = method;
+    view->url_rule->method = method | BALDE_HTTP_OPTIONS;
+    if (view->url_rule->method & BALDE_HTTP_GET)
+        view->url_rule->method |= BALDE_HTTP_HEAD;
     view->view_func = view_func;
     app->views = g_slist_append(app->views, view);
 }
@@ -105,12 +107,20 @@ BEGIN_LOOP
     endpoint = balde_dispatch_from_path(app->views,
         request->path, request->method, &(request->view_args));
     if (endpoint == NULL) {  // no view found! :(
-        response = balde_abort(app, 404);
+        response = balde_abort(app,
+            request->method == BALDE_HTTP_NONE ? 405 : 404);
     }
     else {
         // run the view
         balde_view_t *view = balde_app_get_view_from_endpoint(app, endpoint);
-        response = view->view_func(app, request);
+        if (request->method == BALDE_HTTP_OPTIONS) {
+            response = balde_make_response("");
+            balde_response_set_header(response, "Allow",
+                balde_list_allowed_methods(view->url_rule->method));
+        }
+        else {
+            response = view->view_func(app, request);
+        }
         g_free(endpoint);
     }
 

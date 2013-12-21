@@ -52,7 +52,12 @@ test_app_add_url_rule(void)
     g_assert(view->url_rule != NULL);
     g_assert_cmpstr(view->url_rule->endpoint, ==, "arcoiro");
     g_assert_cmpstr(view->url_rule->rule, ==, "/arcoiro/");
-    g_assert(view->url_rule->method == BALDE_HTTP_POST);
+    g_assert(view->url_rule->method & BALDE_HTTP_POST);
+    g_assert(view->url_rule->method & BALDE_HTTP_OPTIONS);
+    g_assert(!(view->url_rule->method & BALDE_HTTP_GET));
+    g_assert(!(view->url_rule->method & BALDE_HTTP_HEAD));
+    g_assert(!(view->url_rule->method & BALDE_HTTP_PUT));
+    g_assert(!(view->url_rule->method & BALDE_HTTP_DELETE));
     i = 0;
     view->view_func(app, NULL);
     g_assert(i == 1);
@@ -71,7 +76,12 @@ test_app_get_view_from_endpoint(void)
     g_assert(view->url_rule != NULL);
     g_assert_cmpstr(view->url_rule->endpoint, ==, "arcoiro");
     g_assert_cmpstr(view->url_rule->rule, ==, "/arcoiro/");
-    g_assert(view->url_rule->method == BALDE_HTTP_GET);
+    g_assert(view->url_rule->method & BALDE_HTTP_GET);
+    g_assert(view->url_rule->method & BALDE_HTTP_HEAD);
+    g_assert(view->url_rule->method & BALDE_HTTP_OPTIONS);
+    g_assert(!(view->url_rule->method & BALDE_HTTP_POST));
+    g_assert(!(view->url_rule->method & BALDE_HTTP_PUT));
+    g_assert(!(view->url_rule->method & BALDE_HTTP_DELETE));
     i = 0;
     view->view_func(app, NULL);
     g_assert(i == 1);

@@ -202,6 +202,25 @@ test_url_rule_with_multiple_methods(void)
 }
 
 
+void
+test_list_allowed_methods(void)
+{
+    gchar *allow;
+    allow = balde_list_allowed_methods(rules[0].method);
+    g_assert_cmpstr(allow, ==, "GET");
+    g_free(allow);
+    allow = balde_list_allowed_methods(rules[1].method);
+    g_assert_cmpstr(allow, ==, "POST");
+    g_free(allow);
+    allow = balde_list_allowed_methods(rules[2].method);
+    g_assert_cmpstr(allow, ==, "GET");
+    g_free(allow);
+    allow = balde_list_allowed_methods(rules[3].method);
+    g_assert_cmpstr(allow, ==, "GET, POST");
+    g_free(allow);
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -228,5 +247,6 @@ main(int argc, char** argv)
         test_url_rule_not_found);
     g_test_add_func("/routing/url_rule_with_multiple_methods",
         test_url_rule_with_multiple_methods);
+    g_test_add_func("/routing/list_allowed_methods", test_list_allowed_methods);
     return g_test_run();
 }

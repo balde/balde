@@ -72,3 +72,31 @@ balde_dispatch_from_path(GSList *views, gchar *path,
     }
     return NULL;
 }
+
+
+gchar*
+balde_list_allowed_methods(balde_http_method_t method)
+{
+    GSList *methods = NULL;
+    if (method & BALDE_HTTP_OPTIONS)
+        methods = g_slist_append(methods, "OPTIONS");
+    if (method & BALDE_HTTP_DELETE)
+        methods = g_slist_append(methods, "DELETE");
+    if (method & BALDE_HTTP_GET)
+        methods = g_slist_append(methods, "GET");
+    if (method & BALDE_HTTP_HEAD)
+        methods = g_slist_append(methods, "HEAD");
+    if (method & BALDE_HTTP_POST)
+        methods = g_slist_append(methods, "POST");
+    if (method & BALDE_HTTP_PUT)
+        methods = g_slist_append(methods, "PUT");
+    gchar** methods_array = g_new(gchar*, g_slist_length(methods) + 1);
+    guint i = 0;
+    for (GSList *tmp = methods; tmp != NULL; i++, tmp = tmp->next)
+        methods_array[i] = (gchar*) tmp->data;
+    methods_array[i] = NULL;
+    g_slist_free(methods);
+    gchar* rv = g_strjoinv(", ", methods_array);
+    g_free(methods_array);
+    return rv;
+}
