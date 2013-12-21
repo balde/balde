@@ -72,6 +72,25 @@ balde_dispatch_from_path(GSList *views, gchar *path, GHashTable **matches)
 }
 
 
+balde_http_method_t
+balde_http_method_str2enum(const gchar *method)
+{
+    if (g_strcmp0(method, "OPTIONS") == 0)
+        return BALDE_HTTP_OPTIONS;
+    if (g_strcmp0(method, "GET") == 0)
+        return BALDE_HTTP_GET;
+    if (g_strcmp0(method, "HEAD") == 0)
+        return BALDE_HTTP_HEAD;
+    if (g_strcmp0(method, "POST") == 0)
+        return BALDE_HTTP_POST;
+    if (g_strcmp0(method, "PUT") == 0)
+        return BALDE_HTTP_PUT;
+    if (g_strcmp0(method, "DELETE") == 0)
+        return BALDE_HTTP_DELETE;
+    return BALDE_HTTP_NONE;
+}
+
+
 gchar*
 balde_list_allowed_methods(balde_http_method_t method)
 {

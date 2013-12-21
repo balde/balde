@@ -192,6 +192,61 @@ test_url_rule_with_multiple_methods(void)
 
 
 void
+test_http_method_str2enum(void)
+{
+    balde_http_method_t method;
+
+    method = balde_http_method_str2enum("OPTIONS");
+    g_assert(method & BALDE_HTTP_OPTIONS);
+    g_assert(!(method & BALDE_HTTP_GET));
+    g_assert(!(method & BALDE_HTTP_HEAD));
+    g_assert(!(method & BALDE_HTTP_POST));
+    g_assert(!(method & BALDE_HTTP_PUT));
+    g_assert(!(method & BALDE_HTTP_DELETE));
+
+    method = balde_http_method_str2enum("GET");
+    g_assert(!(method & BALDE_HTTP_OPTIONS));
+    g_assert(method & BALDE_HTTP_GET);
+    g_assert(!(method & BALDE_HTTP_HEAD));
+    g_assert(!(method & BALDE_HTTP_POST));
+    g_assert(!(method & BALDE_HTTP_PUT));
+    g_assert(!(method & BALDE_HTTP_DELETE));
+
+    method = balde_http_method_str2enum("HEAD");
+    g_assert(!(method & BALDE_HTTP_OPTIONS));
+    g_assert(!(method & BALDE_HTTP_GET));
+    g_assert(method & BALDE_HTTP_HEAD);
+    g_assert(!(method & BALDE_HTTP_POST));
+    g_assert(!(method & BALDE_HTTP_PUT));
+    g_assert(!(method & BALDE_HTTP_DELETE));
+
+    method = balde_http_method_str2enum("POST");
+    g_assert(!(method & BALDE_HTTP_OPTIONS));
+    g_assert(!(method & BALDE_HTTP_GET));
+    g_assert(!(method & BALDE_HTTP_HEAD));
+    g_assert(method & BALDE_HTTP_POST);
+    g_assert(!(method & BALDE_HTTP_PUT));
+    g_assert(!(method & BALDE_HTTP_DELETE));
+
+    method = balde_http_method_str2enum("PUT");
+    g_assert(!(method & BALDE_HTTP_OPTIONS));
+    g_assert(!(method & BALDE_HTTP_GET));
+    g_assert(!(method & BALDE_HTTP_HEAD));
+    g_assert(!(method & BALDE_HTTP_POST));
+    g_assert(method & BALDE_HTTP_PUT);
+    g_assert(!(method & BALDE_HTTP_DELETE));
+
+    method = balde_http_method_str2enum("DELETE");
+    g_assert(!(method & BALDE_HTTP_OPTIONS));
+    g_assert(!(method & BALDE_HTTP_GET));
+    g_assert(!(method & BALDE_HTTP_HEAD));
+    g_assert(!(method & BALDE_HTTP_POST));
+    g_assert(!(method & BALDE_HTTP_PUT));
+    g_assert(method & BALDE_HTTP_DELETE);
+}
+
+
+void
 test_list_allowed_methods(void)
 {
     gchar *allow;
@@ -236,6 +291,7 @@ main(int argc, char** argv)
         test_url_rule_not_found);
     g_test_add_func("/routing/url_rule_with_multiple_methods",
         test_url_rule_with_multiple_methods);
+    g_test_add_func("/routing/http_method_str2enum", test_http_method_str2enum);
     g_test_add_func("/routing/list_allowed_methods", test_list_allowed_methods);
     return g_test_run();
 }

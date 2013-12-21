@@ -29,6 +29,7 @@ typedef struct {
 
 gboolean balde_url_match(gchar *path, const gchar *rule, GHashTable **matches);
 gchar* balde_dispatch_from_path(GSList *views, gchar *path, GHashTable **matches);
+balde_http_method_t balde_http_method_str2enum(const gchar *method);
 gchar* balde_list_allowed_methods(balde_http_method_t method);
 
 #endif /* _BALDE_ROUTING_H */
