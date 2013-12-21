@@ -10,7 +10,6 @@
 #define _BALDE_APP_H
 
 #include <glib.h>
-#include <balde/app.h>
 #include <balde/routing.h>
 #include <balde/wrappers.h>
 
