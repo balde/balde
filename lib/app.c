@@ -111,7 +111,7 @@ BEGIN_LOOP
     endpoint = balde_dispatch_from_path(app->views,
         request->path, request->method, &(request->view_args));
     if (endpoint == NULL) {  // no view found! :(
-        response = balde_abort(app,
+        balde_abort_set_error(app,
             request->method == BALDE_HTTP_NONE ? 405 : 404);
     }
     else {
@@ -119,8 +119,9 @@ BEGIN_LOOP
         balde_view_t *view = balde_app_get_view_from_endpoint(app, endpoint);
         if (request->method == BALDE_HTTP_OPTIONS) {
             response = balde_make_response("");
-            balde_response_set_header(response, "Allow",
-                balde_list_allowed_methods(view->url_rule->method));
+            gchar *allow = balde_list_allowed_methods(view->url_rule->method);
+            balde_response_set_header(response, "Allow", allow);
+            g_free(allow);
         }
         else {
             response = view->view_func(app, request);
