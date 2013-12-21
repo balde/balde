@@ -111,9 +111,21 @@ void
 test_response_render(void)
 {
     balde_response_t *res = balde_make_response("lol");
-    gchar *out = balde_response_render(res);
+    gchar *out = balde_response_render(res, TRUE);
     g_assert_cmpstr(out, ==,
         "Content-Type: text/html; charset=utf-8\r\nContent-Length: 3\r\n\r\nlol");
+    g_free(out);
+    balde_response_free(res);
+}
+
+
+void
+test_response_render_without_body(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    gchar *out = balde_response_render(res, FALSE);
+    g_assert_cmpstr(out, ==,
+        "Content-Type: text/html; charset=utf-8\r\nContent-Length: 3\r\n\r\n");
     g_free(out);
     balde_response_free(res);
 }
@@ -126,7 +138,7 @@ test_response_render_exception(void)
     balde_abort_set_error(app, 404);
     balde_response_t *res = balde_make_response_from_exception(app->error);
     g_assert(res != NULL);
-    gchar *out = balde_response_render(res);
+    gchar *out = balde_response_render(res, TRUE);
     g_assert_cmpstr(out, ==,
         "Status: 404 Not Found\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"
@@ -134,6 +146,25 @@ test_response_render_exception(void)
         "\r\n"
         "Error: 404 Not Found\n\nThe requested URL was not found on the server. "
         "If you entered the URL manually please check your spelling and try again.\n");
+    g_free(out);
+    balde_response_free(res);
+    balde_app_free(app);
+}
+
+
+void
+test_response_render_exception_without_body(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_abort_set_error(app, 404);
+    balde_response_t *res = balde_make_response_from_exception(app->error);
+    g_assert(res != NULL);
+    gchar *out = balde_response_render(res, FALSE);
+    g_assert_cmpstr(out, ==,
+        "Status: 404 Not Found\r\n"
+        "Content-Type: text/plain; charset=utf-8\r\n"
+        "Content-Length: 143\r\n"
+        "\r\n");
     g_free(out);
     balde_response_free(res);
     balde_app_free(app);
@@ -202,8 +233,12 @@ main(int argc, char** argv)
         test_response_append_body);
     g_test_add_func("/wrappers/fix_header_name", test_fix_header_name);
     g_test_add_func("/wrappers/response_render", test_response_render);
+    g_test_add_func("/wrappers/response_render_without_body",
+        test_response_render_without_body);
     g_test_add_func("/wrappers/response_render_exception",
         test_response_render_exception);
+    g_test_add_func("/wrappers/response_render_exception_without_body",
+        test_response_render_exception_without_body);
     g_test_add_func("/wrappers/request_headers", test_request_headers);
     g_test_add_func("/wrappers/make_request", test_make_request);
     g_test_add_func("/wrappers/request_get_header", test_request_get_header);

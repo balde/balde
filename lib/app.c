@@ -90,18 +90,22 @@ balde_app_run(balde_app_t *app)
     balde_response_t *response;
     balde_response_t *error_response;
     gchar *endpoint;
+    gboolean with_body;
 
 BEGIN_LOOP
+
+    with_body = TRUE;
 
     // render startup error, if any
     if (app->error != NULL) {
         error_response = balde_make_response_from_exception(app->error);
-        balde_response_print(error_response);
+        balde_response_print(error_response, with_body);
         balde_response_free(error_response);
         continue;
     }
 
     request = balde_make_request();
+    with_body = ! (request->method & BALDE_HTTP_HEAD);
 
     // get the view
     endpoint = balde_dispatch_from_path(app->views,
@@ -128,14 +132,14 @@ BEGIN_LOOP
 
     if (app->error != NULL) {
         error_response = balde_make_response_from_exception(app->error);
-        balde_response_print(error_response);
+        balde_response_print(error_response, with_body);
         balde_response_free(error_response);
         g_error_free(app->error);
         app->error = NULL;
         continue;
     }
 
-    balde_response_print(response);
+    balde_response_print(response, with_body);
     balde_response_free(response);
 
 END_LOOP

@@ -107,7 +107,7 @@ balde_header_render(gchar *key, gchar *value, GString *str)
 
 
 gchar*
-balde_response_render(balde_response_t *response)
+balde_response_render(balde_response_t *response, gboolean with_body)
 {
     if (response == NULL)
         return NULL;
@@ -121,15 +121,16 @@ balde_response_render(balde_response_t *response)
     g_free(len);
     g_hash_table_foreach(response->headers, (GHFunc) balde_header_render, str);
     g_string_append(str, "\r\n");
-    g_string_append(str, response->body->str);
+    if (with_body)
+        g_string_append(str, response->body->str);
     return g_string_free(str, FALSE);
 }
 
 
 void
-balde_response_print(balde_response_t *response)
+balde_response_print(balde_response_t *response, gboolean with_body)
 {
-    gchar *resp = balde_response_render(response);
+    gchar *resp = balde_response_render(response, with_body);
     g_print("%s", resp);
     g_free(resp);
 }
