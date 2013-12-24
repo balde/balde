@@ -27,3 +27,17 @@ AM_CFLAGS = \
 AM_LDFLAGS = \
 	$(GLIB_LIBS) \
 	$(top_builddir)/lib/libbalde.la
+
+if USE_VALGRIND
+valgrind:
+	$(MAKE) check TESTS_ENVIRONMENT=" \
+		G_SLICE=always-malloc \
+		G_DEBUG=gc-friendly \
+		$(LIBTOOL) \
+			--mode=execute \
+			$(VALGRIND) \
+				--tool=memcheck \
+				--leak-check=full \
+				--leak-resolution=high \
+				--num-callers=20"
+endif
