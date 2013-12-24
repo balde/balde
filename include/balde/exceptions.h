@@ -41,14 +41,6 @@ typedef enum {
     BALDE_HTTP_SERVICE_UNAVAILABLE = 503
 } balde_http_exception_code_t;
 
-typedef struct {
-    const balde_http_exception_code_t code;
-    const gchar *name;
-    const gchar *description;
-} balde_http_exception_t;
-
-const gchar* balde_exception_get_name_from_code(balde_http_exception_code_t code);
-const gchar* balde_exception_get_description_from_code(balde_http_exception_code_t code);
 void balde_abort_set_error(balde_app_t *app, balde_http_exception_code_t code);
 balde_response_t* balde_abort(balde_app_t *app, balde_http_exception_code_t code);
 

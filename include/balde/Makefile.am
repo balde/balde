@@ -1,6 +1,12 @@
 pkginclude_HEADERS = \
 	app.h \
-	cgi.h \
 	exceptions.h \
 	routing.h \
 	wrappers.h
+
+noinst_HEADERS = \
+	app-private.h \
+	cgi-private.h \
+	exceptions-private.h \
+	routing-private.h \
+	wrappers-private.h

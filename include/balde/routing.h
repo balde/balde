@@ -21,15 +21,4 @@ typedef enum {
     BALDE_HTTP_DELETE = 0x20
 } balde_http_method_t;
 
-typedef struct {
-    const gchar *endpoint;
-    const gchar *rule;
-    balde_http_method_t method;
-} balde_url_rule_t;
-
-gboolean balde_url_match(gchar *path, const gchar *rule, GHashTable **matches);
-gchar* balde_dispatch_from_path(GSList *views, gchar *path, GHashTable **matches);
-balde_http_method_t balde_http_method_str2enum(const gchar *method);
-gchar* balde_list_allowed_methods(balde_http_method_t method);
-
 #endif /* _BALDE_ROUTING_H */

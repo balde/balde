@@ -12,7 +12,9 @@
 
 #include <glib.h>
 #include <balde/app.h>
+#include <balde/app-private.h>
 #include <balde/wrappers.h>
+#include <balde/wrappers-private.h>
 
 
 static guint i = 0;

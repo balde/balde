@@ -12,8 +12,9 @@
 
 #include <glib.h>
 #include <balde/app.h>
+#include <balde/app-private.h>
 #include <balde/routing.h>
-
+#include <balde/routing-private.h>
 
 static balde_url_rule_t rules[] = {
     {"home", "/", BALDE_HTTP_GET},

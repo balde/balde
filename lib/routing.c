@@ -12,7 +12,9 @@
 
 #include <glib.h>
 #include <balde/app.h>
+#include <balde/app-private.h>
 #include <balde/routing.h>
+#include <balde/routing-private.h>
 
 
 gboolean

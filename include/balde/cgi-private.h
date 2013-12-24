@@ -6,8 +6,8 @@
  * See the file COPYING.
  */
 
-#ifndef _BALDE_CGI_H
-#define _BALDE_CGI_H
+#ifndef _BALDE_CGI_PRIVATE_H
+#define _BALDE_CGI_PRIVATE_H
 
 #include <glib.h>
 
@@ -24,4 +24,4 @@
 void balde_stdout_handler(const gchar *str);
 void balde_stderr_handler(const gchar *str);
 
-#endif /* _BALDE_CGI_H */
+#endif /* _BALDE_CGI_PRIVATE_H */

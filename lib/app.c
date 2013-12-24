@@ -13,10 +13,14 @@
 #include <glib.h>
 #include <locale.h>
 #include <balde/app.h>
-#include <balde/cgi.h>
+#include <balde/app-private.h>
+#include <balde/cgi-private.h>
 #include <balde/exceptions.h>
+#include <balde/exceptions-private.h>
 #include <balde/routing.h>
+#include <balde/routing-private.h>
 #include <balde/wrappers.h>
+#include <balde/wrappers-private.h>
 
 
 balde_app_t*

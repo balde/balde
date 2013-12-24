@@ -13,7 +13,10 @@
 #include <glib.h>
 #include <string.h>
 #include <balde/exceptions.h>
+#include <balde/exceptions-private.h>
+#include <balde/routing-private.h>
 #include <balde/wrappers.h>
+#include <balde/wrappers-private.h>
 
 
 void
