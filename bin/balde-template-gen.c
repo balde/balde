@@ -1,4 +1,4 @@
-/**
+/*
  * balde: A microframework for C based on GLib and bad intentions.
  * Copyright (C) 2013 Rafael G. Martins <rafael@rafaelmartins.eng.br>
  *
@@ -11,7 +11,7 @@
 #endif /* HAVE_CONFIG_H */
 
 
-/**
+/*
  * balde-template-gen is a damn simple code generator, that converts an HTML
  * template to C source, that should be compiled and linked to the balde app.
  *
