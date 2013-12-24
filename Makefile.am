@@ -27,6 +27,6 @@ doxygen: Doxyfile
 endif
 
 if USE_VALGRIND
-valgrind:
+valgrind: all
 	$(MAKE) -C tests valgrind
 endif
