@@ -3,6 +3,7 @@ SUBDIRS = \
 	include \
 	bin \
 	examples \
+	doc \
 	tests
 
 ACLOCAL_AMFLAGS = -I m4
@@ -19,6 +20,11 @@ $(top_srcdir)/.version:
 
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
+
+if BUILD_DOCS
+doxygen: Doxyfile
+	$(DOXYGEN) Doxyfile
+endif
 
 valgrind:
 	$(MAKE) check TESTS_ENVIRONMENT=" \

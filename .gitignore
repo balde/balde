@@ -35,3 +35,6 @@ Makefile.in
 /build-aux/*
 !/build-aux/git-version-gen
 /.version
+
+# doxygen
+/Doxyfile

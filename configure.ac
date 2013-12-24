@@ -38,13 +38,32 @@ AC_ARG_ENABLE([fastcgi], AS_HELP_STRING([--enable-fastcgi], [enable fastcgi supp
 ])
 
 AC_ARG_ENABLE([examples], AS_HELP_STRING([--enable-examples], [build examples]), [
-  build_examples=true
+  build_examples=yes
   EXAMPLES="enabled"
 ], [
-  build_examples=false
+  build_examples=no
   EXAMPLES="disabled"
 ])
-AM_CONDITIONAL([BUILD_EXAMPLES], [test "x$build_examples" = "xtrue"])
+AM_CONDITIONAL([BUILD_EXAMPLES], [test "x$build_examples" = "xyes"])
+
+AC_ARG_WITH([doxygen], AS_HELP_STRING([--without-doxygen],
+            [ignore presence of doxygen and disable documentation build]))
+AS_IF([test "x$with_doxygen" != "xno"], [
+  AC_PATH_PROG([doxygen], [doxygen])
+  AS_IF([test "x$ac_cv_path_doxygen" = "x"], [
+    have_doxygen=no
+  ], [
+    have_doxygen=yes
+  ])
+])
+AS_IF([test "x$have_doxygen" = "xyes"], , [
+  AS_IF([test "x$with_doxygen" = "xyes"], [
+    AC_MSG_ERROR([doxygen requested but not found])
+  ])
+])
+AM_CONDITIONAL([BUILD_DOCS], [test "x$have_doxygen" = "xyes"])
+DOXYGEN="$ac_cv_path_doxygen"
+AC_SUBST(DOXYGEN)
 
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.34])
@@ -56,7 +75,9 @@ AC_CONFIG_FILES([
     include/Makefile
     include/balde/Makefile
     lib/Makefile
+    doc/Makefile
     tests/Makefile
+    Doxyfile
 ])
 AC_OUTPUT
 
@@ -71,6 +92,7 @@ AS_ECHO("
         cflags:       ${CFLAGS}
         ldflags:      ${LDFLAGS}
 
+        doxygen:      ${DOXYGEN}
         fastcgi:      ${FASTCGI}
         examples:     ${EXAMPLES}
 ")
