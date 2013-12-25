@@ -10,7 +10,8 @@ ACLOCAL_AMFLAGS = -I m4
 
 EXTRA_DIST = \
 	$(top_srcdir)/autogen.sh \
-	$(top_srcdir)/.version
+	$(top_srcdir)/.version \
+	$(top_srcdir)/README.md
 
 BUILT_SOURCES = \
 	$(top_srcdir)/.version
