@@ -12,19 +12,70 @@
 #include <glib.h>
 #include <balde/wrappers.h>
 
+/** Application related definitions.
+ *
+ * \file balde/app.h
+ */
+
+/** balde application context
+ *
+ * This struct stores everything related to the application context. It stays
+ * loaded in memory during all the application life time, and is reused by all
+ * the requests.
+ */
 typedef struct {
+
+    /**
+     * A GLib singly linked list that stores the application views. Do not
+     * touch this, use the balde_app_add_url_rule() function instead!
+     */
     GSList *views;
+
+    /**
+     * A GLib hash table that stores the application settings. Do not touch
+     * this manually!
+     */
     GHashTable *config;
+
+    /**
+     * A GLib error instance. Do not touch this manually!
+     */
     GError *error;
+
 } balde_app_t;
 
+/** View type definition
+ *
+ * Each view should accept the application context and the request context,
+ * and return a response context.
+ */
 typedef balde_response_t* (*balde_view_func_t) (balde_app_t*, balde_request_t*);
 
+/** Initializes the application context
+ *
+ * This function allocates memory for the application context.
+ */
 balde_app_t* balde_app_init(void);
+
+/** Free application context memory.
+ *
+ * This function will clean and free all memory used by the application context.
+ */
 void balde_app_free(balde_app_t *app);
+
+/** Adds a view to the balde application
+ *
+ * The endpoint should be unique, and multiple methods can be provided with pipes.
+ */
 void balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint,
     const gchar *rule, const balde_http_method_t method,
     balde_view_func_t view_func);
+
+/** Application main loop.
+ *
+ * This function does everything needed to run the registered views and dispatch
+ * requests.
+ */
 void balde_app_run(balde_app_t *app);
 
 #endif /* _BALDE_APP_H */

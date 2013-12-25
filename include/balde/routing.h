@@ -11,6 +11,15 @@
 
 #include <glib.h>
 
+/** URL routing related definitions.
+ *
+ * \file balde/routing.h
+ */
+
+/** Supported HTTP methods.
+ *
+ * BALDE_HTTP_NONE method is internal and shouldn't be used manually.
+ */
 typedef enum {
     BALDE_HTTP_NONE = 0x00,
     BALDE_HTTP_OPTIONS = 0x01,

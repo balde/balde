@@ -13,6 +13,15 @@
 #include <balde/app.h>
 #include <balde/wrappers.h>
 
+/** HTTP exceptions related definitions.
+ *
+ * balde handles HTTP status codes as if they were GLib exceptions (or
+ * "errors", following GLib naming standards).
+ *
+ * \file balde/exceptions.h
+ */
+
+/** Supported HTTP status codes */
 typedef enum {
     BALDE_HTTP_BAD_REQUEST = 400,
     BALDE_HTTP_UNAUTHORIZED = 401,
@@ -41,7 +50,17 @@ typedef enum {
     BALDE_HTTP_SERVICE_UNAVAILABLE = 503
 } balde_http_exception_code_t;
 
+/** Sets application error with an HTTP status code
+ *
+ * It is called "error" to be consistent with GLib naming standards,
+ * but it works like an exception.
+ */
 void balde_abort_set_error(balde_app_t *app, balde_http_exception_code_t code);
+
+/** Returns a response context that represents an HTTP status code
+ *
+ * This function returns the response, but does not sets the GLib error.
+ */
 balde_response_t* balde_abort(balde_app_t *app, balde_http_exception_code_t code);
 
 #endif /* _BALDE_EXCEPTIONS_H */
