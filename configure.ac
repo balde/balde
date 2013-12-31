@@ -1,8 +1,7 @@
 AC_PREREQ(2.68)
 
 AC_INIT([balde], m4_esyscmd([build-aux/git-version-gen .tarball-version]),
-    [https://github.com/rafaelmartins/balde/issues], [balde],
-    [https://github.com/rafaelmartins/balde])
+    [https://github.com/rafaelmartins/balde], [balde], [http://balde.io])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
