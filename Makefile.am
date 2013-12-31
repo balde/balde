@@ -24,6 +24,7 @@ dist-hook:
 
 if BUILD_DOCS
 doxygen: Doxyfile
+	$(MAKE) -C doc clean
 	$(DOXYGEN) Doxyfile
 
 if PUBLISH_DOCS

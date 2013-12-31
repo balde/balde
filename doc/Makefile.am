@@ -1,7 +1,7 @@
 EXTRA_DIST = \
 	00_index.md \
 	01_concepts.md \
-	02_hello.md
+	02_getting-started.md
 
 if BUILD_DOCS
 clean-local:
