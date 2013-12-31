@@ -55,15 +55,22 @@ AS_IF([test "x$with_doxygen" != "xno"], [
   ], [
     have_doxygen=yes
   ])
+  AC_PATH_PROG([github_pages_publish], [github-pages-publish])
 ])
 AS_IF([test "x$have_doxygen" = "xyes"], , [
   AS_IF([test "x$with_doxygen" = "xyes"], [
     AC_MSG_ERROR([doxygen requested but not found])
   ])
 ])
+
 AM_CONDITIONAL([BUILD_DOCS], [test "x$have_doxygen" = "xyes"])
+AM_CONDITIONAL([PUBLISH_DOCS], [test "x$ac_cv_path_github_pages_publish" != "x"])
+
 DOXYGEN="$ac_cv_path_doxygen"
+GITHUB_PAGES_PUBLISH="$ac_cv_path_github_pages_publish"
+
 AC_SUBST(DOXYGEN)
+AC_SUBST(GITHUB_PAGES_PUBLISH)
 
 AC_ARG_WITH([valgrind], AS_HELP_STRING([--without-valgrind],
             [ignore presence of valgrind]))

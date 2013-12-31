@@ -25,6 +25,13 @@ dist-hook:
 if BUILD_DOCS
 doxygen: Doxyfile
 	$(DOXYGEN) Doxyfile
+
+if PUBLISH_DOCS
+publish_docs: doxygen
+	$(GITHUB_PAGES_PUBLISH) --verbose \
+		--cname balde.io \
+		. doc/build/html
+endif
 endif
 
 if USE_VALGRIND
