@@ -209,6 +209,26 @@ test_request_headers(void)
 
 
 void
+test_urldecode(void)
+{
+    gchar *rv = balde_urldecode("saf%3Dgfd+123");
+    g_assert_cmpstr(rv, ==, "saf=gfd 123");
+    g_free(rv);
+}
+
+
+void
+test_parse_query_string(void)
+{
+    GHashTable *qs = balde_parse_query_string("fdds%3Dfsd=etrh+adsf&asd+asd=vfdvf%3Dlol");
+    g_assert(g_hash_table_size(qs) == 2);
+    g_assert_cmpstr(g_hash_table_lookup(qs, "fdds=fsd"), ==, "etrh adsf");
+    g_assert_cmpstr(g_hash_table_lookup(qs, "asd asd"), ==, "vfdvf=lol");
+    g_hash_table_destroy(qs);
+}
+
+
+void
 test_make_request(void)
 {
     g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
@@ -267,6 +287,8 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/response_render_exception_without_body",
         test_response_render_exception_without_body);
     g_test_add_func("/wrappers/request_headers", test_request_headers);
+    g_test_add_func("/wrappers/urldecode", test_urldecode);
+    g_test_add_func("/wrappers/parse_query_string", test_parse_query_string);
     g_test_add_func("/wrappers/make_request", test_make_request);
     g_test_add_func("/wrappers/request_get_header", test_request_get_header);
     return g_test_run();

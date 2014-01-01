@@ -180,6 +180,37 @@ balde_request_headers(void)
 }
 
 
+gchar*
+balde_urldecode(gchar* str)
+{
+    // corner case: + -> ' '
+    GRegex *re_space = g_regex_new("\\+", 0, 0, NULL);
+    gchar *new_str = g_regex_replace_literal(re_space, str, -1, 0, " ", 0, NULL);
+    g_regex_unref(re_space);
+    gchar *rv = g_uri_unescape_string(new_str, NULL);
+    g_free(new_str);
+    return rv;
+}
+
+
+GHashTable*
+balde_parse_query_string(gchar *query_string)
+{
+    GHashTable *qs = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    gchar **kv = g_strsplit(query_string, "&", 0);
+    for (guint i = 0; kv[i] != NULL; i++) {
+        gchar **pieces = g_strsplit(kv[i], "=", 2);
+        if (g_strv_length(pieces) != 2)
+            goto point1;
+        g_hash_table_replace(qs, balde_urldecode(pieces[0]), balde_urldecode(pieces[1]));
+point1:
+        g_strfreev(pieces);
+    }
+    g_strfreev(kv);
+    return qs;
+}
+
+
 balde_request_t*
 balde_make_request(void)
 {
