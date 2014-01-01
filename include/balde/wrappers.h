@@ -33,7 +33,8 @@ typedef struct {
 
     /**
      * A GLib hash table that stores the arguments parsed from the request
-     * path.
+     * path. Do not touch it manually, use the balde_request_get_view_arg()
+     * function instead.
      */
     GHashTable *view_args;
 
