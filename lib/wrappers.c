@@ -46,9 +46,25 @@ balde_make_response(gchar *content)
     balde_response_t *response = g_new(balde_response_t, 1);
     response->status_code = 200;
     response->headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    response->template_ctx = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     balde_response_set_header(response, "Content-Type", "text/html; charset=utf-8");
     response->body = g_string_new(content);
     return response;
+}
+
+
+void
+balde_response_set_tmpl_var(balde_response_t *response, gchar *name,
+    gchar *value)
+{
+    g_hash_table_replace(response->template_ctx, g_strdup(name), g_strdup(value));
+}
+
+
+gchar*
+balde_response_get_tmpl_var(balde_response_t *response, gchar *name)
+{
+    return g_hash_table_lookup(response->template_ctx, name);
 }
 
 
@@ -58,6 +74,7 @@ balde_response_free(balde_response_t *response)
     if (response == NULL)
         return;
     g_hash_table_destroy(response->headers);
+    g_hash_table_destroy(response->template_ctx);
     g_string_free(response->body, TRUE);
     g_free(response);
 }

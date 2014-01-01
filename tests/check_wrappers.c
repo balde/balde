@@ -24,6 +24,7 @@ test_make_response(void)
     g_assert(res != NULL);
     g_assert(res->status_code == 200);
     g_assert(g_hash_table_size(res->headers) == 1);
+    g_assert(g_hash_table_size(res->template_ctx) == 0);
     g_assert_cmpstr(g_hash_table_lookup(res->headers, "content-type"), ==,
         "text/html; charset=utf-8");
     g_assert_cmpstr(res->body->str, ==, "lol");
@@ -105,6 +106,27 @@ test_fix_header_name(void)
     gchar foo[] = "content-type-lol";
     balde_fix_header_name(foo);
     g_assert_cmpstr(foo, ==, "Content-Type-Lol");
+}
+
+
+void
+test_response_set_tmpl_var(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    balde_response_set_tmpl_var(res, "bola", "guda");
+    g_assert(g_hash_table_size(res->template_ctx) == 1);
+    g_assert_cmpstr(g_hash_table_lookup(res->template_ctx, "bola"), ==, "guda");
+    balde_response_free(res);
+}
+
+
+void
+test_response_get_tmpl_var(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    g_hash_table_insert(res->template_ctx, g_strdup("bola"), g_strdup("guda"));
+    g_assert_cmpstr(balde_response_get_tmpl_var(res, "bola"), ==, "guda");
+    balde_response_free(res);
 }
 
 
@@ -233,6 +255,10 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/response_append_body",
         test_response_append_body);
     g_test_add_func("/wrappers/fix_header_name", test_fix_header_name);
+    g_test_add_func("/wrappers/response_set_tmpl_var",
+        test_response_set_tmpl_var);
+    g_test_add_func("/wrappers/response_get_tmpl_var",
+        test_response_get_tmpl_var);
     g_test_add_func("/wrappers/response_render", test_response_render);
     g_test_add_func("/wrappers/response_render_without_body",
         test_response_render_without_body);

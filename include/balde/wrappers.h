@@ -70,6 +70,13 @@ typedef struct {
     GHashTable *headers;
 
     /**
+     * A GLib hash table that stores the template variables. Do not touch
+     * it manually, use the balde_response_set_tmpl_var() and
+     * balde_response_get_tmpl_var() functions instead.
+     */
+    GHashTable *template_ctx;
+
+    /**
      * A GLib string that stores the response body. Do not touch it
      * manually, use the balde_response_append_body() function instead.
      */
@@ -93,6 +100,19 @@ void balde_response_append_body(balde_response_t *response, gchar *content);
  * of NULL.
  */
 balde_response_t* balde_make_response(gchar *content);
+
+/** Sets a template variable.
+ *
+ * The template variable name *IS* case-sensitive.
+ */
+void balde_response_set_tmpl_var(balde_response_t *response, gchar* name,
+    gchar* value);
+
+/** Gets a template variable.
+ *
+ * The template variable name *IS* case-sensitive.
+ */
+gchar* balde_response_get_tmpl_var(balde_response_t *response, gchar* name);
 
 /** Gets a request header.
  *
