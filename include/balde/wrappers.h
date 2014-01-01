@@ -132,4 +132,10 @@ gchar* balde_request_get_header(balde_request_t *request, gchar *name);
  */
 gchar* balde_request_get_arg(balde_request_t *request, gchar *name);
 
+/** Gets a view argument.
+ *
+ * The argument name *IS* case-sensitive.
+ */
+gchar* balde_request_get_view_arg(balde_request_t *request, gchar *name);
+
 #endif /* _BALDE_WRAPPERS_H */

@@ -251,6 +251,13 @@ balde_request_get_arg(balde_request_t *request, gchar *name)
 }
 
 
+gchar*
+balde_request_get_view_arg(balde_request_t *request, gchar *name)
+{
+    return g_hash_table_lookup(request->view_args, name);
+}
+
+
 void
 balde_request_free(balde_request_t *request)
 {
