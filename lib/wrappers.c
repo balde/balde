@@ -254,6 +254,8 @@ balde_request_get_arg(balde_request_t *request, gchar *name)
 gchar*
 balde_request_get_view_arg(balde_request_t *request, gchar *name)
 {
+    if (request->view_args == NULL)
+        return NULL;
     return g_hash_table_lookup(request->view_args, name);
 }
 
@@ -267,7 +269,6 @@ balde_request_free(balde_request_t *request)
     g_hash_table_destroy(request->headers);
     if (request->view_args != NULL)
         g_hash_table_destroy(request->view_args);
-    if (request->args != NULL)
-        g_hash_table_destroy(request->args);
+    g_hash_table_destroy(request->args);
     g_free(request);
 }

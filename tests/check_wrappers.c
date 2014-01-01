@@ -261,6 +261,30 @@ test_request_get_header(void)
 }
 
 
+void
+test_request_get_arg(void)
+{
+    g_setenv("QUERY_STRING", "lol=hehe", TRUE);
+    // FIXME: this thing is too weak :(
+    balde_request_t *request = balde_make_request();
+    g_assert_cmpstr(balde_request_get_arg(request, "lol"), == , "hehe");
+    g_assert(balde_request_get_header(request, "xd") == NULL);
+    balde_request_free(request);
+}
+
+
+void
+test_request_get_view_arg(void)
+{
+    balde_request_t *request = balde_make_request();
+    request->view_args = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    g_hash_table_replace(request->view_args, g_strdup("foo"), g_strdup("bar"));
+    g_assert_cmpstr(balde_request_get_view_arg(request, "foo"), == , "bar");
+    g_assert(balde_request_get_view_arg(request, "xd") == NULL);
+    balde_request_free(request);
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -293,5 +317,7 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/parse_query_string", test_parse_query_string);
     g_test_add_func("/wrappers/make_request", test_make_request);
     g_test_add_func("/wrappers/request_get_header", test_request_get_header);
+    g_test_add_func("/wrappers/request_get_arg", test_request_get_arg);
+    g_test_add_func("/wrappers/request_get_view_arg", test_request_get_view_arg);
     return g_test_run();
 }
