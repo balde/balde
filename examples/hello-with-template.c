@@ -5,7 +5,8 @@ balde_response_t*
 hello(balde_app_t *app, balde_request_t *request)
 {
     balde_response_t *response = balde_make_response("");
-    balde_response_set_tmpl_var(response, "name", "World");
+    gchar *name = balde_request_get_arg(request, "name");
+    balde_response_set_tmpl_var(response, "name", name != NULL ? name : "World");
     balde_template_foo(response);
     return response;
 }

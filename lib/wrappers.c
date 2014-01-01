@@ -194,19 +194,22 @@ balde_urldecode(gchar* str)
 
 
 GHashTable*
-balde_parse_query_string(gchar *query_string)
+balde_parse_query_string(const gchar *query_string)
 {
     GHashTable *qs = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    if (query_string == NULL)
+        goto point1;
     gchar **kv = g_strsplit(query_string, "&", 0);
     for (guint i = 0; kv[i] != NULL; i++) {
         gchar **pieces = g_strsplit(kv[i], "=", 2);
         if (g_strv_length(pieces) != 2)
-            goto point1;
+            goto point2;
         g_hash_table_replace(qs, balde_urldecode(pieces[0]), balde_urldecode(pieces[1]));
-point1:
+point2:
         g_strfreev(pieces);
     }
     g_strfreev(kv);
+point1:
     return qs;
 }
 
@@ -221,6 +224,7 @@ balde_make_request(void)
     request->path = g_strdup(path);
     request->method = balde_http_method_str2enum(g_getenv("REQUEST_METHOD"));
     request->headers = balde_request_headers();
+    request->args = balde_parse_query_string(g_getenv("QUERY_STRING"));
     request->view_args = NULL;
     return request;
 }
@@ -240,6 +244,13 @@ balde_request_get_header(balde_request_t *request, gchar *name)
 }
 
 
+gchar*
+balde_request_get_arg(balde_request_t *request, gchar *name)
+{
+    return g_hash_table_lookup(request->args, name);
+}
+
+
 void
 balde_request_free(balde_request_t *request)
 {
@@ -249,5 +260,7 @@ balde_request_free(balde_request_t *request)
     g_hash_table_destroy(request->headers);
     if (request->view_args != NULL)
         g_hash_table_destroy(request->view_args);
+    if (request->args != NULL)
+        g_hash_table_destroy(request->args);
     g_free(request);
 }

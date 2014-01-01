@@ -235,11 +235,13 @@ test_make_request(void)
     g_setenv("HTTP_XD_KKK", "asdf", TRUE);
     g_setenv("PATH_INFO", "/", TRUE);
     g_setenv("REQUEST_METHOD", "GET", TRUE);
+    g_setenv("QUERY_STRING", "asd=lol&xd=hehe", TRUE);
     // FIXME: this thing is too weak :(
     balde_request_t *request = balde_make_request();
     g_assert_cmpstr(request->path, ==, "/");
     g_assert(request->method == BALDE_HTTP_GET);
     g_assert(g_hash_table_size(request->headers) == 2);
+    g_assert(g_hash_table_size(request->args) == 2);
     g_assert(request->view_args == NULL);
     balde_request_free(request);
 }

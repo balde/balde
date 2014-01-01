@@ -21,7 +21,7 @@ gchar* balde_response_render(balde_response_t *response, gboolean with_body);
 void balde_response_print(balde_response_t *response, gboolean with_body);
 GHashTable* balde_request_headers(void);
 gchar* balde_urldecode(gchar* str);
-GHashTable* balde_parse_query_string(gchar *query_string);
+GHashTable* balde_parse_query_string(const gchar *query_string);
 balde_request_t* balde_make_request(void);
 void balde_request_free(balde_request_t *request);
 

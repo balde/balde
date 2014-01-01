@@ -26,6 +26,12 @@
 typedef struct {
 
     /**
+     * A GLib hash table that stores the query string parameters. Do not
+     * touch it manually, use the balde_request_get_arg() function instead.
+     */
+    GHashTable *args;
+
+    /**
      * A GLib hash table that stores the arguments parsed from the request
      * path.
      */
@@ -116,8 +122,14 @@ gchar* balde_response_get_tmpl_var(balde_response_t *response, gchar* name);
 
 /** Gets a request header.
  *
- * The header name is case insensitive
+ * The header name is case-insensitive.
  */
 gchar* balde_request_get_header(balde_request_t *request, gchar *name);
+
+/** Gets a query string argument.
+ *
+ * The argument name *IS* case-sensitive.
+ */
+gchar* balde_request_get_arg(balde_request_t *request, gchar *name);
 
 #endif /* _BALDE_WRAPPERS_H */
