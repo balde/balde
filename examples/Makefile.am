@@ -1,10 +1,18 @@
 if BUILD_EXAMPLES
 
+SUBDIRS = \
+	templates
+
 noinst_PROGRAMS = \
-	hello
+	hello \
+	hello-with-template
 
 hello_SOURCES = \
 	hello.c
+
+hello_with_template_SOURCES = \
+	hello-with-template.c \
+	templates/foo.c
 
 AM_CFLAGS = \
 	$(all_includes) \
