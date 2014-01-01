@@ -12,6 +12,8 @@
 
 #include <glib.h>
 #include <string.h>
+#include <balde/app.h>
+#include <balde/cgi-private.h>
 #include <balde/exceptions.h>
 #include <balde/exceptions-private.h>
 #include <balde/routing-private.h>
@@ -215,7 +217,7 @@ point1:
 
 
 balde_request_t*
-balde_make_request(void)
+balde_make_request(balde_app_t *app)
 {
     balde_request_t *request = g_new(balde_request_t, 1);
     const gchar *path = g_getenv("PATH_INFO");
@@ -226,6 +228,15 @@ balde_make_request(void)
     request->headers = balde_request_headers();
     request->args = balde_parse_query_string(g_getenv("QUERY_STRING"));
     request->view_args = NULL;
+    if (request->method & (BALDE_HTTP_POST | BALDE_HTTP_PUT | BALDE_HTTP_PATCH)) {
+        request->stream = balde_stdin_read(app);
+        // TODO: do not load form if content-type isn't form
+        request->form = balde_parse_query_string(request->stream);
+    }
+    else {
+        request->stream = NULL;
+        request->form = NULL;
+    }
     return request;
 }
 
@@ -252,6 +263,15 @@ balde_request_get_arg(balde_request_t *request, gchar *name)
 
 
 gchar*
+balde_request_get_form(balde_request_t *request, gchar *name)
+{
+    if (request->form == NULL)
+        return NULL;
+    return g_hash_table_lookup(request->form, name);
+}
+
+
+gchar*
 balde_request_get_view_arg(balde_request_t *request, gchar *name)
 {
     if (request->view_args == NULL)
@@ -267,8 +287,12 @@ balde_request_free(balde_request_t *request)
         return;
     g_free(request->path);
     g_hash_table_destroy(request->headers);
+    g_hash_table_destroy(request->args);
     if (request->view_args != NULL)
         g_hash_table_destroy(request->view_args);
-    g_hash_table_destroy(request->args);
+    if (request->stream != NULL)
+        g_free((gchar*) request->stream);
+    if (request->form != NULL)
+        g_hash_table_destroy(request->form);
     g_free(request);
 }

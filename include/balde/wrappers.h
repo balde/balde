@@ -32,6 +32,18 @@ typedef struct {
     GHashTable *args;
 
     /**
+     * A GLib hash table that stores the parsed form data. Do not touch it
+     * manually, use the balde_request_get_form() function instead.
+     */
+    GHashTable *form;
+
+    /**
+     * Raw request body, if provided by client. You can use it, but not change
+     * its value.
+     */
+    const gchar *stream;
+
+    /**
      * A GLib hash table that stores the arguments parsed from the request
      * path. Do not touch it manually, use the balde_request_get_view_arg()
      * function instead.
@@ -132,6 +144,13 @@ gchar* balde_request_get_header(balde_request_t *request, gchar *name);
  * The argument name *IS* case-sensitive.
  */
 gchar* balde_request_get_arg(balde_request_t *request, gchar *name);
+
+/** Gets a form input value.
+ *
+ * The form input name *IS* case-sensitive, and the function will always return
+ * NULL for HTTP methods that does not accepts request body.
+ */
+gchar* balde_request_get_form(balde_request_t *request, gchar *name);
 
 /** Gets a view argument.
  *

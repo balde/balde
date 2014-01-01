@@ -108,7 +108,7 @@ BEGIN_LOOP
         continue;
     }
 
-    request = balde_make_request();
+    request = balde_make_request(app);
     with_body = ! (request->method & BALDE_HTTP_HEAD);
 
     // get the view

@@ -10,6 +10,7 @@
 #define _BALDE_CGI_PRIVATE_H
 
 #include <glib.h>
+#include <balde/app.h>
 
 #ifdef ENABLE_FASTCGI
 #  include <fcgi_stdio.h>
@@ -23,5 +24,6 @@
 
 void balde_stdout_handler(const gchar *str);
 void balde_stderr_handler(const gchar *str);
+const gchar* balde_stdin_read(balde_app_t *app);
 
 #endif /* _BALDE_CGI_PRIVATE_H */

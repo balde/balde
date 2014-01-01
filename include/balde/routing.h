@@ -27,7 +27,8 @@ typedef enum {
     BALDE_HTTP_HEAD = 0x04,
     BALDE_HTTP_POST = 0x08,
     BALDE_HTTP_PUT = 0x10,
-    BALDE_HTTP_DELETE = 0x20
+    BALDE_HTTP_PATCH = 0x20,
+    BALDE_HTTP_DELETE = 0x40
 } balde_http_method_t;
 
 #endif /* _BALDE_ROUTING_H */
