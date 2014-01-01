@@ -185,7 +185,7 @@ balde_urldecode(gchar* str)
 {
     // corner case: + -> ' '
     GRegex *re_space = g_regex_new("\\+", 0, 0, NULL);
-    gchar *new_str = g_regex_replace_literal(re_space, str, -1, 0, " ", 0, NULL);
+    gchar *new_str = g_regex_replace_literal(re_space, str, -1, 0, "%20", 0, NULL);
     g_regex_unref(re_space);
     gchar *rv = g_uri_unescape_string(new_str, NULL);
     g_free(new_str);
