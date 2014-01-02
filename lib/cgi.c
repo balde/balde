@@ -12,8 +12,8 @@
 
 #include <glib.h>
 #include <balde/app.h>
-#include <balde/exceptions.h>
 #include <balde/cgi-private.h>
+#include <balde/exceptions.h>
 
 
 void
