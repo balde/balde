@@ -15,7 +15,7 @@
 #include <balde/cgi-private.h>
 
 // this thing isn't thread safe, bla, bla, bla, but this is just a test :)
-const gchar *query_string = "guda=bola&moises=arcoiro";
+extern const gchar *query_string;
 static guint counter = 0;
 
 

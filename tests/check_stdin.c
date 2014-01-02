@@ -16,7 +16,7 @@
 #include <balde/cgi-private.h>
 #include <balde/wrappers-private.h>
 
-extern const gchar *query_string;
+const gchar *query_string = "guda=bola&moises=arcoiro";
 
 
 void
