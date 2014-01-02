@@ -19,5 +19,6 @@ install:
 
 script:
   - ./autogen.sh
-  - ./configure
-  - make check
+  - mkdir -p ~/balde-build
+  - pushd ~/balde-build > /dev/null && ./configure --enable-examples && popd > /dev/null
+  - make -C ~/balde-build check
