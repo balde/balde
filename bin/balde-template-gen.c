@@ -78,9 +78,18 @@ generate_source(const gchar *template_name, const gchar *template_source)
         "\n"
         "void\n"
         "balde_template_%s(balde_response_t *response)\n"
-        "{\n"
-        "    gchar *rv = g_strdup_printf(balde_template_%s_format,\n",
-        template_name, final_source, template_name, template_name);
+        "{\n",
+        template_name, final_source, template_name);
+    if (variables == NULL) {
+        g_string_append_printf(rv,
+            "    gchar *rv = g_strdup(balde_template_%s_format);\n",
+            template_name);
+    }
+    else {
+        g_string_append_printf(rv,
+            "    gchar *rv = g_strdup_printf(balde_template_%s_format,\n",
+            template_name);
+    }
     for (GSList *tmp = variables; tmp != NULL; tmp = tmp->next) {
         g_string_append_printf(rv,
             "        balde_response_get_tmpl_var(response, \"%s\")",
