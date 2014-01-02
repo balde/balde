@@ -203,6 +203,7 @@ test_http_method_str2enum(void)
     g_assert(!(method & BALDE_HTTP_HEAD));
     g_assert(!(method & BALDE_HTTP_POST));
     g_assert(!(method & BALDE_HTTP_PUT));
+    g_assert(!(method & BALDE_HTTP_PATCH));
     g_assert(!(method & BALDE_HTTP_DELETE));
 
     method = balde_http_method_str2enum("GET");
@@ -211,6 +212,7 @@ test_http_method_str2enum(void)
     g_assert(!(method & BALDE_HTTP_HEAD));
     g_assert(!(method & BALDE_HTTP_POST));
     g_assert(!(method & BALDE_HTTP_PUT));
+    g_assert(!(method & BALDE_HTTP_PATCH));
     g_assert(!(method & BALDE_HTTP_DELETE));
 
     method = balde_http_method_str2enum("HEAD");
@@ -219,6 +221,7 @@ test_http_method_str2enum(void)
     g_assert(method & BALDE_HTTP_HEAD);
     g_assert(!(method & BALDE_HTTP_POST));
     g_assert(!(method & BALDE_HTTP_PUT));
+    g_assert(!(method & BALDE_HTTP_PATCH));
     g_assert(!(method & BALDE_HTTP_DELETE));
 
     method = balde_http_method_str2enum("POST");
@@ -227,6 +230,7 @@ test_http_method_str2enum(void)
     g_assert(!(method & BALDE_HTTP_HEAD));
     g_assert(method & BALDE_HTTP_POST);
     g_assert(!(method & BALDE_HTTP_PUT));
+    g_assert(!(method & BALDE_HTTP_PATCH));
     g_assert(!(method & BALDE_HTTP_DELETE));
 
     method = balde_http_method_str2enum("PUT");
@@ -235,6 +239,16 @@ test_http_method_str2enum(void)
     g_assert(!(method & BALDE_HTTP_HEAD));
     g_assert(!(method & BALDE_HTTP_POST));
     g_assert(method & BALDE_HTTP_PUT);
+    g_assert(!(method & BALDE_HTTP_PATCH));
+    g_assert(!(method & BALDE_HTTP_DELETE));
+
+    method = balde_http_method_str2enum("PATCH");
+    g_assert(!(method & BALDE_HTTP_OPTIONS));
+    g_assert(!(method & BALDE_HTTP_GET));
+    g_assert(!(method & BALDE_HTTP_HEAD));
+    g_assert(!(method & BALDE_HTTP_POST));
+    g_assert(!(method & BALDE_HTTP_PUT));
+    g_assert(method & BALDE_HTTP_PATCH);
     g_assert(!(method & BALDE_HTTP_DELETE));
 
     method = balde_http_method_str2enum("DELETE");
@@ -243,6 +257,7 @@ test_http_method_str2enum(void)
     g_assert(!(method & BALDE_HTTP_HEAD));
     g_assert(!(method & BALDE_HTTP_POST));
     g_assert(!(method & BALDE_HTTP_PUT));
+    g_assert(!(method & BALDE_HTTP_PATCH));
     g_assert(method & BALDE_HTTP_DELETE);
 }
 

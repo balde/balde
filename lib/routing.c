@@ -87,6 +87,8 @@ balde_http_method_str2enum(const gchar *method)
         return BALDE_HTTP_POST;
     if (g_strcmp0(method, "PUT") == 0)
         return BALDE_HTTP_PUT;
+    if (g_strcmp0(method, "PATCH") == 0)
+        return BALDE_HTTP_PATCH;
     if (g_strcmp0(method, "DELETE") == 0)
         return BALDE_HTTP_DELETE;
     return BALDE_HTTP_NONE;
@@ -109,6 +111,8 @@ balde_list_allowed_methods(balde_http_method_t method)
         methods = g_slist_append(methods, "POST");
     if (method & BALDE_HTTP_PUT)
         methods = g_slist_append(methods, "PUT");
+    if (method & BALDE_HTTP_PATCH)
+        methods = g_slist_append(methods, "PATCH");
     gchar** methods_array = g_new(gchar*, g_slist_length(methods) + 1);
     guint i = 0;
     for (GSList *tmp = methods; tmp != NULL; i++, tmp = tmp->next)
