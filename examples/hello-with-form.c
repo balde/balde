@@ -8,7 +8,7 @@ hello(balde_app_t *app, balde_request_t *request)
     balde_response_t *response = balde_make_response("");
     if (request->method == BALDE_HTTP_POST) {
         gchar *name = balde_request_get_form(request, "name");
-        balde_response_set_tmpl_var(response, "name", name != NULL ? name : "World");
+        balde_response_set_tmpl_var(response, "name", name[0] != '\0' ? name : "World");
         balde_template_hello(response);
     }
     else
