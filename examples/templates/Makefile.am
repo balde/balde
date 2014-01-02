@@ -9,10 +9,10 @@ BUILT_SOURCES = \
 clean-local:
 	rm -f *.h *.c
 
-%.c: %.html ../../bin/balde-template-gen
-	../../bin/balde-template-gen $< $@
+%.c: %.html $(top_builddir)/bin/balde-template-gen
+	$(top_builddir)/bin/balde-template-gen $< $@
 
-%.h: %.html ../../bin/balde-template-gen
-	../../bin/balde-template-gen $< $@
+%.h: %.html $(top_builddir)/bin/balde-template-gen
+	$(top_builddir)/bin/balde-template-gen $< $@
 
 endif
