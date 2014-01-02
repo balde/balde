@@ -6,6 +6,8 @@ BUILT_SOURCES = \
 	form.c \
 	form.h
 
+clean-local:
+	rm -f *.h *.c
 
 %.c: %.html ../../bin/balde-template-gen
 	../../bin/balde-template-gen $< $@
