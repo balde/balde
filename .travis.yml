@@ -18,7 +18,8 @@ install:
   - sudo make -C ~/glib/build install
 
 script:
+  - export BALDE_DIR="$(pwd)"
   - ./autogen.sh
   - mkdir -p ~/balde-build
-  - pushd ~/balde-build > /dev/null && ./configure --enable-examples && popd > /dev/null
+  - pushd ~/balde-build > /dev/null && $BALDE_DIR/configure --enable-examples && popd > /dev/null
   - make -C ~/balde-build check
