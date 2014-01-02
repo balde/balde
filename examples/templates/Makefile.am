@@ -1,8 +1,8 @@
 if BUILD_EXAMPLES
 
 BUILT_SOURCES = \
-	foo.c \
-	foo.h \
+	hello.c \
+	hello.h \
 	form.c \
 	form.h
 

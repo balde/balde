@@ -1,5 +1,5 @@
 #include <balde.h>
-#include "templates/foo.h"
+#include "templates/hello.h"
 #include "templates/form.h"
 
 balde_response_t*
@@ -9,7 +9,7 @@ hello(balde_app_t *app, balde_request_t *request)
     if (request->method == BALDE_HTTP_POST) {
         gchar *name = balde_request_get_form(request, "name");
         balde_response_set_tmpl_var(response, "name", name != NULL ? name : "World");
-        balde_template_foo(response);
+        balde_template_hello(response);
     }
     else
         balde_template_form(response);

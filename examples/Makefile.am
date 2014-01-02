@@ -13,12 +13,12 @@ hello_SOURCES = \
 
 hello_with_form_SOURCES = \
 	hello-with-form.c \
-	templates/foo.c \
+	templates/hello.c \
 	templates/form.c
 
 hello_with_template_SOURCES = \
 	hello-with-template.c \
-	templates/foo.c
+	templates/hello.c
 
 AM_CFLAGS = \
 	$(all_includes) \
