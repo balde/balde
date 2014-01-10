@@ -1,6 +1,6 @@
 /*
  * balde: A microframework for C based on GLib and bad intentions.
- * Copyright (C) 2013 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ * Copyright (C) 2013-2014 Rafael G. Martins <rafael@rafaelmartins.eng.br>
  *
  * This program can be distributed under the terms of the LGPL-2 License.
  * See the file COPYING.
@@ -54,7 +54,7 @@ generate_source(const gchar *template_name, const gchar *template_source)
     // escape % chars.
     GRegex *re_percent = g_regex_new("%", 0, 0, NULL);
     gchar *escaped_perc_source = g_regex_replace_literal(re_percent,
-            escaped_nl_source, -1, 0, "%%", 0, NULL);
+        escaped_nl_source, -1, 0, "%%", 0, NULL);
     g_regex_unref(re_percent);
     g_free(escaped_nl_source);
 
