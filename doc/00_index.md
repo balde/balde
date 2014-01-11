@@ -7,6 +7,8 @@ It is designed to be fast, simple, and memory efficient. Most of its architectur
 
 *balde* is free software, released under the LGPL2 license.
 
+The project is hosted and managed using GitHub: https://github.com/rafaelmartins/balde
+
 Here you will find all the resources required to get started and develop your web applications using *balde*:
 
 - [Basic concepts](@ref concepts)
