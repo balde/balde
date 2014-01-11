@@ -111,7 +111,8 @@ void balde_response_set_header(balde_response_t *response, const gchar *name,
     const gchar *value);
 
 /** Appends a string to the response body. */
-void balde_response_append_body(balde_response_t *response, gchar *content);
+void balde_response_append_body(balde_response_t *response,
+    const gchar *content);
 
 /** Initialize a response context.
  *
@@ -119,7 +120,7 @@ void balde_response_append_body(balde_response_t *response, gchar *content);
  * Please use an empty string if the response doesn't have body, instead
  * of NULL.
  */
-balde_response_t* balde_make_response(gchar *content);
+balde_response_t* balde_make_response(const gchar *content);
 
 /** Sets a template variable.
  *

@@ -199,7 +199,7 @@ balde_http_exception_quark(void)
 
 
 const gchar*
-balde_exception_get_name_from_code(balde_http_exception_code_t code)
+balde_exception_get_name_from_code(const balde_http_exception_code_t code)
 {
     for (guint i = 0; exceptions[i].name != NULL; i++)
         if (exceptions[i].code == code)
@@ -209,7 +209,7 @@ balde_exception_get_name_from_code(balde_http_exception_code_t code)
 
 
 const gchar*
-balde_exception_get_description_from_code(balde_http_exception_code_t code)
+balde_exception_get_description_from_code(const balde_http_exception_code_t code)
 {
     for (guint i = 0; exceptions[i].name != NULL; i++)
         if (exceptions[i].code == code)
@@ -219,7 +219,7 @@ balde_exception_get_description_from_code(balde_http_exception_code_t code)
 
 
 void
-balde_abort_set_error(balde_app_t *app, balde_http_exception_code_t code)
+balde_abort_set_error(balde_app_t *app, const balde_http_exception_code_t code)
 {
     g_propagate_error(&(app->error),
         g_error_new(balde_http_exception_quark(), code,
@@ -230,7 +230,7 @@ balde_abort_set_error(balde_app_t *app, balde_http_exception_code_t code)
 
 
 balde_response_t*
-balde_abort(balde_app_t *app, balde_http_exception_code_t code)
+balde_abort(balde_app_t *app, const balde_http_exception_code_t code)
 {
     balde_abort_set_error(app, code);
     balde_response_t* response = NULL;

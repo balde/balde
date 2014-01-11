@@ -17,8 +17,8 @@
 #include <balde/routing-private.h>
 
 
-gboolean
-balde_url_match(gchar *path, const gchar *rule, GHashTable **matches)
+const gboolean
+balde_url_match(const gchar *path, const gchar *rule, GHashTable **matches)
 {
     GError *_error = NULL;
     gboolean match = FALSE;
@@ -63,7 +63,7 @@ point1:
 
 
 gchar*
-balde_dispatch_from_path(GSList *views, gchar *path, GHashTable **matches)
+balde_dispatch_from_path(GSList *views, const gchar *path, GHashTable **matches)
 {
     for (GSList *tmp = views; tmp != NULL; tmp = g_slist_next(tmp)) {
         balde_view_t *view = tmp->data;
@@ -74,7 +74,7 @@ balde_dispatch_from_path(GSList *views, gchar *path, GHashTable **matches)
 }
 
 
-balde_http_method_t
+const balde_http_method_t
 balde_http_method_str2enum(const gchar *method)
 {
     if (g_strcmp0(method, "OPTIONS") == 0)
@@ -96,7 +96,7 @@ balde_http_method_str2enum(const gchar *method)
 
 
 gchar*
-balde_list_allowed_methods(balde_http_method_t method)
+balde_list_allowed_methods(const balde_http_method_t method)
 {
     GSList *methods = NULL;
     if (method & BALDE_HTTP_OPTIONS)

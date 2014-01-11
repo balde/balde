@@ -37,14 +37,14 @@ balde_response_set_header(balde_response_t *response, const gchar *name,
 
 
 void
-balde_response_append_body(balde_response_t *response, gchar *content)
+balde_response_append_body(balde_response_t *response, const gchar *content)
 {
     g_string_append(response->body, content);
 }
 
 
 balde_response_t*
-balde_make_response(gchar *content)
+balde_make_response(const gchar *content)
 {
     balde_response_t *response = g_new(balde_response_t, 1);
     response->status_code = 200;
@@ -121,15 +121,17 @@ balde_fix_header_name(gchar *name)
 
 
 void
-balde_header_render(gchar *key, gchar *value, GString *str)
+balde_header_render(const gchar *key, const gchar *value, GString *str)
 {
-    balde_fix_header_name(key);
-    g_string_append_printf(str, "%s: %s\r\n", key, value);
+    gchar *new_key = g_strdup(key);
+    balde_fix_header_name(new_key);
+    g_string_append_printf(str, "%s: %s\r\n", new_key, value);
+    g_free(new_key);
 }
 
 
 gchar*
-balde_response_render(balde_response_t *response, gboolean with_body)
+balde_response_render(balde_response_t *response, const gboolean with_body)
 {
     if (response == NULL)
         return NULL;
@@ -150,7 +152,7 @@ balde_response_render(balde_response_t *response, gboolean with_body)
 
 
 void
-balde_response_print(balde_response_t *response, gboolean with_body)
+balde_response_print(balde_response_t *response, const gboolean with_body)
 {
     gchar *resp = balde_response_render(response, with_body);
     g_print("%s", resp);
@@ -183,7 +185,7 @@ balde_request_headers(void)
 
 
 gchar*
-balde_urldecode(gchar* str)
+balde_urldecode(const gchar* str)
 {
     // corner case: + -> ' '
     GRegex *re_space = g_regex_new("\\+", 0, 0, NULL);

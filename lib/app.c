@@ -85,7 +85,7 @@ balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rul
 
 
 balde_view_t*
-balde_app_get_view_from_endpoint(balde_app_t *app, gchar *endpoint)
+balde_app_get_view_from_endpoint(balde_app_t *app, const gchar *endpoint)
 {
     for (GSList *tmp = app->views; tmp != NULL; tmp = g_slist_next(tmp)) {
         balde_view_t *view = tmp->data;

@@ -18,9 +18,11 @@ typedef struct {
     balde_http_method_t method;
 } balde_url_rule_t;
 
-gboolean balde_url_match(gchar *path, const gchar *rule, GHashTable **matches);
-gchar* balde_dispatch_from_path(GSList *views, gchar *path, GHashTable **matches);
-balde_http_method_t balde_http_method_str2enum(const gchar *method);
-gchar* balde_list_allowed_methods(balde_http_method_t method);
+const gboolean balde_url_match(const gchar *path, const gchar *rule,
+    GHashTable **matches);
+gchar* balde_dispatch_from_path(GSList *views, const gchar *path,
+    GHashTable **matches);
+const balde_http_method_t balde_http_method_str2enum(const gchar *method);
+gchar* balde_list_allowed_methods(const balde_http_method_t method);
 
 #endif /* _BALDE_ROUTING_PRIVATE_H */

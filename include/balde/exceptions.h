@@ -55,12 +55,14 @@ typedef enum {
  * It is called "error" to be consistent with GLib naming standards,
  * but it works like an exception.
  */
-void balde_abort_set_error(balde_app_t *app, balde_http_exception_code_t code);
+void balde_abort_set_error(balde_app_t *app,
+    const balde_http_exception_code_t code);
 
 /** Returns a response context that represents an HTTP status code
  *
  * This function returns the response, but does not sets the GLib error.
  */
-balde_response_t* balde_abort(balde_app_t *app, balde_http_exception_code_t code);
+balde_response_t* balde_abort(balde_app_t *app,
+    const balde_http_exception_code_t code);
 
 #endif /* _BALDE_EXCEPTIONS_H */

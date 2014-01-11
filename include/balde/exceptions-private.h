@@ -18,7 +18,7 @@ typedef struct {
     const gchar *description;
 } balde_http_exception_t;
 
-const gchar* balde_exception_get_name_from_code(balde_http_exception_code_t code);
-const gchar* balde_exception_get_description_from_code(balde_http_exception_code_t code);
+const gchar* balde_exception_get_name_from_code(const balde_http_exception_code_t code);
+const gchar* balde_exception_get_description_from_code(const balde_http_exception_code_t code);
 
 #endif /* _BALDE_EXCEPTIONS_PRIVATE_H */
