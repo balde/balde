@@ -33,6 +33,27 @@ test_app_init(void)
 }
 
 
+void
+test_app_set_config(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_app_set_config(app, "BolA", "guda");
+    g_assert(g_hash_table_size(app->config) == 1);
+    g_assert_cmpstr(g_hash_table_lookup(app->config, "bola"), ==, "guda");
+    balde_app_free(app);
+}
+
+
+void
+test_app_get_config(void)
+{
+    balde_app_t *app = balde_app_init();
+    g_hash_table_replace(app->config, g_strdup("bola"), g_strdup("guda"));
+    g_assert_cmpstr(balde_app_get_config(app, "BoLa"), ==, "guda");
+    balde_app_free(app);
+}
+
+
 balde_response_t*
 arcoiro_view(balde_app_t *app, balde_request_t *req)
 {
@@ -108,6 +129,8 @@ main(int argc, char** argv)
 {
     g_test_init(&argc, &argv, NULL);
     g_test_add_func("/app/init", test_app_init);
+    g_test_add_func("/app/set_config", test_app_set_config);
+    g_test_add_func("/app/get_config", test_app_get_config);
     g_test_add_func("/app/add_url_rule", test_app_add_url_rule);
     g_test_add_func("/app/get_view_from_endpoint",
         test_app_get_view_from_endpoint);

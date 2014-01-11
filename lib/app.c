@@ -28,10 +28,23 @@ balde_app_init(void)
 {
     balde_app_t *app = g_new(balde_app_t, 1);
     app->views = NULL;
-    // TODO: load config from somewhere
     app->config = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     app->error = NULL;
     return app;
+}
+
+
+void
+balde_app_set_config(balde_app_t *app, gchar *name, gchar *value)
+{
+    g_hash_table_replace(app->config, g_utf8_strdown(name, -1), g_strdup(value));
+}
+
+
+gchar*
+balde_app_get_config(balde_app_t *app, gchar *name)
+{
+    return g_hash_table_lookup(app->config, g_utf8_strdown(name, -1));
 }
 
 

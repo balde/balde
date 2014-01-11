@@ -57,6 +57,21 @@ typedef balde_response_t* (*balde_view_func_t) (balde_app_t*, balde_request_t*);
  */
 balde_app_t* balde_app_init(void);
 
+
+/** Sets a configuration parameter.
+ *
+ * The parameter name is case-insensitive.
+ */
+void balde_app_set_config(balde_app_t *app, gchar *name, gchar *value);
+
+
+/** Gets a configuration parameter.
+ *
+ * The argument name is case-insensitive.
+ */
+gchar* balde_app_get_config(balde_app_t *app, gchar *name);
+
+
 /** Free application context memory.
  *
  * This function will clean and free all memory used by the application context.
