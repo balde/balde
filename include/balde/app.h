@@ -33,7 +33,8 @@ typedef struct {
 
     /**
      * A GLib hash table that stores the application settings. Do not touch
-     * this manually!
+     * this, use the balde_app_set_config() and balde_app_get_config()
+     * functions instead!
      */
     GHashTable *config;
 
