@@ -107,7 +107,8 @@ typedef struct {
  *
  * The header name is case-insensitive.
  */
-void balde_response_set_header(balde_response_t *response, gchar *name, gchar *value);
+void balde_response_set_header(balde_response_t *response, const gchar *name,
+    const gchar *value);
 
 /** Appends a string to the response body. */
 void balde_response_append_body(balde_response_t *response, gchar *content);
@@ -124,38 +125,41 @@ balde_response_t* balde_make_response(gchar *content);
  *
  * The template variable name *IS* case-sensitive.
  */
-void balde_response_set_tmpl_var(balde_response_t *response, gchar* name,
-    gchar* value);
+void balde_response_set_tmpl_var(balde_response_t *response, const gchar* name,
+    const gchar* value);
 
 /** Gets a template variable.
  *
  * The template variable name *IS* case-sensitive.
  */
-gchar* balde_response_get_tmpl_var(balde_response_t *response, gchar* name);
+const gchar* balde_response_get_tmpl_var(balde_response_t *response,
+    const gchar* name);
 
 /** Gets a request header.
  *
  * The header name is case-insensitive.
  */
-gchar* balde_request_get_header(balde_request_t *request, gchar *name);
+const gchar* balde_request_get_header(balde_request_t *request,
+    const gchar *name);
 
 /** Gets a query string argument.
  *
  * The argument name *IS* case-sensitive.
  */
-gchar* balde_request_get_arg(balde_request_t *request, gchar *name);
+const gchar* balde_request_get_arg(balde_request_t *request, const gchar *name);
 
 /** Gets a form input value.
  *
  * The form input name *IS* case-sensitive, and the function will always return
  * NULL for HTTP methods that does not accepts request body.
  */
-gchar* balde_request_get_form(balde_request_t *request, gchar *name);
+const gchar* balde_request_get_form(balde_request_t *request, const gchar *name);
 
 /** Gets a view argument.
  *
  * The argument name *IS* case-sensitive.
  */
-gchar* balde_request_get_view_arg(balde_request_t *request, gchar *name);
+const gchar* balde_request_get_view_arg(balde_request_t *request,
+    const gchar *name);
 
 #endif /* _BALDE_WRAPPERS_H */

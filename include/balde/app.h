@@ -63,14 +63,14 @@ balde_app_t* balde_app_init(void);
  *
  * The parameter name is case-insensitive.
  */
-void balde_app_set_config(balde_app_t *app, gchar *name, gchar *value);
+void balde_app_set_config(balde_app_t *app, const gchar *name, const gchar *value);
 
 
 /** Gets a configuration parameter.
  *
  * The parameter name is case-insensitive.
  */
-gchar* balde_app_get_config(balde_app_t *app, gchar *name);
+const gchar* balde_app_get_config(balde_app_t *app, const gchar *name);
 
 
 /** Free application context memory.

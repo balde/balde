@@ -22,7 +22,8 @@
 
 
 void
-balde_response_set_header(balde_response_t *response, gchar *name, gchar *value)
+balde_response_set_header(balde_response_t *response, const gchar *name,
+    const gchar *value)
 {
     // http header name is ascii
     gchar *new_name = g_new(gchar, strlen(name) + 1);
@@ -56,15 +57,15 @@ balde_make_response(gchar *content)
 
 
 void
-balde_response_set_tmpl_var(balde_response_t *response, gchar *name,
-    gchar *value)
+balde_response_set_tmpl_var(balde_response_t *response, const gchar *name,
+    const gchar *value)
 {
     g_hash_table_replace(response->template_ctx, g_strdup(name), g_strdup(value));
 }
 
 
-gchar*
-balde_response_get_tmpl_var(balde_response_t *response, gchar *name)
+const gchar*
+balde_response_get_tmpl_var(balde_response_t *response, const gchar *name)
 {
     return g_hash_table_lookup(response->template_ctx, name);
 }
@@ -89,7 +90,6 @@ balde_make_response_from_exception(GError *error)
         return NULL;
     guint status_code = error->code;
     const gchar *name = balde_exception_get_name_from_code(status_code);
-    const gchar *description;
     gchar* new_description;
     if (name == NULL) {
         status_code = 500;
@@ -241,8 +241,8 @@ balde_make_request(balde_app_t *app)
 }
 
 
-gchar*
-balde_request_get_header(balde_request_t *request, gchar *name)
+const gchar*
+balde_request_get_header(balde_request_t *request, const gchar *name)
 {
     gchar *l_name = g_strdup(name);
     guint i;
@@ -255,15 +255,15 @@ balde_request_get_header(balde_request_t *request, gchar *name)
 }
 
 
-gchar*
-balde_request_get_arg(balde_request_t *request, gchar *name)
+const gchar*
+balde_request_get_arg(balde_request_t *request, const gchar *name)
 {
     return g_hash_table_lookup(request->args, name);
 }
 
 
-gchar*
-balde_request_get_form(balde_request_t *request, gchar *name)
+const gchar*
+balde_request_get_form(balde_request_t *request, const gchar *name)
 {
     if (request->form == NULL)
         return NULL;
@@ -271,8 +271,8 @@ balde_request_get_form(balde_request_t *request, gchar *name)
 }
 
 
-gchar*
-balde_request_get_view_arg(balde_request_t *request, gchar *name)
+const gchar*
+balde_request_get_view_arg(balde_request_t *request, const gchar *name)
 {
     if (request->view_args == NULL)
         return NULL;
