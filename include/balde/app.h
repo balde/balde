@@ -67,7 +67,7 @@ void balde_app_set_config(balde_app_t *app, gchar *name, gchar *value);
 
 /** Gets a configuration parameter.
  *
- * The argument name is case-insensitive.
+ * The parameter name is case-insensitive.
  */
 gchar* balde_app_get_config(balde_app_t *app, gchar *name);
 
