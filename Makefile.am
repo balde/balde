@@ -22,6 +22,9 @@ $(top_srcdir)/.version:
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = balde.pc
+
 if BUILD_DOCS
 doxygen: Doxyfile
 	$(MAKE) -C doc clean

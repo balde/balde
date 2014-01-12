@@ -31,6 +31,7 @@ Makefile.in
 /libtool
 /stamp-h1
 .dirstamp
+/balde.pc
 
 # git-version-gen
 /build-aux/*
