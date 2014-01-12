@@ -43,6 +43,11 @@ typedef struct {
      */
     GError *error;
 
+    /**
+     * User data to be attached to the application context.
+     */
+    gpointer user_data;
+
 } balde_app_t;
 
 /** View type definition
