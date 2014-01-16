@@ -21,14 +21,14 @@
  * BALDE_HTTP_NONE method is internal and shouldn't be used manually.
  */
 typedef enum {
-    BALDE_HTTP_NONE = 0x00,
-    BALDE_HTTP_OPTIONS = 0x01,
-    BALDE_HTTP_GET = 0x02,
-    BALDE_HTTP_HEAD = 0x04,
-    BALDE_HTTP_POST = 0x08,
-    BALDE_HTTP_PUT = 0x10,
-    BALDE_HTTP_PATCH = 0x20,
-    BALDE_HTTP_DELETE = 0x40
+    BALDE_HTTP_NONE    = 0,
+    BALDE_HTTP_OPTIONS = 1 << 0,
+    BALDE_HTTP_GET     = 1 << 1,
+    BALDE_HTTP_HEAD    = 1 << 2,
+    BALDE_HTTP_POST    = 1 << 3,
+    BALDE_HTTP_PUT     = 1 << 4,
+    BALDE_HTTP_PATCH   = 1 << 5,
+    BALDE_HTTP_DELETE  = 1 << 6
 } balde_http_method_t;
 
 #endif /* _BALDE_ROUTING_H */
