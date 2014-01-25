@@ -10,6 +10,7 @@
 #define _BALDE_APP_H
 
 #include <glib.h>
+#include <gio/gio.h>
 #include <balde/wrappers.h>
 
 /** Application related definitions.
@@ -61,7 +62,7 @@ typedef balde_response_t* (*balde_view_func_t) (balde_app_t*, balde_request_t*);
  *
  * This function allocates memory for the application context.
  */
-balde_app_t* balde_app_init(void);
+balde_app_t* balde_app_init(GResource *static_resources);
 
 
 /** Sets a configuration parameter.

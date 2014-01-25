@@ -3,6 +3,8 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
+balde_template_gen=@bindir@/balde-template-gen
+
 Name: @PACKAGE@
 Description: A microframework for C based on GLib and bad intentions.
 Version: @VERSION@

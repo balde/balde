@@ -54,7 +54,7 @@ test_exception_get_description_from_code_not_found(void)
 void
 test_abort_set_error(void)
 {
-    balde_app_t *app = balde_app_init();
+    balde_app_t *app = balde_app_init(NULL);
     g_assert(app != NULL);
     balde_abort_set_error(app, 404);
     g_assert(app->error->code == 404);
@@ -68,7 +68,7 @@ test_abort_set_error(void)
 void
 test_abort(void)
 {
-    balde_app_t *app = balde_app_init();
+    balde_app_t *app = balde_app_init(NULL);
     g_assert(app != NULL);
     balde_response_t *res = balde_abort(app, 404);
     g_assert(res->status_code == 404);

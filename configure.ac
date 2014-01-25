@@ -92,7 +92,7 @@ AM_CONDITIONAL([USE_VALGRIND], [test "x$have_valgrind" = "xyes"])
 VALGRIND="$ac_cv_path_valgrind"
 AC_SUBST(VALGRIND)
 
-GLIB_DEP="glib-2.0 >= 2.34"
+GLIB_DEP="glib-2.0 >= 2.34, gio-2.0 >= 2.34"
 AC_SUBST(GLIB_DEP)
 
 PKG_PROG_PKG_CONFIG

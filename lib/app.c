@@ -11,6 +11,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
+#include <gio/gio.h>
 #include <locale.h>
 #include <balde/app.h>
 #include <balde/app-private.h>
@@ -24,7 +25,7 @@
 
 
 balde_app_t*
-balde_app_init(void)
+balde_app_init(GResource *static_resources)
 {
     balde_app_t *app = g_new(balde_app_t, 1);
     app->views = NULL;
