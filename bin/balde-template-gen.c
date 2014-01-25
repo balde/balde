@@ -74,12 +74,13 @@ generate_source(const gchar *template_name, const gchar *template_source)
         "#include <balde.h>\n"
         "#include <glib.h>\n"
         "\n"
-        "const gchar *balde_template_%s_format = \"%s\";\n"
+        "static const gchar *balde_template_%s_format = \"%s\";\n"
+        "extern void balde_template_%s(balde_response_t *response);\n"
         "\n"
         "void\n"
         "balde_template_%s(balde_response_t *response)\n"
         "{\n",
-        template_name, final_source, template_name);
+        template_name, final_source, template_name, template_name);
     if (variables == NULL) {
         g_string_append_printf(rv,
             "    gchar *rv = g_strdup(balde_template_%s_format);\n",
@@ -120,10 +121,9 @@ generate_header(const gchar *template_name)
         "\n"
         "#include <balde.h>\n"
         "\n"
-        "const gchar *balde_template_%s_format;\n"
-        "void balde_template_%s(balde_response_t *response);\n"
+        "extern void balde_template_%s(balde_response_t *response);\n"
         "\n"
-        "#endif\n", template_name, template_name, template_name, template_name);
+        "#endif\n", template_name, template_name, template_name);
 }
 
 
