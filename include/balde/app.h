@@ -40,6 +40,12 @@ typedef struct {
     GHashTable *config;
 
     /**
+     * A GLib GResource object that stores static files, built with the balde
+     * app binary.
+     */
+    GResource *static_resources;
+
+    /**
      * A GLib error instance. Do not touch this manually!
      */
     GError *error;

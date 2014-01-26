@@ -97,17 +97,24 @@ AC_SUBST(GLIB_DEP)
 
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GLIB], [$GLIB_DEP])
+PKG_CHECK_VAR([GLIB_CR], [gio-2.0], [glib_compile_resources])
+
+AC_PATH_PROG([glib_compile_resources], [$GLIB_CR])
+GLIB_COMPILE_RESOURCES="$ac_cv_path_glib_compile_resources"
+AC_SUBST(GLIB_COMPILE_RESOURCES)
 
 AC_CONFIG_FILES([
     Makefile
     bin/Makefile
     examples/Makefile
+    examples/static/Makefile
     examples/templates/Makefile
     include/Makefile
     include/balde/Makefile
     lib/Makefile
     doc/Makefile
     tests/Makefile
+    tests/static/Makefile
     Doxyfile
     balde.pc
 ])
@@ -126,6 +133,7 @@ AS_ECHO("
 
         fastcgi:      ${FASTCGI}
         examples:     ${EXAMPLES}
+
         doxygen:      ${DOXYGEN}
         valgrind:     ${VALGRIND}
 ")

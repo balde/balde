@@ -1,6 +1,7 @@
 check_PROGRAMS = \
 	check_app \
 	check_exceptions \
+	check_resources \
 	check_routing \
 	check_stdin \
 	check_wrappers
@@ -15,6 +16,14 @@ check_app_SOURCES = \
 
 check_exceptions_SOURCES = \
 	check_exceptions.c
+
+check_resources_SOURCES = \
+	check_resources.c
+
+nodist_check_resources_SOURCES = \
+	resources.c \
+	resources.h
+check_resources.$(OBJEXT): resources.c resources.h
 
 check_routing_SOURCES = \
 	check_routing.c
@@ -46,5 +55,16 @@ valgrind:
 				--tool=memcheck \
 				--leak-check=full \
 				--leak-resolution=high \
-				--num-callers=20"
+				--num-callers=20 \
+				--show-possibly-lost=no"
 endif
+
+CLEANFILES = \
+	resources.c \
+	resources.h
+
+%.c: %.xml
+	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --target $@ $<
+
+%.h: %.xml
+	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --target $@ $<

@@ -4,6 +4,7 @@ libbalde_la_SOURCES = \
 	app.c \
 	cgi.c \
 	exceptions.c \
+	resources.c \
 	routing.c \
 	wrappers.c
 

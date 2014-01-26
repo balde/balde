@@ -30,6 +30,7 @@ balde_app_init(GResource *static_resources)
     balde_app_t *app = g_new(balde_app_t, 1);
     app->views = NULL;
     app->config = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    app->static_resources = static_resources;
     app->error = NULL;
     return app;
 }
