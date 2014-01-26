@@ -45,7 +45,10 @@ balde_app_set_config(balde_app_t *app, const gchar *name, const gchar *value)
 const gchar*
 balde_app_get_config(balde_app_t *app, const gchar *name)
 {
-    return g_hash_table_lookup(app->config, g_utf8_strdown(name, -1));
+    gchar *tmp = g_utf8_strdown(name, -1);
+    const gchar *rv = g_hash_table_lookup(app->config, tmp);
+    g_free(tmp);
+    return rv;
 }
 
 

@@ -30,7 +30,7 @@ balde_stderr_handler(const gchar *str)
 }
 
 
-const gchar*
+gchar*
 balde_stdin_read(balde_app_t *app)
 {
     const gchar *clen_str = g_getenv("CONTENT_LENGTH");
@@ -50,7 +50,7 @@ balde_stdin_read(balde_app_t *app)
             }
             g_string_append_c(rv, (gchar) ch);
         }
-        return (const gchar*) g_string_free(rv, FALSE);
+        return (gchar*) g_string_free(rv, FALSE);
     }
     return NULL;
 }

@@ -33,7 +33,9 @@ void
 test_read(void) {
     set_headers();
     balde_app_t *app = balde_app_init(NULL);
-    g_assert_cmpstr(balde_stdin_read(app), ==, "guda=bola&moises=arcoiro");
+    gchar *body = balde_stdin_read(app);
+    g_assert_cmpstr(body, ==, "guda=bola&moises=arcoiro");
+    g_free(body);
     balde_app_free(app);
 }
 
