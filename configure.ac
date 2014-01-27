@@ -114,7 +114,6 @@ AC_CONFIG_FILES([
     lib/Makefile
     doc/Makefile
     tests/Makefile
-    tests/static/Makefile
     Doxyfile
     balde.pc
 ])
