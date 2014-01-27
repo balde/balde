@@ -97,10 +97,8 @@ AC_SUBST(GLIB_DEP)
 
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GLIB], [$GLIB_DEP])
-PKG_CHECK_VAR([GLIB_CR], [gio-2.0], [glib_compile_resources])
 
-AC_PATH_PROG([glib_compile_resources], [$GLIB_CR])
-GLIB_COMPILE_RESOURCES="$ac_cv_path_glib_compile_resources"
+GLIB_COMPILE_RESOURCES="`$PKG_CONFIG --variable glib_compile_resources gio-2.0`"
 AC_SUBST(GLIB_COMPILE_RESOURCES)
 
 AC_CONFIG_FILES([
