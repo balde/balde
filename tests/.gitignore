@@ -1,4 +1,0 @@
-/check_*
-!/check_*.c
-*.log
-/resources.[ch]

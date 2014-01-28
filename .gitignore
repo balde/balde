@@ -40,3 +40,31 @@ Makefile.in
 
 # doxygen
 /Doxyfile
+/doc/build/
+
+# installed .m4 files
+/m4/*.m4
+
+# balde-template-gen
+/bin/balde-template-gen
+
+# tests
+/tests/check_app
+/tests/check_exceptions
+/tests/check_resources
+/tests/check_routing
+/tests/check_stdin
+/tests/check_wrappers
+/tests/*.log
+/tests/resources.c
+/tests/resources.h
+
+# examples
+/examples/hello
+/examples/hello-with-static
+/examples/hello-with-form
+/examples/hello-with-template
+/examples/resources.c
+/examples/resources.h
+/examples/templates/*.c
+/examples/templates/*.h
