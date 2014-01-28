@@ -105,7 +105,6 @@ AC_CONFIG_FILES([
     Makefile
     bin/Makefile
     examples/Makefile
-    examples/static/Makefile
     examples/templates/Makefile
     include/Makefile
     include/balde/Makefile

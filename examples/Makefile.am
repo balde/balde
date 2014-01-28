@@ -1,7 +1,6 @@
 if BUILD_EXAMPLES
 
 SUBDIRS = \
-	static \
 	templates
 
 noinst_PROGRAMS = \
@@ -23,8 +22,12 @@ hello_with_template_SOURCES = \
 	templates/hello.c
 
 hello_with_static_SOURCES = \
-	hello-with-static.c \
-	static/static.c
+	hello-with-static.c
+
+nodist_hello_with_static_SOURCES = \
+	resources.c \
+	resources.h
+hello-with-static.$(OBJEXT): resources.c resources.h
 
 AM_CFLAGS = \
 	$(all_includes) \
@@ -34,5 +37,17 @@ AM_CFLAGS = \
 AM_LDFLAGS = \
 	$(GLIB_LIBS) \
 	$(top_builddir)/lib/libbalde.la
+
+CLEANFILES = \
+	resources.c \
+	resources.h
+
+resources.xml: $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(srcdir)/static $(srcdir)/resources.xml)
+
+%.c: %.xml
+	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(srcdir)/static --target $@ $<
+
+%.h: %.xml
+	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(srcdir)/static --target $@ $<
 
 endif

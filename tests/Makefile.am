@@ -63,8 +63,10 @@ CLEANFILES = \
 	resources.c \
 	resources.h
 
+resources.xml: $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(srcdir)/static $(srcdir)/resources.xml)
+
 %.c: %.xml
-	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --target $@ $<
+	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(srcdir)/static --target $@ $<
 
 %.h: %.xml
-	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --target $@ $<
+	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(srcdir)/static --target $@ $<

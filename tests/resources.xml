@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-	<gresource prefix="/">
-        <file>static/zz.js</file>
-        <file>static/lol.js</file>
-        <file>static/lol.css</file>
+	<gresource prefix="/static">
+        <file>zz.js</file>
+        <file>lol.js</file>
+        <file>lol.css</file>
 	</gresource>
 </gresources>
