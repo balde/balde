@@ -17,6 +17,7 @@
 #include <balde/cgi-private.h>
 #include <balde/exceptions.h>
 #include <balde/exceptions-private.h>
+#include <balde/resources-private.h>
 #include <balde/routing.h>
 #include <balde/routing-private.h>
 #include <balde/wrappers.h>
@@ -28,6 +29,7 @@ balde_app_init(void)
 {
     balde_app_t *app = g_new(balde_app_t, 1);
     app->views = NULL;
+    app->static_resources = NULL;
     app->config = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     app->error = NULL;
     return app;
@@ -64,6 +66,8 @@ balde_app_free(balde_app_t *app)
 {
     if (app->views != NULL)
         g_slist_free_full(app->views, (GDestroyNotify) balde_app_free_views);
+    if (app->static_resources != NULL)
+        g_slist_free_full(app->static_resources, (GDestroyNotify) balde_resource_free);
     g_hash_table_destroy(app->config);
     if (app->error != NULL)
         g_error_free(app->error);

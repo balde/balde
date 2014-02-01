@@ -62,3 +62,46 @@ balde_resources_list_files(GResource *resources, GError **error)
     g_slist_free(list);
     return childrens;
 }
+
+
+void
+balde_resource_free(balde_resource_t *resource)
+{
+    g_return_if_fail(resource != NULL);
+    if (resource->name != NULL)
+        g_free(resource->name);
+    if (resource->content != NULL)
+        g_free(resource->content);
+    if (resource->type != NULL)
+        g_free(resource->type);
+    g_free(resource);
+}
+
+void
+balde_resources_load(balde_app_t *app, GResource *resources)
+{
+    g_return_if_fail(app->error == NULL);
+    GError *tmp_error = NULL;
+    gchar **resources_list = balde_resources_list_files(resources, &tmp_error);
+    if (tmp_error != NULL) {
+        g_propagate_error(&(app->error), tmp_error);
+        return;
+    }
+    GBytes *b;
+    gsize size;
+    gconstpointer data;
+    for (guint i = 0; resources_list[i] != NULL; i++) {
+        b = g_resource_lookup_data(resources, resources_list[i], 0, &tmp_error);
+        if (tmp_error != NULL) {
+            g_propagate_error(&(app->error), tmp_error);
+            return;
+        }
+        data = g_bytes_get_data(b, &size);
+        balde_resource_t *resource = g_new(balde_resource_t, 1);
+        resource->name = g_strdup(resources_list[i]);
+        resource->content = g_strndup((const gchar*) data, size);
+        resource->type = NULL;
+        app->static_resources = g_slist_append(app->static_resources, resource);
+    }
+    g_strfreev(resources_list);
+}

@@ -32,6 +32,12 @@ typedef struct {
     GSList *views;
 
     /**
+     * A GLib singly linked list that stores the static resources. Do not touch
+     * it!
+     */
+    GSList *static_resources;
+
+    /**
      * A GLib hash table that stores the application settings. Do not touch
      * this, use the balde_app_set_config() and balde_app_get_config()
      * functions instead!

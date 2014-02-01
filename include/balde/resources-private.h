@@ -13,6 +13,13 @@
 #include <gio/gio.h>
 #include <balde/app.h>
 
+typedef struct {
+    gchar *name;
+    gchar *content;
+    gchar *type;
+} balde_resource_t;
+
 gchar** balde_resources_list_files(GResource *resources, GError **error);
+void balde_resource_free(balde_resource_t *resource);
 
 #endif /* _BALDE_RESOURCES_PRIVATE_H */

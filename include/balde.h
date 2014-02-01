@@ -11,6 +11,7 @@
 
 #include <balde/app.h>
 #include <balde/exceptions.h>
+#include <balde/resources.h>
 #include <balde/routing.h>
 #include <balde/wrappers.h>
 

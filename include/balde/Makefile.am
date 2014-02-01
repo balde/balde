@@ -1,6 +1,7 @@
 pkginclude_HEADERS = \
 	app.h \
 	exceptions.h \
+	resources.h \
 	routing.h \
 	wrappers.h
 
