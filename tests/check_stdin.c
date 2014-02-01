@@ -32,7 +32,7 @@ set_headers(void)
 void
 test_read(void) {
     set_headers();
-    balde_app_t *app = balde_app_init(NULL);
+    balde_app_t *app = balde_app_init();
     gchar *body = balde_stdin_read(app);
     g_assert_cmpstr(body, ==, "guda=bola&moises=arcoiro");
     g_free(body);
@@ -43,7 +43,7 @@ test_read(void) {
 void
 test_stream(void) {
     set_headers();
-    balde_app_t *app = balde_app_init(NULL);
+    balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app);
     g_assert_cmpstr(request->stream, ==, "guda=bola&moises=arcoiro");
     balde_request_free(request);
@@ -53,7 +53,7 @@ test_stream(void) {
 void
 test_form(void) {
     set_headers();
-    balde_app_t *app = balde_app_init(NULL);
+    balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app);
     g_assert(request->form != NULL);
     g_assert(g_hash_table_size(request->form) == 2);

@@ -23,7 +23,7 @@ static guint i = 0;
 void
 test_app_init(void)
 {
-    balde_app_t *app = balde_app_init(NULL);
+    balde_app_t *app = balde_app_init();
     g_assert(app != NULL);
     g_assert(app->config != NULL);
     g_assert(g_hash_table_size(app->config) == 0);
@@ -36,7 +36,7 @@ test_app_init(void)
 void
 test_app_set_config(void)
 {
-    balde_app_t *app = balde_app_init(NULL);
+    balde_app_t *app = balde_app_init();
     balde_app_set_config(app, "BolA", "guda");
     g_assert(g_hash_table_size(app->config) == 1);
     g_assert_cmpstr(g_hash_table_lookup(app->config, "bola"), ==, "guda");
@@ -47,7 +47,7 @@ test_app_set_config(void)
 void
 test_app_get_config(void)
 {
-    balde_app_t *app = balde_app_init(NULL);
+    balde_app_t *app = balde_app_init();
     g_hash_table_replace(app->config, g_strdup("bola"), g_strdup("guda"));
     g_assert_cmpstr(balde_app_get_config(app, "BoLa"), ==, "guda");
     balde_app_free(app);
@@ -66,7 +66,7 @@ arcoiro_view(balde_app_t *app, balde_request_t *req)
 void
 test_app_add_url_rule(void)
 {
-    balde_app_t *app = balde_app_init(NULL);
+    balde_app_t *app = balde_app_init();
     balde_app_add_url_rule(app, "arcoiro", "/arcoiro/", BALDE_HTTP_POST,
         arcoiro_view);
     g_assert(g_slist_length(app->views) == 1);
@@ -91,7 +91,7 @@ test_app_add_url_rule(void)
 void
 test_app_get_view_from_endpoint(void)
 {
-    balde_app_t *app = balde_app_init(NULL);
+    balde_app_t *app = balde_app_init();
     balde_app_add_url_rule(app, "arcoiro", "/arcoiro/", BALDE_HTTP_GET,
         arcoiro_view);
     balde_view_t *view = balde_app_get_view_from_endpoint(app, "arcoiro");
@@ -115,7 +115,7 @@ test_app_get_view_from_endpoint(void)
 void
 test_app_get_view_from_endpoint_not_found(void)
 {
-    balde_app_t *app = balde_app_init(NULL);
+    balde_app_t *app = balde_app_init();
     balde_app_add_url_rule(app, "arcoiro", "/arcoiro/", BALDE_HTTP_GET,
         arcoiro_view);
     balde_view_t *view = balde_app_get_view_from_endpoint(app, "bola");
