@@ -19,15 +19,15 @@
 void
 test_resources_list_files(void)
 {
-    balde_app_t *app = balde_app_init(resources_get_resource());
-    gchar **rv = balde_resources_list_files(app);
+    GError *error = NULL;
+    gchar **rv = balde_resources_list_files(resources_get_resource(), &error);
     g_assert(rv != NULL);
+    g_assert(error == NULL);
     g_assert_cmpstr(rv[0], ==, "/static/lol.css");
     g_assert_cmpstr(rv[1], ==, "/static/lol.js");
     g_assert_cmpstr(rv[2], ==, "/static/zz.js");
     g_assert(rv[3] == NULL);
     g_strfreev(rv);
-    balde_app_free(app);
 }
 
 

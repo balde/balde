@@ -13,6 +13,6 @@
 #include <gio/gio.h>
 #include <balde/app.h>
 
-gchar** balde_resources_list_files(balde_app_t *app);
+gchar** balde_resources_list_files(GResource *resources, GError **error);
 
 #endif /* _BALDE_RESOURCES_PRIVATE_H */

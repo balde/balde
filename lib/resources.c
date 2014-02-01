@@ -17,19 +17,25 @@
 
 
 static void
-balde_resources_list_childrens(GResource *res, const gchar *path, GSList **list,
-    GError **error)
+balde_resources_list_childrens(GResource *resources, const gchar *path,
+    GSList **list, GError **error)
 {
-    g_return_if_fail(res != NULL && *error == NULL);
-    gchar **childrens = g_resource_enumerate_children(res, path, 0, error);
-    g_return_if_fail(*error == NULL);
+    g_return_if_fail(resources != NULL);
+    g_return_if_fail(error == NULL || *error == NULL);
+    GError *tmp_error = NULL;
+    gchar **childrens = g_resource_enumerate_children(resources, path, 0,
+        &tmp_error);
+    if (tmp_error != NULL) {
+        g_propagate_error(error, tmp_error);
+        return;
+    }
     for (guint i = 0; childrens[i] != NULL; i++) {
         gchar *child = g_strconcat(path, childrens[i], NULL);
-        if (g_resource_get_info(res, child, 0, NULL, NULL, NULL))
+        if (g_resource_get_info(resources, child, 0, NULL, NULL, NULL))
             *list = g_slist_insert_sorted(*list, (gchar*) g_strdup(child),
                 (GCompareFunc) g_strcmp0);
         else
-            balde_resources_list_childrens(res, child, list, error);
+            balde_resources_list_childrens(resources, child, list, error);
         g_free(child);
     }
     g_strfreev(childrens);
@@ -37,14 +43,19 @@ balde_resources_list_childrens(GResource *res, const gchar *path, GSList **list,
 
 
 gchar**
-balde_resources_list_files(balde_app_t *app)
+balde_resources_list_files(GResource *resources, GError **error)
 {
-    g_return_val_if_fail(app->static_resources != NULL, NULL);
+    g_return_val_if_fail(resources != NULL, NULL);
+    g_return_val_if_fail(error == NULL || *error == NULL, NULL);
     GSList *list = NULL;
-    balde_resources_list_childrens(app->static_resources, "/", &list, &(app->error));
-    g_return_val_if_fail(app->error == NULL, NULL);
-    guint i = 0;
+    GError *tmp_error = NULL;
+    balde_resources_list_childrens(resources, "/", &list, &tmp_error);
+    if (tmp_error != NULL) {
+        g_propagate_error(error, tmp_error);
+        return NULL;
+    }
     gchar **childrens = g_new(gchar*, g_slist_length(list) + 1);
+    guint i = 0;
     for (GSList *tmp = list; tmp != NULL; tmp=tmp->next, i++)
         childrens[i] = (gchar*) tmp->data;
     childrens[i] = NULL;

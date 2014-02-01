@@ -6,8 +6,10 @@ SUBDIRS = \
 noinst_PROGRAMS = \
 	hello \
 	hello-with-form \
-	hello-with-template \
-	hello-with-static
+	hello-with-template
+
+# FIXME: broken
+#	hello-with-static
 
 hello_SOURCES = \
 	hello.c
