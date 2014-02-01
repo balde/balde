@@ -102,6 +102,7 @@ balde_resources_load(balde_app_t *app, GResource *resources)
         resource->content = g_strndup((const gchar*) data, size);
         resource->type = NULL;
         app->static_resources = g_slist_append(app->static_resources, resource);
+        g_bytes_unref(b);
     }
     g_strfreev(resources_list);
 }
