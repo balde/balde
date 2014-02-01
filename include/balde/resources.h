@@ -21,4 +21,4 @@
  */
 void balde_resources_load(balde_app_t *app, GResource *resources);
 
-#endif /* _BALDE_APP_H */
+#endif /* _BALDE_RESOURCES_H */
