@@ -12,7 +12,9 @@
 
 #include <glib.h>
 #include <gio/gio.h>
+#include <magic.h>
 #include <balde/app.h>
+#include <balde/exceptions.h>
 #include <balde/resources-private.h>
 
 
@@ -81,11 +83,20 @@ void
 balde_resources_load(balde_app_t *app, GResource *resources)
 {
     g_return_if_fail(app->error == NULL);
+    magic_t magic = magic_open(MAGIC_MIME);
+    if (magic == NULL) {
+        balde_abort_set_error(app, 500);
+        return;
+    }
+    if (magic_load(magic, NULL) != 0) {
+        balde_abort_set_error(app, 500);
+        goto point1;
+    }
     GError *tmp_error = NULL;
     gchar **resources_list = balde_resources_list_files(resources, &tmp_error);
     if (tmp_error != NULL) {
         g_propagate_error(&(app->error), tmp_error);
-        return;
+        goto point1;
     }
     GBytes *b;
     gsize size;
@@ -94,15 +105,18 @@ balde_resources_load(balde_app_t *app, GResource *resources)
         b = g_resource_lookup_data(resources, resources_list[i], 0, &tmp_error);
         if (tmp_error != NULL) {
             g_propagate_error(&(app->error), tmp_error);
-            return;
+            goto point1;
         }
         data = g_bytes_get_data(b, &size);
         balde_resource_t *resource = g_new(balde_resource_t, 1);
         resource->name = g_strdup(resources_list[i]);
         resource->content = g_strndup((const gchar*) data, size);
-        resource->type = NULL;
+        resource->type = g_strdup(magic_buffer(magic, (const gchar*) data,
+            (size_t) size));
         app->static_resources = g_slist_append(app->static_resources, resource);
         g_bytes_unref(b);
     }
     g_strfreev(resources_list);
+point1:
+    magic_close(magic);
 }

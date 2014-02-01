@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
     <gresource prefix="/static">
-        <file>zz.js</file>
+        <file>zz.sh</file>
         <file>lol.js</file>
         <file>lol.css</file>
     </gresource>

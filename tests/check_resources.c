@@ -26,7 +26,7 @@ test_resources_list_files(void)
     g_assert(error == NULL);
     g_assert_cmpstr(rv[0], ==, "/static/lol.css");
     g_assert_cmpstr(rv[1], ==, "/static/lol.js");
-    g_assert_cmpstr(rv[2], ==, "/static/zz.js");
+    g_assert_cmpstr(rv[2], ==, "/static/zz.sh");
     g_assert(rv[3] == NULL);
     g_strfreev(rv);
 }
@@ -59,11 +59,14 @@ test_resources_load(void)
     g_assert(app->static_resources != NULL);
     g_assert(g_slist_length(app->static_resources) == 3);
     balde_assert_resource(app->static_resources, "/static/lol.css",
-        "body {\n    background-color: #CCC;\n}\n", NULL);
+        "body {\n    background-color: #CCC;\n}\n",
+        "text/plain; charset=us-ascii");
     balde_assert_resource(app->static_resources->next, "/static/lol.js",
-        "function a() {\n    alert('lol');\n}\n", NULL);
-    balde_assert_resource(app->static_resources->next->next, "/static/zz.js",
-        "function zz() {}\n", NULL);
+        "function a() {\n    alert('lol');\n}\n",
+        "text/plain; charset=us-ascii");
+    balde_assert_resource(app->static_resources->next->next, "/static/zz.sh",
+        "#!/bin/bash\n\nzz() {\n    :\n}\n",
+        "text/x-shellscript; charset=us-ascii");
     g_assert(app->static_resources->next->next->next == NULL);
     balde_app_free(app);
 }

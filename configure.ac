@@ -30,6 +30,10 @@ AC_SEARCH_LIBS([FCGI_Accept], [fcgi], , [
   AC_MSG_ERROR([FCGI_Accept not found. please install the fastcgi developer kit.])
 ])
 
+AC_SEARCH_LIBS([magic_buffer], [magic], , [
+  AC_MSG_ERROR([magic_buffer not found. please install libmagic.])
+])
+
 AC_ARG_ENABLE([examples], AS_HELP_STRING([--enable-examples], [build examples]))
 AS_IF([test "x$enable_examples" = "xyes"], [
   build_examples=yes
