@@ -44,7 +44,7 @@ test_make_response_from_exception(void)
     g_assert_cmpstr(g_hash_table_lookup(res->headers, "content-type"), ==,
         "text/plain; charset=utf-8");
     g_assert_cmpstr(res->body->str, ==,
-        "Error: 404 Not Found\n\nThe requested URL was not found on the server. "
+        "404 Not Found\n\nThe requested URL was not found on the server. "
         "If you entered the URL manually please check your spelling and try again.\n");
     balde_response_free(res);
     balde_app_free(app);
@@ -71,9 +71,9 @@ test_make_response_from_external_exception(void)
     g_assert_cmpstr(g_hash_table_lookup(res->headers, "content-type"), ==,
         "text/plain; charset=utf-8");
     g_assert_cmpstr(res->body->str, ==,
-        "Error: 500 Internal Server Error\n\nThe server encountered an internal "
-        "error and was unable to complete your request. Either the server is "
-        "overloaded or there is an error in the application.\n\n1024 (null): (null)\n");
+        "500 Internal Server Error\n\nThe server encountered an internal error "
+        "and was unable to complete your request. Either the server is "
+        "overloaded or there is an error in the application.\n\n(null)\n");
     balde_response_free(res);
     balde_app_free(app);
 }
@@ -165,9 +165,9 @@ test_response_render_exception(void)
     g_assert_cmpstr(out, ==,
         "Status: 404 Not Found\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"
-        "Content-Length: 143\r\n"
+        "Content-Length: 136\r\n"
         "\r\n"
-        "Error: 404 Not Found\n\nThe requested URL was not found on the server. "
+        "404 Not Found\n\nThe requested URL was not found on the server. "
         "If you entered the URL manually please check your spelling and try again.\n");
     g_free(out);
     balde_response_free(res);
@@ -186,7 +186,7 @@ test_response_render_exception_without_body(void)
     g_assert_cmpstr(out, ==,
         "Status: 404 Not Found\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"
-        "Content-Length: 143\r\n"
+        "Content-Length: 136\r\n"
         "\r\n");
     g_free(out);
     balde_response_free(res);

@@ -99,9 +99,9 @@ balde_make_response_from_exception(GError *error)
             error->message);
     }
     else
-        new_description = g_strdup(balde_exception_get_description_from_code(status_code));
+        new_description = g_strdup(error->message);
     gchar *content = g_strdup_printf(
-        "Error: %d %s\n\n%s\n", status_code, name, new_description);
+        "%d %s\n\n%s\n", status_code, name, new_description);
     balde_response_t *response = balde_make_response(content);
     g_free(content);
     g_free(new_description);

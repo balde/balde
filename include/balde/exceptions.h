@@ -58,11 +58,27 @@ typedef enum {
 void balde_abort_set_error(balde_app_t *app,
     const balde_http_exception_code_t code);
 
+/** Sets application error with an HTTP status code and custom description
+ *
+ * It is called "error" to be consistent with GLib naming standards,
+ * but it works like an exception.
+ */
+void balde_abort_set_error_with_description(balde_app_t *app,
+    const balde_http_exception_code_t code, const gchar* description);
+
 /** Returns a response context that represents an HTTP status code
  *
  * This function returns the response, but does not sets the GLib error.
  */
 balde_response_t* balde_abort(balde_app_t *app,
     const balde_http_exception_code_t code);
+
+/** Returns a response context that represents an HTTP status code with custom
+ * description
+ *
+ * This function returns the response, but does not sets the GLib error.
+ */
+balde_response_t* balde_abort_with_description(balde_app_t *app,
+    const balde_http_exception_code_t code, const gchar *description);
 
 #endif /* _BALDE_EXCEPTIONS_H */

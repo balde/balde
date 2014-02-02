@@ -223,9 +223,18 @@ balde_abort_set_error(balde_app_t *app, const balde_http_exception_code_t code)
 {
     g_propagate_error(&(app->error),
         g_error_new(balde_http_exception_quark(), code,
-            "%d %s: %s", code,
-            balde_exception_get_name_from_code(code),
-            balde_exception_get_description_from_code(code)));
+            "%s", balde_exception_get_description_from_code(code)));
+}
+
+
+void
+balde_abort_set_error_with_description(balde_app_t *app,
+    const balde_http_exception_code_t code, const gchar* description)
+{
+    g_propagate_error(&(app->error),
+        g_error_new(balde_http_exception_quark(), code,
+            "%s\n\n%s", balde_exception_get_description_from_code(code),
+            description));
 }
 
 
@@ -233,6 +242,21 @@ balde_response_t*
 balde_abort(balde_app_t *app, const balde_http_exception_code_t code)
 {
     balde_abort_set_error(app, code);
+    balde_response_t* response = NULL;
+    if (app->error != NULL) {
+        response = balde_make_response_from_exception(app->error);
+        g_error_free(app->error);
+        app->error = NULL;
+    }
+    return response;
+}
+
+
+balde_response_t*
+balde_abort_with_description(balde_app_t *app,
+    const balde_http_exception_code_t code, const gchar *description)
+{
+    balde_abort_set_error_with_description(app, code, description);
     balde_response_t* response = NULL;
     if (app->error != NULL) {
         response = balde_make_response_from_exception(app->error);
