@@ -85,11 +85,13 @@ balde_resources_load(balde_app_t *app, GResource *resources)
     g_return_if_fail(app->error == NULL);
     magic_t magic = magic_open(MAGIC_MIME);
     if (magic == NULL) {
-        balde_abort_set_error(app, 500);
+        balde_abort_set_error_with_description(app, 500,
+            "Unable to initialize libmagic.");
         return;
     }
     if (magic_load(magic, NULL) != 0) {
-        balde_abort_set_error(app, 500);
+        balde_abort_set_error_with_description(app, 500,
+            magic_error(magic));
         goto point1;
     }
     GError *tmp_error = NULL;
