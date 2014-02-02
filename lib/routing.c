@@ -123,3 +123,49 @@ balde_list_allowed_methods(const balde_http_method_t method)
     g_free(methods_array);
     return rv;
 }
+
+
+GRegex*
+balde_parse_url_rule(const gchar *rule, GError **error)
+{
+    g_return_val_if_fail(rule != NULL, NULL);
+    GError *tmp_error = NULL;
+    GRegex *regex_final = NULL;
+    GRegex *regex_default = g_regex_new("<([a-zA-Z]+)>", 0, 0, &tmp_error);
+    if (tmp_error != NULL) {
+        g_propagate_error(error, tmp_error);
+        goto point1;
+    }
+    GRegex *regex_path = g_regex_new("<path:([a-zA-Z]+)>", 0, 0, &tmp_error);
+    if (tmp_error != NULL) {
+        g_propagate_error(error, tmp_error);
+        goto point2;
+    }
+    gchar *pattern1 = g_regex_replace(regex_default, rule, -1, 0,
+        "(?P<\\1>[^/]+)", 0, &tmp_error);
+    if (tmp_error != NULL) {
+        g_propagate_error(error, tmp_error);
+        goto point3;
+    }
+    gchar *pattern2 = g_regex_replace(regex_path, pattern1, -1, 0,
+        "(?P<\\1>[^/].*?)", 0, &tmp_error);
+    if (tmp_error != NULL) {
+        g_propagate_error(error, tmp_error);
+        goto point4;
+    }
+    regex_final = g_regex_new(pattern2, 0, 0, &tmp_error);
+    if (tmp_error != NULL) {
+        g_propagate_error(error, tmp_error);
+    }
+point4:
+    if(pattern2 != NULL)
+        g_free(pattern2);
+point3:
+    if(pattern1 != NULL)
+        g_free(pattern1);
+point2:
+    g_regex_unref(regex_path);
+point1:
+    g_regex_unref(regex_default);
+    return regex_final;
+}

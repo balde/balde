@@ -17,11 +17,11 @@
 #include <balde/routing-private.h>
 
 static balde_url_rule_t rules[] = {
-    {"home", "/", BALDE_HTTP_GET},
-    {"user", "/user/<username>/", BALDE_HTTP_POST},
-    {"customer", "/customer/<username>/contracts/", BALDE_HTTP_GET},
-    {"policy", "/policies/", BALDE_HTTP_GET | BALDE_HTTP_POST},
-    {NULL, NULL, 0}
+    {"home", "/", NULL, BALDE_HTTP_GET},
+    {"user", "/user/<username>/", NULL, BALDE_HTTP_POST},
+    {"customer", "/customer/<username>/contracts/", NULL, BALDE_HTTP_GET},
+    {"policy", "/policies/", NULL, BALDE_HTTP_GET | BALDE_HTTP_POST},
+    {NULL, NULL, NULL, 0}
 };
 
 
@@ -281,6 +281,29 @@ test_list_allowed_methods(void)
 }
 
 
+void
+test_parse_url_rule(void)
+{
+    GRegex *reg;
+    GError *error = NULL;
+    reg = balde_parse_url_rule("/foo/", &error);
+    g_assert_cmpstr(g_regex_get_pattern(reg), ==, "/foo/");
+    g_regex_unref(reg);
+    reg = balde_parse_url_rule("/foo/<bar>/", &error);
+    g_assert_cmpstr(g_regex_get_pattern(reg), ==, "/foo/(?P<bar>[^/]+)/");
+    g_regex_unref(reg);
+    reg = balde_parse_url_rule("/foo/<bar>/<path:lol>/", &error);
+    g_assert_cmpstr(g_regex_get_pattern(reg), ==,
+        "/foo/(?P<bar>[^/]+)/(?P<lol>[^/].*?)/");
+    g_regex_unref(reg);
+    reg = balde_parse_url_rule("/foo/<bar>/<path:lol>/<path:baz>/<kkk>/",
+        &error);
+    g_assert_cmpstr(g_regex_get_pattern(reg), ==,
+        "/foo/(?P<bar>[^/]+)/(?P<lol>[^/].*?)/(?P<baz>[^/].*?)/(?P<kkk>[^/]+)/");
+    g_regex_unref(reg);
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -309,5 +332,6 @@ main(int argc, char** argv)
         test_url_rule_with_multiple_methods);
     g_test_add_func("/routing/http_method_str2enum", test_http_method_str2enum);
     g_test_add_func("/routing/list_allowed_methods", test_list_allowed_methods);
+    g_test_add_func("/routing/parse_url_rule", test_parse_url_rule);
     return g_test_run();
 }
