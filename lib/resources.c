@@ -122,3 +122,21 @@ balde_resources_load(balde_app_t *app, GResource *resources)
 point1:
     magic_close(magic);
 }
+
+
+balde_response_t*
+balde_make_response_from_static_resource(balde_app_t *app, const gchar *name)
+{
+    if (app->static_resources == NULL)
+        return NULL;
+    for (GSList *tmp = app->static_resources; tmp != NULL; tmp = g_slist_next(tmp)) {
+        balde_resource_t *resource = tmp->data;
+        if (0 == g_strcmp0(name, resource->name)) {
+            balde_response_t *response = balde_make_response(resource->content);
+            if (resource->type != NULL)
+                balde_response_set_header(response, "Content-Type", resource->type);
+            return response;
+        }
+    }
+    return balde_abort(app, 404);
+}
