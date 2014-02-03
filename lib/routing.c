@@ -140,7 +140,8 @@ balde_parse_url_rule(const gchar *rule, GError **error)
         goto point1;
     }
     GSList *args = NULL;
-    gchar *pattern = g_regex_replace_eval(regex_variables, rule, -1, 0, 0,
+    gchar *escaped_rule = g_regex_escape_string(rule, -1);
+    gchar *pattern = g_regex_replace_eval(regex_variables, escaped_rule, -1, 0, 0,
         (GRegexEvalCallback) replace_url_rule_variables_cb, &args, &tmp_error);
     if (tmp_error != NULL) {
         g_propagate_error(error, tmp_error);
@@ -165,6 +166,8 @@ point3:
 point2:
     if (pattern != NULL)
         g_free(pattern);
+    if (escaped_rule != NULL)
+        g_free(escaped_rule);
     if (args != NULL)
         g_slist_free(args);
 point1:
