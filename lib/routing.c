@@ -18,47 +18,27 @@
 
 
 const gboolean
-balde_url_match(const gchar *path, const gchar *rule, GHashTable **matches)
+balde_url_match(const gchar *path, const balde_url_rule_match_t *rule,
+    GHashTable **matches)
 {
+    g_return_val_if_fail(rule != NULL, FALSE);
     GError *_error = NULL;
-    gboolean match = FALSE;
     if (path == NULL || path[0] == '\0')
         path = "/";
-    gchar **path_pieces = g_strsplit(path, "/", 0);
-    gchar **rule_pieces = g_strsplit(rule, "/", 0);
-    if (g_strv_length(path_pieces) != g_strv_length(rule_pieces))
+    GMatchInfo *info;
+    gboolean rv = TRUE;
+    if (!g_regex_match(rule->regex, path, 0, &info)) {
+        rv = FALSE;
         goto point1;
-    GRegex *re_variables = g_regex_new("<([^>]+)>", 0, 0, &_error);
-    if (NULL != _error) {
-        g_error_free(_error);
-        goto point2;
     }
-    GMatchInfo *match_info;
     *matches = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    for (guint i=0; rule_pieces[i] != NULL; i++) {
-        g_regex_match(re_variables, rule_pieces[i], 0, &match_info);
-        if (!g_match_info_matches(match_info)) {
-            if (0 != g_strcmp0(rule_pieces[i], path_pieces[i])) {
-                g_hash_table_destroy(*matches);
-                *matches = NULL;
-                match = FALSE;
-                g_match_info_free(match_info);
-                goto point2;
-            }
-        }
-        else {
-            gchar* key = g_match_info_fetch(match_info, 1);
-            g_hash_table_insert(*matches, key, g_strdup(path_pieces[i]));
-        }
-        match = TRUE;
-        g_match_info_free(match_info);
+    for (guint i = 0; rule->args[i] != NULL; i++) {
+        gchar *value = g_match_info_fetch_named(info, rule->args[i]);
+        g_hash_table_insert(*matches, g_strdup(rule->args[i]), value);
     }
-point2:
-    g_regex_unref(re_variables);
 point1:
-    g_strfreev(rule_pieces);
-    g_strfreev(path_pieces);
-    return match;
+    g_match_info_free(info);
+    return rv;
 }
 
 
@@ -67,7 +47,7 @@ balde_dispatch_from_path(GSList *views, const gchar *path, GHashTable **matches)
 {
     for (GSList *tmp = views; tmp != NULL; tmp = g_slist_next(tmp)) {
         balde_view_t *view = tmp->data;
-        if (balde_url_match(path, view->url_rule->rule, matches))
+        if (balde_url_match(path, view->url_rule->match, matches))
             return g_strdup(view->url_rule->endpoint);
     }
     return NULL;
@@ -125,47 +105,81 @@ balde_list_allowed_methods(const balde_http_method_t method)
 }
 
 
-GRegex*
+static gboolean
+replace_url_rule_variables_cb(const GMatchInfo *info, GString *res, gpointer data)
+{
+    gchar *converter = g_match_info_fetch(info, 2);
+    gchar *name = g_match_info_fetch(info, 3);
+    GSList **tmp = (GSList**) data;
+    *tmp = g_slist_append(*tmp, (gchar*) g_strdup(name));
+    data = tmp;
+    gboolean rv = FALSE;
+    if (0 == g_strcmp0(converter, ""))  // string, default
+        g_string_append_printf(res, "(?P<%s>[^/]+)", name);
+    else if (0 == g_strcmp0(converter, "path"))  // path
+        g_string_append_printf(res, "(?P<%s>[^/].*?)", name);
+    else
+        rv = TRUE;
+    g_free(name);
+    if (converter != NULL)
+        g_free(converter);
+    return rv;
+}
+
+
+balde_url_rule_match_t*
 balde_parse_url_rule(const gchar *rule, GError **error)
 {
     g_return_val_if_fail(rule != NULL, NULL);
     GError *tmp_error = NULL;
-    GRegex *regex_final = NULL;
-    GRegex *regex_default = g_regex_new("<([a-zA-Z]+)>", 0, 0, &tmp_error);
+    balde_url_rule_match_t *rv = NULL;
+    GRegex *regex_variables = g_regex_new("<(([a-zA-Z]+):)?([a-zA-Z]+)>", 0, 0,
+        &tmp_error);
     if (tmp_error != NULL) {
         g_propagate_error(error, tmp_error);
         goto point1;
     }
-    GRegex *regex_path = g_regex_new("<path:([a-zA-Z]+)>", 0, 0, &tmp_error);
+    GSList *args = NULL;
+    gchar *pattern = g_regex_replace_eval(regex_variables, rule, -1, 0, 0,
+        (GRegexEvalCallback) replace_url_rule_variables_cb, &args, &tmp_error);
     if (tmp_error != NULL) {
         g_propagate_error(error, tmp_error);
         goto point2;
     }
-    gchar *pattern1 = g_regex_replace(regex_default, rule, -1, 0,
-        "(?P<\\1>[^/]+)", 0, &tmp_error);
+    gchar *tmp_pattern = g_strdup_printf("^%s$", pattern);
+    GRegex *regex_final = g_regex_new(tmp_pattern, 0, 0, &tmp_error);
     if (tmp_error != NULL) {
         g_propagate_error(error, tmp_error);
         goto point3;
     }
-    gchar *pattern2 = g_regex_replace(regex_path, pattern1, -1, 0,
-        "(?P<\\1>[^/].*?)", 0, &tmp_error);
-    if (tmp_error != NULL) {
-        g_propagate_error(error, tmp_error);
-        goto point4;
-    }
-    regex_final = g_regex_new(pattern2, 0, 0, &tmp_error);
-    if (tmp_error != NULL) {
-        g_propagate_error(error, tmp_error);
-    }
-point4:
-    if(pattern2 != NULL)
-        g_free(pattern2);
+    rv = g_new(balde_url_rule_match_t, 1);
+    rv->regex = regex_final;
+    rv->args = g_new(gchar*, g_slist_length(args) + 1);
+    guint i = 0;
+    for (GSList *tmp = args; tmp != NULL; tmp = g_slist_next(tmp), i++)
+        rv->args[i] = (gchar*) tmp->data;
+    rv->args[i] = NULL;
 point3:
-    if(pattern1 != NULL)
-        g_free(pattern1);
+    if (tmp_pattern != NULL)
+        g_free(tmp_pattern);
 point2:
-    g_regex_unref(regex_path);
+    if (pattern != NULL)
+        g_free(pattern);
+    if (args != NULL)
+        g_slist_free(args);
 point1:
-    g_regex_unref(regex_default);
-    return regex_final;
+    g_regex_unref(regex_variables);
+    return rv;
+}
+
+
+void
+balde_free_url_rule_match(balde_url_rule_match_t *match)
+{
+    if (match == NULL)
+        return;
+    if (match->args != NULL)
+        g_strfreev(match->args);
+    g_regex_unref(match->regex);
+    g_free(match);
 }

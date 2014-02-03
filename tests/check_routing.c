@@ -21,6 +21,7 @@ static balde_url_rule_t rules[] = {
     {"user", "/user/<username>/", NULL, BALDE_HTTP_POST},
     {"customer", "/customer/<username>/contracts/", NULL, BALDE_HTTP_GET},
     {"policy", "/policies/", NULL, BALDE_HTTP_GET | BALDE_HTTP_POST},
+    {"path", "/foo/<path:p>/bar/", NULL, BALDE_HTTP_GET},
     {NULL, NULL, NULL, 0}
 };
 
@@ -32,7 +33,11 @@ get_test_views(void)
     balde_view_t *view;
     for (guint i=0; rules[i].endpoint != NULL; i++) {
         view = g_new(balde_view_t, 1);
-        view->url_rule = &rules[i];
+        view->url_rule = g_new(balde_url_rule_t, 1);
+        view->url_rule->endpoint = g_strdup(rules[i].endpoint);
+        view->url_rule->rule = g_strdup(rules[i].rule);
+        view->url_rule->method = rules[i].method;
+        view->url_rule->match = balde_parse_url_rule(view->url_rule->rule, NULL);
         view->view_func = NULL;
         views = g_slist_append(views, view);
     }
@@ -43,8 +48,16 @@ get_test_views(void)
 void
 free_test_views(GSList* views)
 {
-    for (GSList *tmp = views; tmp != NULL; tmp = g_slist_next(tmp))
-        g_free(tmp->data);
+    for (GSList *tmp = views; tmp != NULL; tmp = g_slist_next(tmp)) {
+        balde_view_t *view = (balde_view_t*) tmp->data;
+        if (view->url_rule->endpoint != NULL)
+            g_free((gchar*) view->url_rule->endpoint);
+        if (view->url_rule->rule != NULL)
+            g_free((gchar*) view->url_rule->rule);
+        if (view->url_rule != NULL)
+            g_free(view->url_rule);
+        g_free(view);
+    }
     g_slist_free(views);
 }
 
@@ -53,9 +66,11 @@ void
 test_url_match(void)
 {
     GHashTable *matches = NULL;
-    gboolean match = balde_url_match("/lol/", "/lol/", &matches);
+    balde_url_rule_match_t *m = balde_parse_url_rule("/lol/", NULL);
+    gboolean match = balde_url_match("/lol/", m, &matches);
     g_assert(match);
     g_assert(g_hash_table_size(matches) == 0);
+    balde_free_url_rule_match(m);
     g_hash_table_destroy(matches);
 }
 
@@ -64,10 +79,12 @@ void
 test_url_match_with_variable(void)
 {
     GHashTable *matches = NULL;
-    gboolean match = balde_url_match("/lol/hehe/", "/lol/<asd>/", &matches);
+    balde_url_rule_match_t *m = balde_parse_url_rule("/lol/<asd>/", NULL);
+    gboolean match = balde_url_match("/lol/hehe/", m, &matches);
     g_assert(match);
     g_assert(g_hash_table_size(matches) == 1);
     g_assert_cmpstr(g_hash_table_lookup(matches, "asd"), ==, "hehe");
+    balde_free_url_rule_match(m);
     g_hash_table_destroy(matches);
 }
 
@@ -76,9 +93,11 @@ void
 test_url_match_with_null_path(void)
 {
     GHashTable *matches = NULL;
-    gboolean match = balde_url_match(NULL, "/", &matches);
+    balde_url_rule_match_t *m = balde_parse_url_rule("/", NULL);
+    gboolean match = balde_url_match(NULL, m, &matches);
     g_assert(match);
     g_assert(g_hash_table_size(matches) == 0);
+    balde_free_url_rule_match(m);
     g_hash_table_destroy(matches);
 }
 
@@ -87,9 +106,11 @@ void
 test_url_match_with_empty_path(void)
 {
     GHashTable *matches = NULL;
-    gboolean match = balde_url_match("", "/", &matches);
+    balde_url_rule_match_t *m = balde_parse_url_rule("/", NULL);
+    gboolean match = balde_url_match("", m, &matches);
     g_assert(match);
     g_assert(g_hash_table_size(matches) == 0);
+    balde_free_url_rule_match(m);
     g_hash_table_destroy(matches);
 }
 
@@ -98,9 +119,11 @@ void
 test_url_match_without_trailing_slash(void)
 {
     GHashTable *matches = NULL;
-    gboolean match = balde_url_match("/test/asd", "/test/asd", &matches);
+    balde_url_rule_match_t *m = balde_parse_url_rule("/test/asd", NULL);
+    gboolean match = balde_url_match("/test/asd", m, &matches);
     g_assert(match);
     g_assert(g_hash_table_size(matches) == 0);
+    balde_free_url_rule_match(m);
     g_hash_table_destroy(matches);
 }
 
@@ -109,10 +132,12 @@ void
 test_url_match_without_trailing_slash_with_variable(void)
 {
     GHashTable *matches = NULL;
-    gboolean match = balde_url_match("/test/asd", "/test/<lol>", &matches);
+    balde_url_rule_match_t *m = balde_parse_url_rule("/test/<lol>", NULL);
+    gboolean match = balde_url_match("/test/asd", m, &matches);
     g_assert(match);
     g_assert(g_hash_table_size(matches) == 1);
     g_assert_cmpstr(g_hash_table_lookup(matches, "lol"), ==, "asd");
+    balde_free_url_rule_match(m);
     g_hash_table_destroy(matches);
 }
 
@@ -121,13 +146,29 @@ void
 test_url_match_with_multiple_matches(void)
 {
     GHashTable *matches = NULL;
-    gboolean match = balde_url_match("/test/foo/tset/bar/test/baz/",
-        "/test/<lol>/tset/<hehe>/test/<xd>/", &matches);
+    balde_url_rule_match_t *m = balde_parse_url_rule(
+        "/test/<lol>/tset/<hehe>/test/<xd>/", NULL);
+    gboolean match = balde_url_match("/test/foo/tset/bar/test/baz/", m, &matches);
     g_assert(match);
     g_assert(g_hash_table_size(matches) == 3);
     g_assert_cmpstr(g_hash_table_lookup(matches, "lol"), ==, "foo");
     g_assert_cmpstr(g_hash_table_lookup(matches, "hehe"), ==, "bar");
     g_assert_cmpstr(g_hash_table_lookup(matches, "xd"), ==, "baz");
+    balde_free_url_rule_match(m);
+    g_hash_table_destroy(matches);
+}
+
+
+void
+test_url_match_with_path(void)
+{
+    GHashTable *matches = NULL;
+    balde_url_rule_match_t *m = balde_parse_url_rule("/foo/<path:p>/asd/", NULL);
+    gboolean match = balde_url_match("/foo/guda/bola/arcoiro/asd/", m, &matches);
+    g_assert(match);
+    g_assert(g_hash_table_size(matches) == 1);
+    g_assert_cmpstr(g_hash_table_lookup(matches, "p"), ==, "guda/bola/arcoiro");
+    balde_free_url_rule_match(m);
     g_hash_table_destroy(matches);
 }
 
@@ -136,9 +177,11 @@ void
 test_url_no_match(void)
 {
     GHashTable *matches = NULL;
-    gboolean match = balde_url_match("/test/foo/", "/test/fool/", &matches);
+    balde_url_rule_match_t *m = balde_parse_url_rule("/test/fool/", NULL);
+    gboolean match = balde_url_match("/test/foo/", m, &matches);
     g_assert(!match);
     g_assert(matches == NULL);
+    balde_free_url_rule_match(m);
 }
 
 
@@ -146,9 +189,11 @@ void
 test_url_no_match2(void)
 {
     GHashTable *matches = NULL;
-    gboolean match = balde_url_match("/test/foo/", "/test/", &matches);
+    balde_url_rule_match_t *m = balde_parse_url_rule("/test/", NULL);
+    gboolean match = balde_url_match("/test/foo/", m, &matches);
     g_assert(!match);
     g_assert(matches == NULL);
+    balde_free_url_rule_match(m);
 }
 
 
@@ -160,6 +205,21 @@ test_url_rule(void)
     gchar* endpoint = balde_dispatch_from_path(views, "/user/arcoiro/", &matches);
     g_assert_cmpstr(endpoint, ==, "user");
     g_assert_cmpstr(g_hash_table_lookup(matches, "username"), ==, "arcoiro");
+    g_free(endpoint);
+    g_hash_table_destroy(matches);
+    free_test_views(views);
+}
+
+
+void
+test_url_rule_with_path(void)
+{
+    GSList *views = get_test_views();
+    GHashTable *matches = NULL;
+    gchar* endpoint = balde_dispatch_from_path(views, "/foo/bola/arcoiro/bar/",
+        &matches);
+    g_assert_cmpstr(endpoint, ==, "path");
+    g_assert_cmpstr(g_hash_table_lookup(matches, "p"), ==, "bola/arcoiro");
     g_free(endpoint);
     g_hash_table_destroy(matches);
     free_test_views(views);
@@ -284,23 +344,35 @@ test_list_allowed_methods(void)
 void
 test_parse_url_rule(void)
 {
-    GRegex *reg;
+    balde_url_rule_match_t *match;
     GError *error = NULL;
-    reg = balde_parse_url_rule("/foo/", &error);
-    g_assert_cmpstr(g_regex_get_pattern(reg), ==, "/foo/");
-    g_regex_unref(reg);
-    reg = balde_parse_url_rule("/foo/<bar>/", &error);
-    g_assert_cmpstr(g_regex_get_pattern(reg), ==, "/foo/(?P<bar>[^/]+)/");
-    g_regex_unref(reg);
-    reg = balde_parse_url_rule("/foo/<bar>/<path:lol>/", &error);
-    g_assert_cmpstr(g_regex_get_pattern(reg), ==,
-        "/foo/(?P<bar>[^/]+)/(?P<lol>[^/].*?)/");
-    g_regex_unref(reg);
-    reg = balde_parse_url_rule("/foo/<bar>/<path:lol>/<path:baz>/<kkk>/",
+    match = balde_parse_url_rule("/foo/", &error);
+    g_assert_cmpstr(g_regex_get_pattern(match->regex), ==, "^/foo/$");
+    g_assert(match->args[0] == NULL);
+    balde_free_url_rule_match(match);
+    match = balde_parse_url_rule("/foo/<bar>/", &error);
+    g_assert_cmpstr(g_regex_get_pattern(match->regex), ==,
+        "^/foo/(?P<bar>[^/]+)/$");
+    g_assert_cmpstr(match->args[0], ==, "bar");
+    g_assert(match->args[1] == NULL);
+    balde_free_url_rule_match(match);
+    match = balde_parse_url_rule("/foo/<bar>/<path:lol>/", &error);
+    g_assert_cmpstr(g_regex_get_pattern(match->regex), ==,
+        "^/foo/(?P<bar>[^/]+)/(?P<lol>[^/].*?)/$");
+    g_assert_cmpstr(match->args[0], ==, "bar");
+    g_assert_cmpstr(match->args[1], ==, "lol");
+    g_assert(match->args[2] == NULL);
+    balde_free_url_rule_match(match);
+    match = balde_parse_url_rule("/foo/<bar>/<path:lol>/<path:baz>/<kkk>/",
         &error);
-    g_assert_cmpstr(g_regex_get_pattern(reg), ==,
-        "/foo/(?P<bar>[^/]+)/(?P<lol>[^/].*?)/(?P<baz>[^/].*?)/(?P<kkk>[^/]+)/");
-    g_regex_unref(reg);
+    g_assert_cmpstr(g_regex_get_pattern(match->regex), ==,
+        "^/foo/(?P<bar>[^/]+)/(?P<lol>[^/].*?)/(?P<baz>[^/].*?)/(?P<kkk>[^/]+)/$");
+    g_assert_cmpstr(match->args[0], ==, "bar");
+    g_assert_cmpstr(match->args[1], ==, "lol");
+    g_assert_cmpstr(match->args[2], ==, "baz");
+    g_assert_cmpstr(match->args[3], ==, "kkk");
+    g_assert(match->args[4] == NULL);
+    balde_free_url_rule_match(match);
 }
 
 
@@ -321,10 +393,10 @@ main(int argc, char** argv)
         test_url_match_without_trailing_slash_with_variable);
     g_test_add_func("/routing/url_match_with_multiple_matches",
         test_url_match_with_multiple_matches);
-    g_test_add_func("/routing/url_no_match",
-        test_url_no_match);
-    g_test_add_func("/routing/url_no_match2",
-        test_url_no_match2);
+    g_test_add_func("/routing/url_match_with_path", test_url_match_with_path);
+    g_test_add_func("/routing/url_no_match", test_url_no_match);
+    g_test_add_func("/routing/url_no_match2", test_url_no_match2);
+    g_test_add_func("/routing/url_rule_with_path", test_url_rule_with_path);
     g_test_add_func("/routing/url_rule", test_url_rule);
     g_test_add_func("/routing/url_rule_not_found",
         test_url_rule_not_found);

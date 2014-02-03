@@ -56,7 +56,7 @@ balde_app_get_config(balde_app_t *app, const gchar *name)
 void
 balde_app_free_views(balde_view_t *view)
 {
-    g_regex_unref(view->url_rule->regex);
+    balde_free_url_rule_match(view->url_rule->match);
     g_free(view->url_rule);
     g_free(view);
 }
@@ -85,7 +85,7 @@ balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rul
     view->url_rule = g_new(balde_url_rule_t, 1);
     view->url_rule->endpoint = endpoint;
     view->url_rule->rule = rule;
-    view->url_rule->regex = balde_parse_url_rule(view->url_rule->rule, &tmp_error);
+    view->url_rule->match = balde_parse_url_rule(view->url_rule->rule, &tmp_error);
     if (tmp_error != NULL) {
         g_propagate_error(&(app->error), tmp_error);
         balde_app_free_views(view);
