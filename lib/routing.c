@@ -133,8 +133,8 @@ balde_parse_url_rule(const gchar *rule, GError **error)
     g_return_val_if_fail(rule != NULL, NULL);
     GError *tmp_error = NULL;
     balde_url_rule_match_t *rv = NULL;
-    GRegex *regex_variables = g_regex_new("<(([a-zA-Z]+):)?([a-zA-Z_-]+)>", 0, 0,
-        &tmp_error);
+    GRegex *regex_variables = g_regex_new("<(([a-z]+):)?([a-zA-Z_][a-zA-Z0-9_]*)>",
+        0, 0, &tmp_error);
     if (tmp_error != NULL) {
         g_propagate_error(error, tmp_error);
         goto point1;

@@ -147,12 +147,12 @@ test_url_match_with_multiple_matches(void)
 {
     GHashTable *matches = NULL;
     balde_url_rule_match_t *m = balde_parse_url_rule(
-        "/test/<lol>/tset/<hehe>/test/<xd>/", NULL);
+        "/test/<lol>/tset/<hehe1>/test/<xd>/", NULL);
     gboolean match = balde_url_match("/test/foo/tset/bar/test/baz/", m, &matches);
     g_assert(match);
     g_assert(g_hash_table_size(matches) == 3);
     g_assert_cmpstr(g_hash_table_lookup(matches, "lol"), ==, "foo");
-    g_assert_cmpstr(g_hash_table_lookup(matches, "hehe"), ==, "bar");
+    g_assert_cmpstr(g_hash_table_lookup(matches, "hehe1"), ==, "bar");
     g_assert_cmpstr(g_hash_table_lookup(matches, "xd"), ==, "baz");
     balde_free_url_rule_match(m);
     g_hash_table_destroy(matches);
@@ -372,6 +372,12 @@ test_parse_url_rule(void)
     g_assert_cmpstr(match->args[2], ==, "baz");
     g_assert_cmpstr(match->args[3], ==, "kkk");
     g_assert(match->args[4] == NULL);
+    balde_free_url_rule_match(match);
+    match = balde_parse_url_rule("/foo/<path:foo_bar1>/", &error);
+    g_assert_cmpstr(g_regex_get_pattern(match->regex), ==,
+        "^/foo/(?P<foo_bar1>[^/].*?)/$");
+    g_assert_cmpstr(match->args[0], ==, "foo_bar1");
+    g_assert(match->args[1] == NULL);
     balde_free_url_rule_match(match);
 }
 
