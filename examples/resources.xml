@@ -3,5 +3,6 @@
     <gresource prefix="/static">
         <file>foo.js</file>
         <file>foo.css</file>
+        <file>asd/bola.txt</file>
     </gresource>
 </gresources>

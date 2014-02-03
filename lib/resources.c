@@ -124,7 +124,7 @@ point1:
 }
 
 
-balde_response_t*
+static balde_response_t*
 balde_make_response_from_static_resource(balde_app_t *app, const gchar *name)
 {
     if (app->static_resources == NULL)
@@ -139,4 +139,15 @@ balde_make_response_from_static_resource(balde_app_t *app, const gchar *name)
         }
     }
     return balde_abort(app, 404);
+}
+
+
+balde_response_t*
+balde_resource_view(balde_app_t *app, balde_request_t *request)
+{
+    const gchar* p = balde_request_get_view_arg(request, "file");
+    gchar *tmp = g_strdup_printf("/static/%s", p);
+    balde_response_t *rv = balde_make_response_from_static_resource(app, tmp);
+    g_free(tmp);
+    return rv;
 }

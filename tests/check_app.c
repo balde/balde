@@ -27,7 +27,8 @@ test_app_init(void)
     g_assert(app != NULL);
     g_assert(app->config != NULL);
     g_assert(g_hash_table_size(app->config) == 0);
-    g_assert(app->views == NULL);
+    g_assert(app->views != NULL);
+    g_assert(app->views->next == NULL);
     g_assert(app->error == NULL);
     balde_app_free(app);
 }
@@ -69,8 +70,8 @@ test_app_add_url_rule(void)
     balde_app_t *app = balde_app_init();
     balde_app_add_url_rule(app, "arcoiro", "/arcoiro/", BALDE_HTTP_POST,
         arcoiro_view);
-    g_assert(g_slist_length(app->views) == 1);
-    balde_view_t *view = app->views->data;
+    g_assert(g_slist_length(app->views) == 2);
+    balde_view_t *view = app->views->next->data;
     g_assert(view != NULL);
     g_assert(view->url_rule != NULL);
     g_assert_cmpstr(view->url_rule->endpoint, ==, "arcoiro");

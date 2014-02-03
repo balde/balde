@@ -32,6 +32,8 @@ balde_app_init(void)
     app->static_resources = NULL;
     app->config = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     app->error = NULL;
+    balde_app_add_url_rule(app, "static", "/static/<path:file>", BALDE_HTTP_GET,
+        balde_resource_view);
     return app;
 }
 

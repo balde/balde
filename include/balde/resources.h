@@ -25,12 +25,4 @@
  */
 void balde_resources_load(balde_app_t *app, GResource *resources);
 
-/** Initialize a response context with a static resource.
- *
- * The function will return a response object with the static resource content
- * and mime type. If the resource isn't found, a 404 response will be returned.
- */
-balde_response_t* balde_make_response_from_static_resource(balde_app_t *app,
-    const gchar *name);
-
 #endif /* _BALDE_RESOURCES_H */
