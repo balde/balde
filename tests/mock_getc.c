@@ -29,4 +29,4 @@ getc(FILE *stream)
     return c;
 }
 
-#include "../lib/cgi.c"
+#include "../libbalde/cgi.c"

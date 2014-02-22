@@ -36,7 +36,7 @@ AM_CFLAGS = \
 
 AM_LDFLAGS = \
 	$(GLIB_LIBS) \
-	$(top_builddir)/lib/libbalde.la
+	$(top_builddir)/libbalde/libbalde.la
 
 CLEANFILES = \
 	resources.c \

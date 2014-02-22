@@ -105,7 +105,7 @@ AC_CONFIG_FILES([
     examples/templates/Makefile
     include/Makefile
     include/balde/Makefile
-    lib/Makefile
+    libbalde/Makefile
     doc/Makefile
     tests/Makefile
     Doxyfile

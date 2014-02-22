@@ -1,5 +1,5 @@
 SUBDIRS = \
-	lib \
+	libbalde \
 	include \
 	bin \
 	examples \

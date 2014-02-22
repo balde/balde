@@ -50,6 +50,7 @@ test_stream(void) {
     balde_app_free(app);
 }
 
+
 void
 test_form(void) {
     set_headers();
@@ -62,9 +63,6 @@ test_form(void) {
     balde_request_free(request);
     balde_app_free(app);
 }
-
-
-
 
 
 int
