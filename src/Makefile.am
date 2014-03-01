@@ -1,0 +1,4 @@
+SUBDIRS = \
+	libbalde \
+	include \
+	bin

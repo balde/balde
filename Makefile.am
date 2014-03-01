@@ -1,7 +1,5 @@
 SUBDIRS = \
-	libbalde \
-	include \
-	bin \
+	src \
 	examples \
 	doc \
 	tests

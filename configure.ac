@@ -100,16 +100,17 @@ AC_SUBST(GLIB_COMPILE_RESOURCES)
 
 AC_CONFIG_FILES([
     Makefile
-    bin/Makefile
+    doc/Makefile
     examples/Makefile
     examples/templates/Makefile
-    include/Makefile
-    include/balde/Makefile
-    libbalde/Makefile
-    doc/Makefile
+    src/Makefile
+    src/bin/Makefile
+    src/include/Makefile
+    src/include/balde/Makefile
+    src/libbalde/Makefile
     tests/Makefile
-    Doxyfile
     balde.pc
+    Doxyfile
 ])
 AC_OUTPUT
 
