@@ -54,6 +54,7 @@ free_test_views(GSList* views)
             g_free((gchar*) view->url_rule->endpoint);
         if (view->url_rule->rule != NULL)
             g_free((gchar*) view->url_rule->rule);
+        balde_free_url_rule_match(view->url_rule->match);
         if (view->url_rule != NULL)
             g_free(view->url_rule);
         g_free(view);
