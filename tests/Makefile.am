@@ -4,6 +4,7 @@ check_PROGRAMS = \
 	check_resources \
 	check_routing \
 	check_stdin \
+	check_template \
 	check_wrappers
 
 TESTS = \
@@ -31,6 +32,9 @@ check_routing_SOURCES = \
 check_stdin_SOURCES = \
 	check_stdin.c \
 	mock_getc.c
+
+check_template_SOURCES = \
+	check_template.c
 
 check_wrappers_SOURCES = \
 	check_wrappers.c

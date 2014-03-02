@@ -54,6 +54,7 @@ Makefile.in
 /tests/check_resources
 /tests/check_routing
 /tests/check_stdin
+/tests/check_template
 /tests/check_wrappers
 /tests/*.log
 /tests/resources.c
