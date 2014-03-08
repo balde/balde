@@ -286,7 +286,7 @@ test_parse_query_string(void)
 void
 test_parse_cookies(void)
 {
-    GHashTable *c = balde_parse_cookies("bola=\"guda\"; guda=\"chunda\"");
+    GHashTable *c = balde_parse_cookies("bola=\"guda\"; guda=chunda");
     g_assert(g_hash_table_size(c) == 2);
     g_assert_cmpstr(g_hash_table_lookup(c, "bola"), ==, "guda");
     g_assert_cmpstr(g_hash_table_lookup(c, "guda"), ==, "chunda");
@@ -299,6 +299,7 @@ test_make_request(void)
 {
     g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
     g_setenv("HTTP_XD_KKK", "asdf", TRUE);
+    g_setenv("HTTP_COOKIE", "asd=\"qwe\"; bola=guda", TRUE);
     g_setenv("PATH_INFO", "/", TRUE);
     g_setenv("REQUEST_METHOD", "GET", TRUE);
     g_setenv("QUERY_STRING", "asd=lol&xd=hehe", TRUE);
@@ -307,8 +308,9 @@ test_make_request(void)
     balde_request_t *request = balde_make_request(app);
     g_assert_cmpstr(request->path, ==, "/");
     g_assert(request->method == BALDE_HTTP_GET);
-    g_assert(g_hash_table_size(request->headers) == 2);
+    g_assert(g_hash_table_size(request->headers) == 3);
     g_assert(g_hash_table_size(request->args) == 2);
+    g_assert(g_hash_table_size(request->cookies) == 2);
     g_assert(request->view_args == NULL);
     balde_request_free(request);
     balde_app_free(app);
