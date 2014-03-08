@@ -131,6 +131,61 @@ test_response_get_tmpl_var(void)
 
 
 void
+test_response_set_cookie(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    balde_response_set_cookie(res, "bola", "guda", -1, -1, NULL, NULL, FALSE);
+    g_assert_cmpstr(g_hash_table_lookup(res->headers, "set-cookie"), ==,
+        "bola=\"guda\"; Path=/");
+    balde_response_free(res);
+}
+
+
+void
+test_response_set_cookie_with_max_age(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    balde_response_set_cookie(res, "bola", "guda", 60, -1, NULL, NULL, FALSE);
+    g_assert_cmpstr(g_hash_table_lookup(res->headers, "set-cookie"), ==,
+        "bola=\"guda\"; Max-Age=60; Path=/");
+    balde_response_free(res);
+}
+
+
+void
+test_response_set_cookie_with_path(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    balde_response_set_cookie(res, "bola", "guda", -1, -1, "/bola/", NULL, FALSE);
+    g_assert_cmpstr(g_hash_table_lookup(res->headers, "set-cookie"), ==,
+        "bola=\"guda\"; Path=/bola/");
+    balde_response_free(res);
+}
+
+
+void
+test_response_set_cookie_with_domain(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    balde_response_set_cookie(res, "bola", "guda", -1, -1, NULL, "bola.com", FALSE);
+    g_assert_cmpstr(g_hash_table_lookup(res->headers, "set-cookie"), ==,
+        "bola=\"guda\"; Domain=\"bola.com\"; Path=/");
+    balde_response_free(res);
+}
+
+
+void
+test_response_set_cookie_with_secure(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    balde_response_set_cookie(res, "bola", "guda", -1, -1, NULL, NULL, TRUE);
+    g_assert_cmpstr(g_hash_table_lookup(res->headers, "set-cookie"), ==,
+        "bola=\"guda\"; Secure; Path=/");
+    balde_response_free(res);
+}
+
+
+void
 test_response_render(void)
 {
     balde_response_t *res = balde_make_response("lol");
@@ -225,6 +280,17 @@ test_parse_query_string(void)
     g_assert_cmpstr(g_hash_table_lookup(qs, "fdds=fsd"), ==, "etrh adsf");
     g_assert_cmpstr(g_hash_table_lookup(qs, "asd asd"), ==, "vfdvf=lol");
     g_hash_table_destroy(qs);
+}
+
+
+void
+test_parse_cookies(void)
+{
+    GHashTable *c = balde_parse_cookies("bola=\"guda\"; guda=\"chunda\"");
+    g_assert(g_hash_table_size(c) == 2);
+    g_assert_cmpstr(g_hash_table_lookup(c, "bola"), ==, "guda");
+    g_assert_cmpstr(g_hash_table_lookup(c, "guda"), ==, "chunda");
+    g_hash_table_destroy(c);
 }
 
 
@@ -324,6 +390,19 @@ test_request_get_view_arg(void)
 }
 
 
+void
+test_request_get_cookie(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app);
+    g_hash_table_replace(request->cookies, g_strdup("foo"), g_strdup("bar"));
+    g_assert_cmpstr(balde_request_get_cookie(request, "foo"), == , "bar");
+    g_assert(balde_request_get_cookie(request, "xd") == NULL);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -344,6 +423,16 @@ main(int argc, char** argv)
         test_response_set_tmpl_var);
     g_test_add_func("/wrappers/response_get_tmpl_var",
         test_response_get_tmpl_var);
+    g_test_add_func("/wrappers/response_set_cookie",
+        test_response_set_cookie);
+    g_test_add_func("/wrappers/response_set_cookie_with_max_age",
+        test_response_set_cookie_with_max_age);
+    g_test_add_func("/wrappers/response_set_cookie_with_path",
+        test_response_set_cookie_with_path);
+    g_test_add_func("/wrappers/response_set_cookie_with_domain",
+        test_response_set_cookie_with_domain);
+    g_test_add_func("/wrappers/response_set_cookie_with_secure",
+        test_response_set_cookie_with_secure);
     g_test_add_func("/wrappers/response_render", test_response_render);
     g_test_add_func("/wrappers/response_render_without_body",
         test_response_render_without_body);
@@ -354,6 +443,7 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/request_headers", test_request_headers);
     g_test_add_func("/wrappers/urldecode", test_urldecode);
     g_test_add_func("/wrappers/parse_query_string", test_parse_query_string);
+    g_test_add_func("/wrappers/parse_cookies", test_parse_cookies);
     g_test_add_func("/wrappers/make_request", test_make_request);
     g_test_add_func("/wrappers/request_get_header", test_request_get_header);
     g_test_add_func("/wrappers/request_get_arg", test_request_get_arg);
@@ -361,5 +451,6 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/request_get_form_with_empty_body",
         test_request_get_form_with_empty_body);
     g_test_add_func("/wrappers/request_get_view_arg", test_request_get_view_arg);
+    g_test_add_func("/wrappers/request_get_cookie", test_request_get_cookie);
     return g_test_run();
 }

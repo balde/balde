@@ -5,12 +5,16 @@ SUBDIRS = \
 
 noinst_PROGRAMS = \
 	hello \
+	hello-with-cookies \
 	hello-with-form \
 	hello-with-template \
 	hello-with-static
 
 hello_SOURCES = \
 	hello.c
+
+hello_with_cookies_SOURCES = \
+	hello-with-cookies.c
 
 hello_with_form_SOURCES = \
 	hello-with-form.c \

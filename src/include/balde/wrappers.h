@@ -57,6 +57,13 @@ typedef struct {
     GHashTable *headers;
 
     /**
+     * A GLib hash table that stores the cookies received from the client.
+     * Do not touch it manually, use the balde_request_get_cookie() function
+     * instead.
+     */
+    GHashTable *cookies;
+
+    /**
      * Request path.
      */
     gchar *path;
@@ -136,6 +143,17 @@ void balde_response_set_tmpl_var(balde_response_t *response, const gchar* name,
 const gchar* balde_response_get_tmpl_var(balde_response_t *response,
     const gchar* name);
 
+/** Sets a cookie.
+ *
+ * Integer arguments should be set to -1 to be ignored.
+ * String arguments (excluding name and value) should be set to NULL to be ignored.
+ *
+ * The 'expires' argument isn't implemented yet.
+ */
+void balde_response_set_cookie(balde_response_t *response, const gchar *name,
+    const gchar *value, const gint max_age, const gint expires,
+    const gchar *path, const gchar *domain, gboolean secure);
+
 /** Gets a request header.
  *
  * The header name is case-insensitive.
@@ -162,5 +180,11 @@ const gchar* balde_request_get_form(balde_request_t *request, const gchar *name)
  */
 const gchar* balde_request_get_view_arg(balde_request_t *request,
     const gchar *name);
+
+/** Gets a cookie.
+ *
+ * The argument name *IS* case-sensitive.
+ */
+const gchar* balde_request_get_cookie(balde_request_t *request, const gchar *name);
 
 #endif /* _BALDE_WRAPPERS_H */

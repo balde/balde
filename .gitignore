@@ -62,6 +62,7 @@ Makefile.in
 
 # examples
 /examples/hello
+/examples/hello-with-cookies
 /examples/hello-with-static
 /examples/hello-with-form
 /examples/hello-with-template

@@ -73,6 +73,34 @@ balde_response_get_tmpl_var(balde_response_t *response, const gchar *name)
 
 
 void
+balde_response_set_cookie(balde_response_t *response, const gchar *name,
+    const gchar *value, const gint max_age, const gint expires,
+    const gchar *path, const gchar *domain, gboolean secure)
+{
+    GSList *pieces = NULL;
+    pieces = g_slist_append(pieces, g_strdup_printf("%s=\"%s\"", name, value));
+    if (domain != NULL)
+        pieces = g_slist_append(pieces, g_strdup_printf("Domain=\"%s\"", domain));
+    if (max_age >= 0)
+        pieces = g_slist_append(pieces, g_strdup_printf("Max-Age=%d", max_age));
+    if (secure)
+        pieces = g_slist_append(pieces, g_strdup("Secure"));
+    pieces = g_slist_append(pieces, g_strdup_printf("Path=%s",
+        (path != NULL) ? path : "/"));
+    GString *val = g_string_new("");
+    for (GSList *tmp = pieces; tmp != NULL; tmp = g_slist_next(tmp)) {
+        val = g_string_append(val, (gchar*) tmp->data);
+        if (g_slist_next(tmp) != NULL)
+            val = g_string_append(val, "; ");
+    }
+    g_slist_free_full(pieces, g_free);
+    gchar *tmp = g_string_free(val, FALSE);
+    balde_response_set_header(response, "Set-Cookie", tmp);
+    g_free(tmp);
+}
+
+
+void
 balde_response_free(balde_response_t *response)
 {
     if (response == NULL)
@@ -219,6 +247,33 @@ point1:
 }
 
 
+GHashTable*
+balde_parse_cookies(const gchar *cookie_header)
+{
+    GHashTable *c = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    if (cookie_header == NULL)
+        goto point1;
+    gchar **kv = g_strsplit(cookie_header, ";", 0);
+    for (guint i = 0; kv[i] != NULL; i++) {
+        gchar **pieces = g_strsplit(kv[i], "=", 2);
+        if (g_strv_length(pieces) != 2)
+            goto point2;
+        gchar *value = g_strstrip(pieces[1]);
+        guint len_value = strlen(value);
+        if (len_value > 1 && value[0] == '"' && value[len_value - 1] == '"') {
+            value[len_value - 1] = '\0';
+            value++;
+        }
+        g_hash_table_replace(c, g_strdup(g_strstrip(pieces[0])), g_strdup(value));
+point2:
+        g_strfreev(pieces);
+    }
+    g_strfreev(kv);
+point1:
+    return c;
+}
+
+
 balde_request_t*
 balde_make_request(balde_app_t *app)
 {
@@ -231,6 +286,7 @@ balde_make_request(balde_app_t *app)
     request->headers = balde_request_headers();
     request->args = balde_parse_query_string(g_getenv("QUERY_STRING"));
     request->view_args = NULL;
+    request->cookies = balde_parse_cookies(g_getenv("HTTP_COOKIE"));
     if (request->method & (BALDE_HTTP_POST | BALDE_HTTP_PUT | BALDE_HTTP_PATCH)) {
         request->stream = balde_stdin_read(app);
         // TODO: do not load form if content-type isn't form
@@ -283,6 +339,15 @@ balde_request_get_view_arg(balde_request_t *request, const gchar *name)
 }
 
 
+const gchar*
+balde_request_get_cookie(balde_request_t *request, const gchar *name)
+{
+    if (request->cookies == NULL)
+        return NULL;
+    return g_hash_table_lookup(request->cookies, name);
+}
+
+
 void
 balde_request_free(balde_request_t *request)
 {
@@ -297,5 +362,7 @@ balde_request_free(balde_request_t *request)
         g_free((gchar*) request->stream);
     if (request->form != NULL)
         g_hash_table_destroy(request->form);
+    if (request->cookies != NULL)
+        g_hash_table_destroy(request->cookies);
     g_free(request);
 }
