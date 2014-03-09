@@ -245,7 +245,7 @@ balde_abort(balde_app_t *app, const balde_http_exception_code_t code)
     balde_response_t* response = NULL;
     if (app->error != NULL) {
         response = balde_make_response_from_exception(app->error);
-        g_error_free(app->error);
+        g_clear_error(&app->error);
         app->error = NULL;
     }
     return response;
@@ -260,7 +260,7 @@ balde_abort_with_description(balde_app_t *app,
     balde_response_t* response = NULL;
     if (app->error != NULL) {
         response = balde_make_response_from_exception(app->error);
-        g_error_free(app->error);
+        g_clear_error(&app->error);
         app->error = NULL;
     }
     return response;

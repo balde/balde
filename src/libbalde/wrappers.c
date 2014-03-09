@@ -419,8 +419,7 @@ balde_request_free(balde_request_t *request)
     g_hash_table_destroy(request->args);
     if (request->view_args != NULL)
         g_hash_table_destroy(request->view_args);
-    if (request->stream != NULL)
-        g_free((gchar*) request->stream);
+    g_free((gchar*) request->stream);
     if (request->form != NULL)
         g_hash_table_destroy(request->form);
     if (request->cookies != NULL)

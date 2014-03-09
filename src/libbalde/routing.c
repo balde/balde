@@ -121,8 +121,7 @@ replace_url_rule_variables_cb(const GMatchInfo *info, GString *res, gpointer dat
     else
         rv = TRUE;
     g_free(name);
-    if (converter != NULL)
-        g_free(converter);
+    g_free(converter);
     return rv;
 }
 
@@ -161,15 +160,11 @@ balde_parse_url_rule(const gchar *rule, GError **error)
         rv->args[i] = (gchar*) tmp->data;
     rv->args[i] = NULL;
 point3:
-    if (tmp_pattern != NULL)
-        g_free(tmp_pattern);
+    g_free(tmp_pattern);
 point2:
-    if (pattern != NULL)
-        g_free(pattern);
-    if (escaped_rule != NULL)
-        g_free(escaped_rule);
-    if (args != NULL)
-        g_slist_free(args);
+    g_free(pattern);
+    g_free(escaped_rule);
+    g_slist_free(args);
 point1:
     g_regex_unref(regex_variables);
     return rv;
@@ -181,8 +176,7 @@ balde_free_url_rule_match(balde_url_rule_match_t *match)
 {
     if (match == NULL)
         return;
-    if (match->args != NULL)
-        g_strfreev(match->args);
+    g_strfreev(match->args);
     g_regex_unref(match->regex);
     g_free(match);
 }

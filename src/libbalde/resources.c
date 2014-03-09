@@ -70,12 +70,9 @@ void
 balde_resource_free(balde_resource_t *resource)
 {
     g_return_if_fail(resource != NULL);
-    if (resource->name != NULL)
-        g_free(resource->name);
-    if (resource->content != NULL)
-        g_free(resource->content);
-    if (resource->type != NULL)
-        g_free(resource->type);
+    g_free(resource->name);
+    g_free(resource->content);
+    g_free(resource->type);
     g_free(resource);
 }
 

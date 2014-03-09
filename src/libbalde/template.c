@@ -165,13 +165,10 @@ balde_template_main(int argc, char **argv)
         goto point3;  // duh!
     }
 point3:
-    if (source != NULL)
-        g_free(source);
-    if (template_source != NULL)
-        g_free(template_source);
+    g_free(source);
+    g_free(template_source);
 point2:
-    if (template_name != NULL)
-        g_free(template_name);
+    g_free(template_name);
 point1:
     return rv;
 }

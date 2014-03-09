@@ -67,13 +67,10 @@ balde_app_free_views(balde_view_t *view)
 void
 balde_app_free(balde_app_t *app)
 {
-    if (app->views != NULL)
-        g_slist_free_full(app->views, (GDestroyNotify) balde_app_free_views);
-    if (app->static_resources != NULL)
-        g_slist_free_full(app->static_resources, (GDestroyNotify) balde_resource_free);
+    g_slist_free_full(app->views, (GDestroyNotify) balde_app_free_views);
+    g_slist_free_full(app->static_resources, (GDestroyNotify) balde_resource_free);
     g_hash_table_destroy(app->config);
-    if (app->error != NULL)
-        g_error_free(app->error);
+    g_clear_error(&app->error);
     g_free(app);
 }
 
@@ -176,8 +173,7 @@ BEGIN_LOOP
         error_response = balde_make_response_from_exception(app->error);
         balde_response_print(error_response, with_body);
         balde_response_free(error_response);
-        g_error_free(app->error);
-        app->error = NULL;
+        g_clear_error(&app->error);
         continue;
     }
 
