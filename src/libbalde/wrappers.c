@@ -33,6 +33,8 @@ balde_response_set_header(balde_response_t *response, const gchar *name,
     values = g_slist_append(values, g_strdup(value));
     if (tmp == NULL)
         g_hash_table_insert(response->headers, new_name, values);
+    else
+        g_free(new_name);
 }
 
 
