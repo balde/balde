@@ -27,12 +27,7 @@ balde_response_set_header(balde_response_t *response, const gchar *name,
     const gchar *value)
 {
     // http header name is ascii
-    gchar *new_name = g_new(gchar, strlen(name) + 1);
-    guint i;
-    for (i = 0; name[i] != '\0'; i++) {
-        new_name[i] = g_ascii_tolower(name[i]);
-    }
-    new_name[i] = '\0';
+    gchar *new_name = g_ascii_strdown(name, -1);
     g_hash_table_replace(response->headers, new_name, g_strdup(value));
 }
 
@@ -303,11 +298,7 @@ balde_make_request(balde_app_t *app)
 const gchar*
 balde_request_get_header(balde_request_t *request, const gchar *name)
 {
-    gchar *l_name = g_strdup(name);
-    guint i;
-    for (i = 0; name[i] != '\0'; i++)
-        l_name[i] = g_ascii_tolower(l_name[i]);
-    l_name[i] = '\0';
+    gchar *l_name = g_ascii_strdown(name, -1);
     gchar *value = g_hash_table_lookup(request->headers, l_name);
     g_free(l_name);
     return value;
