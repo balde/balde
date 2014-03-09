@@ -107,6 +107,14 @@ balde_response_set_cookie(balde_response_t *response, const gchar *name,
 
 
 void
+balde_response_delete_cookie(balde_response_t *response, const gchar *name,
+    const gchar *path, const gchar *domain)
+{
+    balde_response_set_cookie(response, name, "", 0, 0, path, domain, FALSE);
+}
+
+
+void
 balde_response_free(balde_response_t *response)
 {
     if (response == NULL)

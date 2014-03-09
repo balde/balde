@@ -185,6 +185,17 @@ test_response_set_cookie_with_secure(void)
 
 
 void
+test_response_delete_cookie(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    balde_response_delete_cookie(res, "bola", NULL, NULL);
+    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    g_assert_cmpstr(tmp->data, ==, "bola=\"\"; Max-Age=0; Path=/");
+    balde_response_free(res);
+}
+
+
+void
 test_response_render(void)
 {
     balde_response_t *res = balde_make_response("lol");
@@ -468,6 +479,8 @@ main(int argc, char** argv)
         test_response_set_cookie_with_domain);
     g_test_add_func("/wrappers/response_set_cookie_with_secure",
         test_response_set_cookie_with_secure);
+    g_test_add_func("/wrappers/response_delete_cookie",
+        test_response_delete_cookie);
     g_test_add_func("/wrappers/response_render", test_response_render);
     g_test_add_func("/wrappers/response_render_with_custom_mime_type",
         test_response_render_with_custom_mime_type);

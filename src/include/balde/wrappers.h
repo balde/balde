@@ -154,6 +154,14 @@ void balde_response_set_cookie(balde_response_t *response, const gchar *name,
     const gchar *value, const gint max_age, const gint expires,
     const gchar *path, const gchar *domain, gboolean secure);
 
+/** Deletes a cookie from client.
+ *
+ * The same arguments provided when setting the cookie should be provided
+ * when deleted (if required).
+ */
+void balde_response_delete_cookie(balde_response_t *response, const gchar *name,
+    const gchar *path, const gchar *domain);
+
 /** Gets a request header.
  *
  * The header name is case-insensitive.
