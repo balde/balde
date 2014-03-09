@@ -28,7 +28,11 @@ balde_response_set_header(balde_response_t *response, const gchar *name,
 {
     // http header name is ascii
     gchar *new_name = g_ascii_strdown(name, -1);
-    g_hash_table_replace(response->headers, new_name, g_strdup(value));
+    GSList *values = g_hash_table_lookup(response->headers, new_name);
+    GSList *tmp = values;
+    values = g_slist_append(values, g_strdup(value));
+    if (tmp == NULL)
+        g_hash_table_insert(response->headers, new_name, values);
 }
 
 
@@ -39,14 +43,21 @@ balde_response_append_body(balde_response_t *response, const gchar *content)
 }
 
 
+void
+balde_response_headers_free(gpointer l)
+{
+    g_slist_free_full(l, g_free);
+}
+
+
 balde_response_t*
 balde_make_response(const gchar *content)
 {
     balde_response_t *response = g_new(balde_response_t, 1);
     response->status_code = 200;
-    response->headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    response->headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
+        balde_response_headers_free);
     response->template_ctx = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    balde_response_set_header(response, "Content-Type", "text/html; charset=utf-8");
     response->body = g_string_new(content);
     return response;
 }
@@ -145,11 +156,12 @@ balde_fix_header_name(gchar *name)
 
 
 void
-balde_header_render(const gchar *key, const gchar *value, GString *str)
+balde_header_render(const gchar *key, GSList *value, GString *str)
 {
     gchar *new_key = g_strdup(key);
     balde_fix_header_name(new_key);
-    g_string_append_printf(str, "%s: %s\r\n", new_key, value);
+    for (GSList *tmp = value; tmp != NULL; tmp = g_slist_next(tmp))
+        g_string_append_printf(str, "%s: %s\r\n", new_key, (gchar*) tmp->data);
     g_free(new_key);
 }
 
@@ -167,6 +179,8 @@ balde_response_render(balde_response_t *response, const gboolean with_body)
     // we shouldn't trust response->body->len
     balde_response_set_header(response, "Content-Length", len);
     g_free(len);
+    if (g_hash_table_lookup(response->headers, "content-type") == NULL)
+        balde_response_set_header(response, "Content-Type", "text/html; charset=utf-8");
     g_hash_table_foreach(response->headers, (GHFunc) balde_header_render, str);
     g_string_append(str, "\r\n");
     if (with_body)

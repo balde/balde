@@ -23,10 +23,8 @@ test_make_response(void)
     balde_response_t *res = balde_make_response("lol");
     g_assert(res != NULL);
     g_assert(res->status_code == 200);
-    g_assert(g_hash_table_size(res->headers) == 1);
+    g_assert(g_hash_table_size(res->headers) == 0);
     g_assert(g_hash_table_size(res->template_ctx) == 0);
-    g_assert_cmpstr(g_hash_table_lookup(res->headers, "content-type"), ==,
-        "text/html; charset=utf-8");
     g_assert_cmpstr(res->body->str, ==, "lol");
     balde_response_free(res);
 }
@@ -41,8 +39,8 @@ test_make_response_from_exception(void)
     g_assert(res != NULL);
     g_assert(res->status_code == 404);
     g_assert(g_hash_table_size(res->headers) == 1);
-    g_assert_cmpstr(g_hash_table_lookup(res->headers, "content-type"), ==,
-        "text/plain; charset=utf-8");
+    GSList *tmp = g_hash_table_lookup(res->headers, "content-type");
+    g_assert_cmpstr(tmp->data, ==, "text/plain; charset=utf-8");
     g_assert_cmpstr(res->body->str, ==,
         "404 Not Found\n\nThe requested URL was not found on the server. "
         "If you entered the URL manually please check your spelling and try again.\n");
@@ -68,8 +66,8 @@ test_make_response_from_external_exception(void)
     g_assert(res != NULL);
     g_assert(res->status_code == 500);
     g_assert(g_hash_table_size(res->headers) == 1);
-    g_assert_cmpstr(g_hash_table_lookup(res->headers, "content-type"), ==,
-        "text/plain; charset=utf-8");
+    GSList *tmp = g_hash_table_lookup(res->headers, "content-type");
+    g_assert_cmpstr(tmp->data, ==, "text/plain; charset=utf-8");
     g_assert_cmpstr(res->body->str, ==,
         "500 Internal Server Error\n\nThe server encountered an internal error "
         "and was unable to complete your request. Either the server is "
@@ -84,8 +82,9 @@ test_response_set_headers(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_header(res, "AsDf-QwEr", "test");
-    g_assert(g_hash_table_size(res->headers) == 2);
-    g_assert_cmpstr(g_hash_table_lookup(res->headers, "asdf-qwer"), ==, "test");
+    g_assert(g_hash_table_size(res->headers) == 1);
+    GSList *tmp = g_hash_table_lookup(res->headers, "asdf-qwer");
+    g_assert_cmpstr(tmp->data, ==, "test");
     balde_response_free(res);
 }
 
@@ -135,8 +134,8 @@ test_response_set_cookie(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", -1, -1, NULL, NULL, FALSE);
-    g_assert_cmpstr(g_hash_table_lookup(res->headers, "set-cookie"), ==,
-        "bola=\"guda\"; Path=/");
+    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    g_assert_cmpstr(tmp->data, ==, "bola=\"guda\"; Path=/");
     balde_response_free(res);
 }
 
@@ -146,8 +145,8 @@ test_response_set_cookie_with_max_age(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", 60, -1, NULL, NULL, FALSE);
-    g_assert_cmpstr(g_hash_table_lookup(res->headers, "set-cookie"), ==,
-        "bola=\"guda\"; Max-Age=60; Path=/");
+    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    g_assert_cmpstr(tmp->data, ==, "bola=\"guda\"; Max-Age=60; Path=/");
     balde_response_free(res);
 }
 
@@ -157,8 +156,8 @@ test_response_set_cookie_with_path(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", -1, -1, "/bola/", NULL, FALSE);
-    g_assert_cmpstr(g_hash_table_lookup(res->headers, "set-cookie"), ==,
-        "bola=\"guda\"; Path=/bola/");
+    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    g_assert_cmpstr(tmp->data, ==, "bola=\"guda\"; Path=/bola/");
     balde_response_free(res);
 }
 
@@ -168,8 +167,8 @@ test_response_set_cookie_with_domain(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", -1, -1, NULL, "bola.com", FALSE);
-    g_assert_cmpstr(g_hash_table_lookup(res->headers, "set-cookie"), ==,
-        "bola=\"guda\"; Domain=\"bola.com\"; Path=/");
+    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    g_assert_cmpstr(tmp->data, ==, "bola=\"guda\"; Domain=\"bola.com\"; Path=/");
     balde_response_free(res);
 }
 
@@ -179,8 +178,8 @@ test_response_set_cookie_with_secure(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", -1, -1, NULL, NULL, TRUE);
-    g_assert_cmpstr(g_hash_table_lookup(res->headers, "set-cookie"), ==,
-        "bola=\"guda\"; Secure; Path=/");
+    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    g_assert_cmpstr(tmp->data, ==, "bola=\"guda\"; Secure; Path=/");
     balde_response_free(res);
 }
 
@@ -192,6 +191,40 @@ test_response_render(void)
     gchar *out = balde_response_render(res, TRUE);
     g_assert_cmpstr(out, ==,
         "Content-Type: text/html; charset=utf-8\r\nContent-Length: 3\r\n\r\nlol");
+    g_free(out);
+    balde_response_free(res);
+}
+
+
+void
+test_response_render_with_custom_mime_type(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    balde_response_set_header(res, "content-type", "text/plain");
+    gchar *out = balde_response_render(res, TRUE);
+    g_assert_cmpstr(out, ==,
+        "Content-Type: text/plain\r\nContent-Length: 3\r\n\r\nlol");
+    g_free(out);
+    balde_response_free(res);
+}
+
+
+void
+test_response_render_with_multiple_cookies(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    balde_response_set_cookie(res, "bola", "guda", 60, -1, NULL, NULL, FALSE);
+    balde_response_set_cookie(res, "asd", "qwe", -1, -1, NULL, NULL, FALSE);
+    balde_response_set_cookie(res, "xd", ":D", -1, -1, "/bola/", NULL, FALSE);
+    gchar *out = balde_response_render(res, TRUE);
+    g_assert_cmpstr(out, ==,
+        "Set-Cookie: bola=\"guda\"; Max-Age=60; Path=/\r\n"
+        "Set-Cookie: asd=\"qwe\"; Path=/\r\n"
+        "Set-Cookie: xd=\":D\"; Path=/bola/\r\n"
+        "Content-Type: text/html; charset=utf-8\r\n"
+        "Content-Length: 3\r\n"
+        "\r\n"
+        "lol");
     g_free(out);
     balde_response_free(res);
 }
@@ -436,6 +469,10 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/response_set_cookie_with_secure",
         test_response_set_cookie_with_secure);
     g_test_add_func("/wrappers/response_render", test_response_render);
+    g_test_add_func("/wrappers/response_render_with_custom_mime_type",
+        test_response_render_with_custom_mime_type);
+    g_test_add_func("/wrappers/response_render_with_multiple_cookies",
+        test_response_render_with_multiple_cookies);
     g_test_add_func("/wrappers/response_render_without_body",
         test_response_render_without_body);
     g_test_add_func("/wrappers/response_render_exception",

@@ -91,8 +91,8 @@ test_abort(void)
         "404 Not Found\n\n"
         "The requested URL was not found on the server. If you entered the URL "
         "manually please check your spelling and try again.\n");
-    g_assert_cmpstr(g_hash_table_lookup(res->headers, "content-type"), ==,
-        "text/plain; charset=utf-8");
+    GSList *tmp = g_hash_table_lookup(res->headers, "content-type");
+    g_assert_cmpstr(tmp->data, ==, "text/plain; charset=utf-8");
     balde_response_free(res);
     balde_app_free(app);
 }
@@ -109,8 +109,8 @@ test_abort_with_description(void)
         "404 Not Found\n\n"
         "The requested URL was not found on the server. If you entered the URL "
         "manually please check your spelling and try again.\n\nbola\n");
-    g_assert_cmpstr(g_hash_table_lookup(res->headers, "content-type"), ==,
-        "text/plain; charset=utf-8");
+    GSList *tmp = g_hash_table_lookup(res->headers, "content-type");
+    g_assert_cmpstr(tmp->data, ==, "text/plain; charset=utf-8");
     balde_response_free(res);
     balde_app_free(app);
 }

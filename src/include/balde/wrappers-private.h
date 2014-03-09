@@ -14,10 +14,11 @@
 #include <balde/routing.h>
 #include <balde/wrappers.h>
 
+void balde_response_headers_free(gpointer l);
 void balde_response_free(balde_response_t *response);
 balde_response_t* balde_make_response_from_exception(GError *error);
 void balde_fix_header_name(gchar *name);
-void balde_header_render(const gchar *key, const gchar *value, GString *str);
+void balde_header_render(const gchar *key, GSList *value, GString *str);
 gchar* balde_response_render(balde_response_t *response,
     const gboolean with_body);
 void balde_response_print(balde_response_t *response, const gboolean with_body);
