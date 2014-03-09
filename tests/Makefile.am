@@ -37,7 +37,8 @@ check_template_SOURCES = \
 	check_template.c
 
 check_wrappers_SOURCES = \
-	check_wrappers.c
+	check_wrappers.c \
+	mock_datetime.c
 
 AM_CFLAGS = \
 	$(all_includes) \

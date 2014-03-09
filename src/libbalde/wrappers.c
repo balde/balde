@@ -80,15 +80,61 @@ balde_response_get_tmpl_var(balde_response_t *response, const gchar *name)
 }
 
 
+static const gchar* days[] = {
+    "Mon",
+    "Tue",
+    "Wed",
+    "Thu",
+    "Fri",
+    "Sat",
+    "Sun",
+};
+
+
+static const gchar* months[] = {
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+};
+
+
 void
 balde_response_set_cookie(balde_response_t *response, const gchar *name,
-    const gchar *value, const gint max_age, const gint expires,
+    const gchar *value, const gint max_age, const gint64 expires,
     const gchar *path, const gchar *domain, gboolean secure)
 {
     GSList *pieces = NULL;
     pieces = g_slist_append(pieces, g_strdup_printf("%s=\"%s\"", name, value));
     if (domain != NULL)
         pieces = g_slist_append(pieces, g_strdup_printf("Domain=\"%s\"", domain));
+    if (expires >= 0 || max_age >= 0) {
+        GDateTime *exp;
+        if (expires < 0) {
+            GDateTime *now = g_date_time_new_now_utc();
+            exp = g_date_time_add_seconds(now, max_age);
+            g_date_time_unref(now);
+        }
+        else {
+            exp = g_date_time_new_from_unix_utc(expires);
+        }
+        gchar *tmp = g_strdup_printf("Expires=%s, %02d-%s-%04d %02d:%02d:%02d GMT",
+            days[g_date_time_get_day_of_week(exp) - 1],
+            g_date_time_get_day_of_month(exp),
+            months[g_date_time_get_month(exp) - 1], g_date_time_get_year(exp),
+            g_date_time_get_hour(exp), g_date_time_get_minute(exp),
+            g_date_time_get_second(exp));
+        g_date_time_unref(exp);
+        pieces = g_slist_append(pieces, tmp);
+    }
     if (max_age >= 0)
         pieces = g_slist_append(pieces, g_strdup_printf("Max-Age=%d", max_age));
     if (secure)

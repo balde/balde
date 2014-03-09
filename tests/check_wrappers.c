@@ -141,12 +141,38 @@ test_response_set_cookie(void)
 
 
 void
+test_response_set_cookie_with_expires(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    balde_response_set_cookie(res, "bola", "guda", -1, 1234567890, NULL, NULL,
+        FALSE);
+    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    g_assert_cmpstr(tmp->data, ==,
+        "bola=\"guda\"; Expires=Fri, 13-Feb-2009 23:31:30 GMT; Path=/");
+    balde_response_free(res);
+}
+
+
+void
 test_response_set_cookie_with_max_age(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", 60, -1, NULL, NULL, FALSE);
     GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
-    g_assert_cmpstr(tmp->data, ==, "bola=\"guda\"; Max-Age=60; Path=/");
+    g_assert_cmpstr(tmp->data, ==,
+        "bola=\"guda\"; Expires=Fri, 13-Feb-2009 23:32:30 GMT; Max-Age=60; Path=/");
+    balde_response_free(res);
+}
+
+
+void
+test_response_set_cookie_with_expires_and_max_age(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    balde_response_set_cookie(res, "bola", "guda", 60, 1235555555, NULL, NULL, FALSE);
+    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    g_assert_cmpstr(tmp->data, ==,
+        "bola=\"guda\"; Expires=Wed, 25-Feb-2009 09:52:35 GMT; Max-Age=60; Path=/");
     balde_response_free(res);
 }
 
@@ -190,7 +216,8 @@ test_response_delete_cookie(void)
     balde_response_t *res = balde_make_response("lol");
     balde_response_delete_cookie(res, "bola", NULL, NULL);
     GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
-    g_assert_cmpstr(tmp->data, ==, "bola=\"\"; Max-Age=0; Path=/");
+    g_assert_cmpstr(tmp->data, ==,
+        "bola=\"\"; Expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/");
     balde_response_free(res);
 }
 
@@ -229,7 +256,7 @@ test_response_render_with_multiple_cookies(void)
     balde_response_set_cookie(res, "xd", ":D", -1, -1, "/bola/", NULL, FALSE);
     gchar *out = balde_response_render(res, TRUE);
     g_assert_cmpstr(out, ==,
-        "Set-Cookie: bola=\"guda\"; Max-Age=60; Path=/\r\n"
+        "Set-Cookie: bola=\"guda\"; Expires=Fri, 13-Feb-2009 23:32:30 GMT; Max-Age=60; Path=/\r\n"
         "Set-Cookie: asd=\"qwe\"; Path=/\r\n"
         "Set-Cookie: xd=\":D\"; Path=/bola/\r\n"
         "Content-Type: text/html; charset=utf-8\r\n"
@@ -471,8 +498,12 @@ main(int argc, char** argv)
         test_response_get_tmpl_var);
     g_test_add_func("/wrappers/response_set_cookie",
         test_response_set_cookie);
+    g_test_add_func("/wrappers/response_set_cookie_with_expires",
+        test_response_set_cookie_with_expires);
     g_test_add_func("/wrappers/response_set_cookie_with_max_age",
         test_response_set_cookie_with_max_age);
+    g_test_add_func("/wrappers/response_set_cookie_with_expires_and_max_age",
+        test_response_set_cookie_with_expires_and_max_age);
     g_test_add_func("/wrappers/response_set_cookie_with_path",
         test_response_set_cookie_with_path);
     g_test_add_func("/wrappers/response_set_cookie_with_domain",

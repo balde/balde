@@ -148,10 +148,11 @@ const gchar* balde_response_get_tmpl_var(balde_response_t *response,
  * Integer arguments should be set to -1 to be ignored.
  * String arguments (excluding name and value) should be set to NULL to be ignored.
  *
- * The 'expires' argument isn't implemented yet.
+ * If the 'expires' argument is less than 0 and 'max_age' is provided, it
+ * will be evaluated automatically for you.
  */
 void balde_response_set_cookie(balde_response_t *response, const gchar *name,
-    const gchar *value, const gint max_age, const gint expires,
+    const gchar *value, const gint max_age, const gint64 expires,
     const gchar *path, const gchar *domain, gboolean secure);
 
 /** Deletes a cookie from client.
