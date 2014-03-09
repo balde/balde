@@ -153,7 +153,7 @@ const gchar* balde_response_get_tmpl_var(balde_response_t *response,
  */
 void balde_response_set_cookie(balde_response_t *response, const gchar *name,
     const gchar *value, const gint max_age, const gint64 expires,
-    const gchar *path, const gchar *domain, gboolean secure);
+    const gchar *path, const gchar *domain, const gboolean secure);
 
 /** Deletes a cookie from client.
  *
