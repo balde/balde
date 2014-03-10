@@ -141,13 +141,6 @@ balde_response_t* balde_make_response(const gchar *content);
  */
 balde_response_t* balde_make_response_len(const gchar *content, const gssize len);
 
-/** Initialize a response context.
- *
- * The response context is initialized with the content from a GString object.
- */
-balde_response_t* balde_make_response_from_gstring(GString *content);
-
-
 /** Sets a template variable.
  *
  * The template variable name *IS* case-sensitive.

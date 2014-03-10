@@ -16,6 +16,7 @@
 
 void balde_response_headers_free(gpointer l);
 void balde_response_free(balde_response_t *response);
+balde_response_t* balde_make_response_from_gstring(GString *content);
 balde_response_t* balde_make_response_from_exception(GError *error);
 void balde_fix_header_name(gchar *name);
 void balde_header_render(const gchar *key, GSList *value, GString *str);
