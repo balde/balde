@@ -17,6 +17,7 @@ typedef struct {
     gchar *name;
     gchar *content;
     gchar *type;
+    gsize size;
 } balde_resource_t;
 
 gchar** balde_resources_list_files(GResource *resources, GError **error);

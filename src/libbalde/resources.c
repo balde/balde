@@ -110,6 +110,7 @@ balde_resources_load(balde_app_t *app, GResource *resources)
         balde_resource_t *resource = g_new(balde_resource_t, 1);
         resource->name = g_strdup(resources_list[i]);
         resource->content = g_strndup((const gchar*) data, size);
+        resource->size = size;
         resource->type = g_strdup(magic_buffer(magic, (const gchar*) data,
             (size_t) size));
         app->static_resources = g_slist_append(app->static_resources, resource);
@@ -129,7 +130,8 @@ balde_make_response_from_static_resource(balde_app_t *app, const gchar *name)
     for (GSList *tmp = app->static_resources; tmp != NULL; tmp = g_slist_next(tmp)) {
         balde_resource_t *resource = tmp->data;
         if (0 == g_strcmp0(name, resource->name)) {
-            balde_response_t *response = balde_make_response(resource->content);
+            balde_response_t *response = balde_make_response_len(resource->content,
+                resource->size);
             if (resource->type != NULL)
                 balde_response_set_header(response, "Content-Type", resource->type);
             return response;
