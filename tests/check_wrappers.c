@@ -31,6 +31,19 @@ test_make_response(void)
 
 
 void
+test_make_response_len(void)
+{
+    balde_response_t *res = balde_make_response_len("lolasdf", 3);
+    g_assert(res != NULL);
+    g_assert(res->status_code == 200);
+    g_assert(g_hash_table_size(res->headers) == 0);
+    g_assert(g_hash_table_size(res->template_ctx) == 0);
+    g_assert_cmpstr(res->body->str, ==, "lol");
+    balde_response_free(res);
+}
+
+
+void
 test_make_response_from_exception(void)
 {
     balde_app_t *app = balde_app_init();
@@ -94,6 +107,16 @@ test_response_append_body(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_append_body(res, "hehe");
+    g_assert_cmpstr(res->body->str, ==, "lolhehe");
+    balde_response_free(res);
+}
+
+
+void
+test_response_append_body_len(void)
+{
+    balde_response_t *res = balde_make_response("lol");
+    balde_response_append_body_len(res, "heheasd", 4);
     g_assert_cmpstr(res->body->str, ==, "lolhehe");
     balde_response_free(res);
 }
@@ -481,6 +504,7 @@ main(int argc, char** argv)
 {
     g_test_init(&argc, &argv, NULL);
     g_test_add_func("/wrappers/make_response", test_make_response);
+    g_test_add_func("/wrappers/make_response_len", test_make_response_len);
     g_test_add_func("/wrappers/make_response_from_exception",
         test_make_response_from_exception);
     g_test_add_func("/wrappers/make_response_from_exception_not_found",
@@ -491,6 +515,8 @@ main(int argc, char** argv)
         test_response_set_headers);
     g_test_add_func("/wrappers/response_append_body",
         test_response_append_body);
+    g_test_add_func("/wrappers/response_append_body_len",
+        test_response_append_body_len);
     g_test_add_func("/wrappers/fix_header_name", test_fix_header_name);
     g_test_add_func("/wrappers/response_set_tmpl_var",
         test_response_set_tmpl_var);

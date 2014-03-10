@@ -117,17 +117,29 @@ typedef struct {
 void balde_response_set_header(balde_response_t *response, const gchar *name,
     const gchar *value);
 
-/** Appends a string to the response body. */
+/** Appends a nul-terminated string to the response body. */
 void balde_response_append_body(balde_response_t *response,
     const gchar *content);
+
+/** Appends a string to the response body, with specific length. */
+void balde_response_append_body_len(balde_response_t *response,
+    const gchar *content, const gssize len);
+
+/** Initialize a response context.
+ *
+ * The nul-terminated string passed as argument is used to initialize the
+ * response body. Please use an empty string if the response doesn't have body,
+ * instead of NULL.
+ */
+balde_response_t* balde_make_response(const gchar *content);
 
 /** Initialize a response context.
  *
  * The string passed as argument is used to initialize the response body.
- * Please use an empty string if the response doesn't have body, instead
- * of NULL.
+ * The string size must be passed as the second argument. The string need not
+ * to be nul-terminated.
  */
-balde_response_t* balde_make_response(const gchar *content);
+balde_response_t* balde_make_response_len(const gchar *content, const gssize len);
 
 /** Sets a template variable.
  *

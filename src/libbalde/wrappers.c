@@ -46,22 +46,44 @@ balde_response_append_body(balde_response_t *response, const gchar *content)
 
 
 void
+balde_response_append_body_len(balde_response_t *response, const gchar *content,
+    const gssize len)
+{
+    g_string_append_len(response->body, content, len);
+}
+
+
+void
 balde_response_headers_free(gpointer l)
 {
     g_slist_free_full(l, g_free);
 }
 
 
-balde_response_t*
-balde_make_response(const gchar *content)
+static balde_response_t*
+balde_make_response_internal(GString *content)
 {
     balde_response_t *response = g_new(balde_response_t, 1);
     response->status_code = 200;
     response->headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
         balde_response_headers_free);
     response->template_ctx = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    response->body = g_string_new(content);
+    response->body = content;
     return response;
+}
+
+
+balde_response_t*
+balde_make_response(const gchar *content)
+{
+    return balde_make_response_internal(g_string_new(content));
+}
+
+
+balde_response_t*
+balde_make_response_len(const gchar *content, const gssize len)
+{
+    return balde_make_response_internal(g_string_new_len(content, len));
 }
 
 
@@ -231,8 +253,7 @@ balde_response_render(balde_response_t *response, const gboolean with_body)
     if (response->status_code != 200)
         g_string_append_printf(str, "Status: %d %s\r\n", response->status_code,
             balde_exception_get_name_from_code(response->status_code));
-    gchar *len = g_strdup_printf("%zu", strlen(response->body->str));
-    // we shouldn't trust response->body->len
+    gchar *len = g_strdup_printf("%zu", response->body->len);
     balde_response_set_header(response, "Content-Length", len);
     g_free(len);
     if (g_hash_table_lookup(response->headers, "content-type") == NULL)
