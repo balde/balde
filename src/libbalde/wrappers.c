@@ -60,8 +60,8 @@ balde_response_headers_free(gpointer l)
 }
 
 
-static balde_response_t*
-balde_make_response_internal(GString *content)
+balde_response_t*
+balde_make_response_from_gstring(GString *content)
 {
     balde_response_t *response = g_new(balde_response_t, 1);
     response->status_code = 200;
@@ -76,14 +76,14 @@ balde_make_response_internal(GString *content)
 balde_response_t*
 balde_make_response(const gchar *content)
 {
-    return balde_make_response_internal(g_string_new(content));
+    return balde_make_response_from_gstring(g_string_new(content));
 }
 
 
 balde_response_t*
 balde_make_response_len(const gchar *content, const gssize len)
 {
-    return balde_make_response_internal(g_string_new_len(content, len));
+    return balde_make_response_from_gstring(g_string_new_len(content, len));
 }
 
 

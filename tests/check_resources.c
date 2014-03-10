@@ -41,7 +41,7 @@ balde_assert_resource(GSList *l, gchar *name, gchar *content, gchar *type)
     else
         g_assert(resource->name == NULL);
     if (content != NULL)
-        g_assert_cmpstr(resource->content, ==, content);
+        g_assert_cmpstr(resource->content->str, ==, content);
     else
         g_assert(resource->content == NULL);
     if (type != NULL)
