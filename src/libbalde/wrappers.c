@@ -435,7 +435,7 @@ balde_request_free(balde_request_t *request)
 {
     if (request == NULL)
         return;
-    g_free(request->path);
+    g_free((gchar*) request->path);
     g_hash_table_destroy(request->headers);
     g_hash_table_destroy(request->args);
     if (request->view_args != NULL)

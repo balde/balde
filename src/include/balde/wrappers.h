@@ -66,7 +66,7 @@ typedef struct {
     /**
      * Request path.
      */
-    gchar *path;
+    const gchar *path;
 
     /**
      * Request HTTP method. Can be used to verify which method was used
