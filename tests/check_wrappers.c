@@ -249,10 +249,10 @@ void
 test_response_render(void)
 {
     balde_response_t *res = balde_make_response("lol");
-    gchar *out = balde_response_render(res, TRUE);
-    g_assert_cmpstr(out, ==,
+    GString *out = balde_response_render(res, TRUE);
+    g_assert_cmpstr(out->str, ==,
         "Content-Type: text/html; charset=utf-8\r\nContent-Length: 3\r\n\r\nlol");
-    g_free(out);
+    g_string_free(out, TRUE);
     balde_response_free(res);
 }
 
@@ -262,10 +262,10 @@ test_response_render_with_custom_mime_type(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_header(res, "content-type", "text/plain");
-    gchar *out = balde_response_render(res, TRUE);
-    g_assert_cmpstr(out, ==,
+    GString *out = balde_response_render(res, TRUE);
+    g_assert_cmpstr(out->str, ==,
         "Content-Type: text/plain\r\nContent-Length: 3\r\n\r\nlol");
-    g_free(out);
+    g_string_free(out, TRUE);
     balde_response_free(res);
 }
 
@@ -277,8 +277,8 @@ test_response_render_with_multiple_cookies(void)
     balde_response_set_cookie(res, "bola", "guda", 60, -1, NULL, NULL, FALSE);
     balde_response_set_cookie(res, "asd", "qwe", -1, -1, NULL, NULL, FALSE);
     balde_response_set_cookie(res, "xd", ":D", -1, -1, "/bola/", NULL, FALSE);
-    gchar *out = balde_response_render(res, TRUE);
-    g_assert_cmpstr(out, ==,
+    GString *out = balde_response_render(res, TRUE);
+    g_assert_cmpstr(out->str, ==,
         "Set-Cookie: bola=\"guda\"; Expires=Fri, 13-Feb-2009 23:32:30 GMT; Max-Age=60; Path=/\r\n"
         "Set-Cookie: asd=\"qwe\"; Path=/\r\n"
         "Set-Cookie: xd=\":D\"; Path=/bola/\r\n"
@@ -286,7 +286,7 @@ test_response_render_with_multiple_cookies(void)
         "Content-Length: 3\r\n"
         "\r\n"
         "lol");
-    g_free(out);
+    g_string_free(out, TRUE);
     balde_response_free(res);
 }
 
@@ -295,10 +295,10 @@ void
 test_response_render_without_body(void)
 {
     balde_response_t *res = balde_make_response("lol");
-    gchar *out = balde_response_render(res, FALSE);
-    g_assert_cmpstr(out, ==,
+    GString *out = balde_response_render(res, FALSE);
+    g_assert_cmpstr(out->str, ==,
         "Content-Type: text/html; charset=utf-8\r\nContent-Length: 3\r\n\r\n");
-    g_free(out);
+    g_string_free(out, TRUE);
     balde_response_free(res);
 }
 
@@ -310,15 +310,15 @@ test_response_render_exception(void)
     balde_abort_set_error(app, 404);
     balde_response_t *res = balde_make_response_from_exception(app->error);
     g_assert(res != NULL);
-    gchar *out = balde_response_render(res, TRUE);
-    g_assert_cmpstr(out, ==,
+    GString *out = balde_response_render(res, TRUE);
+    g_assert_cmpstr(out->str, ==,
         "Status: 404 Not Found\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"
         "Content-Length: 136\r\n"
         "\r\n"
         "404 Not Found\n\nThe requested URL was not found on the server. "
         "If you entered the URL manually please check your spelling and try again.\n");
-    g_free(out);
+    g_string_free(out, TRUE);
     balde_response_free(res);
     balde_app_free(app);
 }
@@ -331,13 +331,13 @@ test_response_render_exception_without_body(void)
     balde_abort_set_error(app, 404);
     balde_response_t *res = balde_make_response_from_exception(app->error);
     g_assert(res != NULL);
-    gchar *out = balde_response_render(res, FALSE);
-    g_assert_cmpstr(out, ==,
+    GString *out = balde_response_render(res, FALSE);
+    g_assert_cmpstr(out->str, ==,
         "Status: 404 Not Found\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"
         "Content-Length: 136\r\n"
         "\r\n");
-    g_free(out);
+    g_string_free(out, TRUE);
     balde_response_free(res);
     balde_app_free(app);
 }
