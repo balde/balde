@@ -16,7 +16,6 @@
 #define BEGIN_LOOP while (FCGI_Accept() >= 0) {
 #define END_LOOP }
 
-void balde_stdout_handler(const gchar *str);
 void balde_stderr_handler(const gchar *str);
 gchar* balde_stdin_read(balde_app_t *app);
 

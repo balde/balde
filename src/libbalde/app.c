@@ -114,7 +114,6 @@ void
 balde_app_run(balde_app_t *app)
 {
     setlocale(LC_ALL, "");
-    g_set_print_handler(balde_stdout_handler);
     g_set_printerr_handler(balde_stderr_handler);
 
 BEGIN_LOOP

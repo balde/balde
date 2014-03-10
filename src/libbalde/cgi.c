@@ -17,13 +17,6 @@
 
 
 void
-balde_stdout_handler(const gchar *str)
-{
-    fprintf(stdout, "%s", (char*) str);
-}
-
-
-void
 balde_stderr_handler(const gchar *str)
 {
     fprintf(stderr, "%s", (char*) str);
