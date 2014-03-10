@@ -117,22 +117,30 @@ balde_app_run(balde_app_t *app)
     g_set_print_handler(balde_stdout_handler);
     g_set_printerr_handler(balde_stderr_handler);
 
+BEGIN_LOOP
+
+    balde_app_main_loop(app);
+
+END_LOOP
+
+}
+
+
+void
+balde_app_main_loop(balde_app_t *app)
+{
     balde_request_t *request;
     balde_response_t *response;
     balde_response_t *error_response;
     gchar *endpoint;
-    gboolean with_body;
-
-BEGIN_LOOP
-
-    with_body = TRUE;
+    gboolean with_body = TRUE;
 
     // render startup error, if any
     if (app->error != NULL) {
         error_response = balde_make_response_from_exception(app->error);
         balde_response_print(error_response, with_body);
         balde_response_free(error_response);
-        continue;
+        return;
     }
 
     request = balde_make_request(app);
@@ -174,12 +182,9 @@ BEGIN_LOOP
         balde_response_print(error_response, with_body);
         balde_response_free(error_response);
         g_clear_error(&app->error);
-        continue;
+        return;
     }
 
     balde_response_print(response, with_body);
     balde_response_free(response);
-
-END_LOOP
-
 }
