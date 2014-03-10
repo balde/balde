@@ -16,6 +16,7 @@
 #include <balde/app.h>
 #include <balde/exceptions.h>
 #include <balde/resources-private.h>
+#include <balde/wrappers-private.h>
 
 
 static void
@@ -129,7 +130,8 @@ balde_make_response_from_static_resource(balde_app_t *app, const gchar *name)
     for (GSList *tmp = app->static_resources; tmp != NULL; tmp = g_slist_next(tmp)) {
         balde_resource_t *resource = tmp->data;
         if (0 == g_strcmp0(name, resource->name)) {
-            balde_response_t *response = balde_make_response_from_gstring(resource->content);
+            GString *tmp = g_string_new_len(resource->content->str, resource->content->len);
+            balde_response_t *response = balde_make_response_from_gstring(tmp);
             if (resource->type != NULL)
                 balde_response_set_header(response, "Content-Type", resource->type);
             return response;
