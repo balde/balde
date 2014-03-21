@@ -7,8 +7,8 @@ balde_template_gen_SOURCES = \
 AM_CFLAGS = \
 	$(all_includes) \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/src/include
+	-I$(top_srcdir)/include
 
 AM_LDFLAGS = \
 	$(GLIB_LIBS) \
-	$(top_builddir)/src/libbalde/libbalde.la
+	$(top_builddir)/libbalde/libbalde.la

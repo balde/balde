@@ -1,4 +1,0 @@
-SUBDIRS = \
-	libbalde \
-	include \
-	bin

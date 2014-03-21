@@ -12,7 +12,7 @@ libbalde_la_SOURCES = \
 libbalde_la_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/src/include
+	-I$(top_srcdir)/include
 
 libbalde_la_LDFLAGS = \
 	$(AM_LDADD) \

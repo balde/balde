@@ -103,11 +103,10 @@ AC_CONFIG_FILES([
     doc/Makefile
     examples/Makefile
     examples/templates/Makefile
-    src/Makefile
-    src/bin/Makefile
-    src/include/Makefile
-    src/include/balde/Makefile
-    src/libbalde/Makefile
+    bin/Makefile
+    include/Makefile
+    include/balde/Makefile
+    libbalde/Makefile
     tests/Makefile
     balde.pc
     Doxyfile

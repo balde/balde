@@ -46,7 +46,7 @@ Makefile.in
 /m4/*.m4
 
 # balde-template-gen
-/src/bin/balde-template-gen
+/bin/balde-template-gen
 
 # tests
 /tests/check_app
@@ -57,6 +57,7 @@ Makefile.in
 /tests/check_template
 /tests/check_wrappers
 /tests/*.log
+/tests/*.trs
 /tests/resources.c
 /tests/resources.h
 
