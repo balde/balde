@@ -100,6 +100,7 @@ AC_SUBST(GLIB_COMPILE_RESOURCES)
 
 AC_CONFIG_FILES([
     Makefile
+    artwork/Makefile
     doc/Makefile
     examples/Makefile
     examples/static/Makefile

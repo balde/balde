@@ -1,4 +1,5 @@
 SUBDIRS = \
+	artwork \
 	libbalde \
 	include \
 	bin \
