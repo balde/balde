@@ -6,6 +6,10 @@ BUILT_SOURCES = \
 	form.c \
 	form.h
 
+EXTRA_DIST = \
+	hello.html \
+	form.html
+
 clean-local:
 	rm -f *.h *.c
 

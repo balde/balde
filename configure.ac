@@ -102,12 +102,15 @@ AC_CONFIG_FILES([
     Makefile
     doc/Makefile
     examples/Makefile
+    examples/static/Makefile
+    examples/static/asd/Makefile
     examples/templates/Makefile
     bin/Makefile
     include/Makefile
     include/balde/Makefile
     libbalde/Makefile
     tests/Makefile
+    tests/static/Makefile
     balde.pc
     Doxyfile
 ])

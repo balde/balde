@@ -1,3 +1,9 @@
+SUBDIRS = \
+	static
+
+EXTRA_DIST = \
+	resources.xml
+
 check_PROGRAMS = \
 	check_app \
 	check_exceptions \

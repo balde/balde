@@ -11,4 +11,5 @@ noinst_HEADERS = \
 	exceptions-private.h \
 	resources-private.h \
 	routing-private.h \
+	template-private.h \
 	wrappers-private.h

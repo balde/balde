@@ -1,7 +1,11 @@
 if BUILD_EXAMPLES
 
 SUBDIRS = \
+	static \
 	templates
+
+EXTRA_DIST = \
+	resources.xml
 
 noinst_PROGRAMS = \
 	hello \

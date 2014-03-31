@@ -71,3 +71,6 @@ Makefile.in
 /examples/resources.h
 /examples/templates/*.c
 /examples/templates/*.h
+
+# tarballs
+balde-*.tar.xz
