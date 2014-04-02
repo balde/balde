@@ -35,7 +35,7 @@ doxygen: Doxyfile
 if PUBLISH_DOCS
 publish_docs: doxygen
 	$(GITHUB_PAGES_PUBLISH) --verbose \
-		--cname balde.io \
+		--cname docs.balde.io \
 		. doc/build/html
 endif
 endif
