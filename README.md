@@ -1,7 +1,7 @@
 balde
 =====
 
-[![Build Status](https://travis-ci.org/rafaelmartins/balde.png)](https://travis-ci.org/rafaelmartins/balde)
+[![Build Status](https://travis-ci.org/balde/balde.png)](https://travis-ci.org/balde/balde)
 
 This is *balde*, a microframework for C based on GLib and bad intentions.
 
