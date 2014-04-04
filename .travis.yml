@@ -5,16 +5,16 @@ compiler:
   - clang
 
 env:
-  - GLIB_VERSION=2.34.3
-  - GLIB_VERSION=2.38.2
-  - GLIB_VERSION=2.40.0
+  - GLIB_VERSION=2.34 GLIB_RELEASE=2.34.3
+  - GLIB_VERSION=2.38 GLIB_RELEASE=2.38.2
+  - GLIB_VERSION=2.40 GLIB_RELEASE=2.40.0
 
 before_install:
   - sudo apt-get install -y libfcgi-dev libmagic-dev
-  - wget "http://ftp.gnome.org/pub/gnome/sources/glib/2.34/glib-$GLIB_VERSION.tar.xz"
-  - tar -xvf "glib-$GLIB_VERSION.tar.xz" -C ~
+  - wget "http://ftp.gnome.org/pub/gnome/sources/glib/$GLIB_VERSION/glib-$GLIB_RELEASE.tar.xz"
+  - tar -xvf "glib-$GLIB_RELEASE.tar.xz" -C ~
   - mkdir -p ~/glib/build
-  - pushd ~/glib/build > /dev/null && ~/glib-$GLIB_VERSION/configure && popd > /dev/null
+  - pushd ~/glib/build > /dev/null && ~/glib-$GLIB_RELEASE/configure && popd > /dev/null
   - make -C ~/glib/build
 
 install:
