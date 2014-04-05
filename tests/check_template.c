@@ -176,10 +176,55 @@ test_template_get_name(void)
 
 
 void
+balde_assert_template_content(GSList *l, const gchar *content)
+{
+    balde_template_block_t *node = l->data;
+    g_assert(node->type == BALDE_TEMPLATE_CONTENT_BLOCK);
+    balde_template_content_block_t *block = node->block;
+    g_assert_cmpstr(block->content, ==, content);
+}
+
+
+void
+balde_assert_template_print_var(GSList *l, const gchar *variable)
+{
+    balde_template_block_t *node = l->data;
+    g_assert(node->type == BALDE_TEMPLATE_PRINT_VAR_BLOCK);
+    balde_template_print_var_block_t *block = node->block;
+    g_assert_cmpstr(block->variable, ==, variable);
+}
+
+
+void
+balde_assert_template_print_function_call(GSList *l, const gchar *name, ...)
+{
+    va_list args;
+    va_start(args, name);
+    balde_template_block_t *node = l->data;
+    g_assert(node->type == BALDE_TEMPLATE_PRINT_FN_CALL_BLOCK);
+    balde_template_print_fn_call_block_t *block = node->block;
+    g_assert_cmpstr(block->name, ==, name);
+    for (GSList *tmp = block->args; tmp != NULL; tmp = g_slist_next(tmp))
+        g_assert_cmpstr((gchar*) tmp->data, ==, va_arg(args, const gchar*));
+    va_end(args);
+}
+
+
+void
 test_template_parse(void)
 {
-    GSList *blocks = balde_template_parse("{{ bola(gude, xd) }}");
+    GSList *blocks = balde_template_parse(
+        "Test\n"
+        "\n"
+        "foo {{ bola(gude, xd) }}\n"
+        "  {{ test }} \n"
+        "bola\n");
     g_assert(blocks != NULL);
+    balde_assert_template_content(blocks, "Test\n\nfoo ");
+    balde_assert_template_print_function_call(blocks->next, "bola", "gude", "xd");
+    balde_assert_template_content(blocks->next->next, "\n  ");
+    balde_assert_template_print_var(blocks->next->next->next, "test");
+    balde_assert_template_content(blocks->next->next->next->next, " \nbola\n");
     balde_template_free_blocks(blocks);
 }
 
