@@ -9,7 +9,7 @@
 %{
 
 #include <glib.h>
-#include <balde-template/parser.h>
+#include <balde-template/parser-private.h>
 
 #define YY_INPUT(buf, result, max_size)                          \
 {                                                                \

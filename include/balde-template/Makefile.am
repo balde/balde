@@ -1,5 +1,5 @@
 tmplincludedir = $(includedir)/balde-template
 
 tmplinclude_HEADERS = \
-	template.h \
-	parser.h
+	template-private.h \
+	parser-private.h
