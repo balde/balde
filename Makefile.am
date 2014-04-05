@@ -9,7 +9,9 @@ SUBDIRS = \
 	tests
 
 ACLOCAL_AMFLAGS = -I m4
-AM_DISTCHECK_CONFIGURE_FLAGS = --enable-examples
+AM_DISTCHECK_CONFIGURE_FLAGS = \
+	--enable-examples \
+	--without-leg
 
 EXTRA_DIST = \
 	$(top_srcdir)/autogen.sh \

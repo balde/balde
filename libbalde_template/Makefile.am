@@ -15,6 +15,9 @@ libbalde_template_la_LDFLAGS = \
 	$(GLIB_LIBS) \
 	-version-info $(LIBBALDE_TEMPLATE_LT_VERSION_INFO)
 
+EXTRA_DIST = \
+	parser-grammar.leg
+
 if USE_LEG
 parser-grammar.c: parser-grammar.leg
 	$(AM_V_GEN)$(LEG) -o $@ $<
