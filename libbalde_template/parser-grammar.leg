@@ -1,0 +1,115 @@
+#
+# balde: A microframework for C based on GLib and bad intentions.
+# Copyright (C) 2013-2014 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+#
+# This program can be distributed under the terms of the LGPL-2 License.
+# See the file COPYING.
+#
+
+%{
+
+#include <glib.h>
+#include <balde-template/parser.h>
+
+#define YY_INPUT(buf, result, max_size)                          \
+{                                                                \
+    int yyc = (charbuf && *charbuf != '\0') ? *charbuf++ : EOF;  \
+    result = (EOF == yyc) ? 0 : (*buf = yyc, 1);                 \
+}
+
+static GSList *nodes = NULL;
+static gchar *fn_name = NULL;
+static GSList *fn_args = NULL;
+static const gchar *charbuf = NULL;
+
+static void
+balde_template_content_block(const gchar *content)
+{
+    balde_template_content_block_t *block = g_new(balde_template_content_block_t, 1);
+    block->content = g_strdup(content);
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = block;
+    node->type = BALDE_TEMPLATE_CONTENT_BLOCK;
+    nodes = g_slist_append(nodes, node);
+}
+
+static void
+balde_template_print_var_block(const gchar *var)
+{
+    balde_template_print_var_block_t *block = g_new(balde_template_print_var_block_t, 1);
+    block->variable = g_strdup(var);
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = block;
+    node->type = BALDE_TEMPLATE_PRINT_VAR_BLOCK;
+    nodes = g_slist_append(nodes, node);
+}
+
+static void
+balde_template_print_fn_arg(const gchar *arg)
+{
+    fn_args = g_slist_append(fn_args, g_strdup(arg));
+}
+
+static void
+balde_template_print_fn_id(const gchar *fn_id)
+{
+    fn_name = g_strdup(fn_id);
+}
+
+static void
+balde_template_print_block(void)
+{
+    balde_template_print_fn_call_block_t *block = g_new(balde_template_print_fn_call_block_t, 1);
+    block->name = fn_name;
+    block->args = fn_args;
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = block;
+    node->type = BALDE_TEMPLATE_PRINT_FN_CALL_BLOCK;
+    nodes = g_slist_append(nodes, node);
+    fn_name = NULL;
+    fn_args = NULL;
+}
+
+%}
+
+page = print_call | content | anything
+    { g_printerr("Syntax error near: %s\n", yytext); }
+
+# Useful rules
+eol = '\n' | '\r\n' | '\r'
+eof = !.
+- = [\t ]*
+id = [a-zA-Z][a-zA-Z0-9_]*
+str = '"' ( !'"' . )+ '"'
+anything = < ( !eol . )* > eol
+
+# Print calls
+print_open = '{{' -
+print_close = - '}}'
+print_var = < id >
+    { balde_template_print_var_block(yytext); }
+print_fn_arg = < ( id | str ) >
+    { balde_template_print_fn_arg(yytext); }
+print_fn_args = - ( print_fn_arg ( - ',' - print_fn_arg )* - )*
+print_fn_id = < id >
+    { balde_template_print_fn_id(yytext); }
+print_fn = print_fn_id - '(' print_fn_args ')'
+    { balde_template_print_block(); }
+print_call = print_open ( print_fn | print_var ) print_close
+
+# Generic content
+content = < ( !eof !print_open !print_close . )+ >
+    { balde_template_content_block(yytext); }
+
+%%
+
+GSList*
+balde_template_parse(const gchar *tmpl)
+{
+    charbuf = tmpl;
+    while(yyparse());
+    GSList *rv = nodes;
+    charbuf = NULL;
+    nodes = NULL;
+    return rv;
+}

@@ -6,7 +6,6 @@ libbalde_la_SOURCES = \
 	exceptions.c \
 	resources.c \
 	routing.c \
-	template.c \
 	wrappers.c
 
 libbalde_la_CFLAGS = \
@@ -17,4 +16,4 @@ libbalde_la_CFLAGS = \
 libbalde_la_LDFLAGS = \
 	$(AM_LDADD) \
 	$(GLIB_LIBS) \
-	-version-info $(LT_VERSION_INFO)
+	-version-info $(LIBBALDE_LT_VERSION_INFO)

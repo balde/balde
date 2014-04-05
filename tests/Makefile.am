@@ -42,6 +42,9 @@ check_stdin_SOURCES = \
 check_template_SOURCES = \
 	check_template.c
 
+check_template_LDADD = \
+	$(top_builddir)/libbalde_template/libbalde_template.la
+
 check_wrappers_SOURCES = \
 	check_wrappers.c \
 	mock_datetime.c

@@ -8,12 +8,18 @@ AC_CONFIG_MACRO_DIR([m4])
 # code changed: REVISION++.
 # interface changed: CURRENT++, REVISION=0.
 # interface changed (backwards compatible): AGE++, else AGE=0.
-CURRENT=0
-AGE=0
-REVISION=0
+LIBBALDE_CURRENT=0
+LIBBALDE_AGE=0
+LIBBALDE_REVISION=0
+LIBBALDE_TEMPLATE_CURRENT=0
+LIBBALDE_TEMPLATE_AGE=0
+LIBBALDE_TEMPLATE_REVISION=0
 
-LT_VERSION_INFO="$CURRENT:$REVISION:$AGE"
-AC_SUBST(LT_VERSION_INFO)
+LIBBALDE_LT_VERSION_INFO="$LIBBALDE_CURRENT:$LIBBALDE_REVISION:$LIBBALDE_AGE"
+LIBBALDE_TEMPLATE_LT_VERSION_INFO="$LIBBALDE_TEMPLATE_CURRENT:$LIBBALDE_TEMPLATE_REVISION:$LIBBALDE_TEMPLATE_AGE"
+
+AC_SUBST(LIBBALDE_LT_VERSION_INFO)
+AC_SUBST(LIBBALDE_TEMPLATE_LT_VERSION_INFO)
 
 AM_INIT_AUTOMAKE([foreign no-dist-gzip dist-xz subdir-objects])
 AC_CONFIG_HEADERS([config.h])
@@ -89,6 +95,25 @@ AM_CONDITIONAL([USE_VALGRIND], [test "x$have_valgrind" = "xyes"])
 VALGRIND="$ac_cv_path_valgrind"
 AC_SUBST(VALGRIND)
 
+AC_ARG_WITH([leg], AS_HELP_STRING([--without-leg],
+            [ignore presence of peg/leg and disable template parser grammar regeneration]))
+AS_IF([test "x$with_leg" != "xno"], [
+  AC_PATH_PROG([leg], [leg])
+  AS_IF([test "x$ac_cv_path_leg" = "x"], [
+    have_leg=no
+  ], [
+    have_leg=yes
+  ])
+])
+AS_IF([test "x$have_leg" = "xyes"], , [
+  AS_IF([test "x$with_leg" = "xyes"], [
+    AC_MSG_ERROR([peg/leg requested but not found])
+  ])
+])
+AM_CONDITIONAL([USE_LEG], [test "x$have_leg" = "xyes"])
+LEG="$ac_cv_path_leg"
+AC_SUBST(LEG)
+
 GLIB_DEP="glib-2.0 >= 2.34, gio-2.0 >= 2.34"
 AC_SUBST(GLIB_DEP)
 
@@ -109,7 +134,9 @@ AC_CONFIG_FILES([
     bin/Makefile
     include/Makefile
     include/balde/Makefile
+    include/balde-template/Makefile
     libbalde/Makefile
+    libbalde_template/Makefile
     tests/Makefile
     tests/static/Makefile
     balde.pc
@@ -132,4 +159,5 @@ AS_ECHO("
 
         doxygen:      ${DOXYGEN}
         valgrind:     ${VALGRIND}
+        leg:          ${LEG}
 ")

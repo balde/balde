@@ -1,6 +1,7 @@
 SUBDIRS = \
 	artwork \
 	libbalde \
+	libbalde_template \
 	include \
 	bin \
 	examples \

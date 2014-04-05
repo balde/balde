@@ -11,7 +11,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include <balde/template-private.h>
+#include <balde-template/template.h>
+#include <balde-template/parser.h>
 
 
 void
@@ -174,6 +175,15 @@ test_template_get_name(void)
 }
 
 
+void
+test_template_parse(void)
+{
+    GSList *blocks = balde_template_parse("{{ bola(gude, xd) }}");
+    g_assert(blocks != NULL);
+    balde_template_free_blocks(blocks);
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -191,5 +201,6 @@ main(int argc, char** argv)
     g_test_add_func("/template/generate_header",
         test_template_generate_header);
     g_test_add_func("/template/get_name", test_template_get_name);
+    g_test_add_func("/template/parse", test_template_parse);
     return g_test_run();
 }

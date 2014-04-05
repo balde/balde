@@ -11,4 +11,4 @@ AM_CFLAGS = \
 
 AM_LDFLAGS = \
 	$(GLIB_LIBS) \
-	$(top_builddir)/libbalde/libbalde.la
+	$(top_builddir)/libbalde_template/libbalde_template.la

@@ -13,7 +13,8 @@
 #include <glib.h>
 #include <stdlib.h>
 #include <string.h>
-#include <balde/template-private.h>
+#include <balde-template/template.h>
+#include <balde-template/parser.h>
 
 
 static gboolean
