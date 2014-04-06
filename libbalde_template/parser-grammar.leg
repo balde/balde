@@ -23,6 +23,17 @@ static GSList *fn_args = NULL;
 static const gchar *charbuf = NULL;
 
 static void
+balde_template_include_block(const gchar *include)
+{
+    balde_template_include_block_t *block = g_new(balde_template_include_block_t, 1);
+    block->include = g_strdup(include);
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = block;
+    node->type = BALDE_TEMPLATE_INCLUDE_BLOCK;
+    nodes = g_slist_append(nodes, node);
+}
+
+static void
 balde_template_content_block(const gchar *content)
 {
     balde_template_content_block_t *block = g_new(balde_template_content_block_t, 1);
@@ -72,7 +83,7 @@ balde_template_print_block(void)
 
 %}
 
-page = print_call | content | anything
+page = include | print_call | content | anything
     { g_printerr("Syntax error near: %s\n", yytext); }
 
 # Useful rules
@@ -80,8 +91,15 @@ eol = '\n' | '\r\n' | '\r'
 eof = !.
 - = [\t ]*
 id = [a-zA-Z][a-zA-Z0-9_]*
-str = '"' ( !'"' . )+ '"'
+unq_str = ( !'"' . )+
+str = '"' unq_str '"'
 anything = < ( !eol . )* > eol
+
+# Includes
+include_open = '{%' -
+include_close = - '%}'
+include = include_open 'include' ' '+ '"' < unq_str > '"' include_close
+    { balde_template_include_block(yytext); }
 
 # Print calls
 print_open = '{{' -
@@ -98,7 +116,7 @@ print_fn = print_fn_id - '(' print_fn_args ')'
 print_call = print_open ( print_fn | print_var ) print_close
 
 # Generic content
-content = < ( !eof !print_open !print_close . )+ >
+content = < ( !eof !include_open !include_close !print_open !print_close . )+ >
     { balde_template_content_block(yytext); }
 
 %%

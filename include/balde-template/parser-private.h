@@ -12,6 +12,10 @@
 #include <glib.h>
 
 typedef struct {
+    gchar *include;
+} balde_template_include_block_t;
+
+typedef struct {
     gchar *content;
 } balde_template_content_block_t;
 
@@ -25,6 +29,7 @@ typedef struct {
 } balde_template_print_fn_call_block_t;
 
 typedef enum {
+    BALDE_TEMPLATE_INCLUDE_BLOCK,
     BALDE_TEMPLATE_CONTENT_BLOCK,
     BALDE_TEMPLATE_PRINT_VAR_BLOCK,
     BALDE_TEMPLATE_PRINT_FN_CALL_BLOCK,
