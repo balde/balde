@@ -17,19 +17,6 @@
 #include <balde-template/parser-private.h>
 
 
-static gboolean
-replace_template_variables_cb(const GMatchInfo *info, GString *res, gpointer data)
-{
-    gchar *match = g_match_info_fetch(info, 1);
-    GSList **tmp = (GSList**) data;
-    *tmp = g_slist_append(*tmp, (gchar*) g_strdup(match));
-    data = tmp;
-    g_string_append(res, "%s");
-    g_free (match);
-    return FALSE;
-}
-
-
 gchar*
 balde_template_generate_source(const gchar *template_name,
     const gchar *template_source)
