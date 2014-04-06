@@ -20,6 +20,7 @@
 static GSList *nodes = NULL;
 static gchar *fn_name = NULL;
 static GSList *fn_args = NULL;
+static balde_template_fn_arg_type_t fn_arg_type;
 static const gchar *charbuf = NULL;
 
 static void
@@ -58,7 +59,10 @@ balde_template_print_var_block(const gchar *var)
 static void
 balde_template_print_fn_arg(const gchar *arg)
 {
-    fn_args = g_slist_append(fn_args, g_strdup(arg));
+    balde_template_fn_arg_t *a = g_new(balde_template_fn_arg_t, 1);
+    a->content = g_strdup(arg);
+    a->type = fn_arg_type;
+    fn_args = g_slist_append(fn_args, a);
 }
 
 static void
@@ -93,6 +97,11 @@ eof = !.
 id = [a-zA-Z][a-zA-Z0-9_]*
 unq_str = ( !'"' . )+
 str = '"' unq_str '"'
+int = sign? [0-9]+
+float = sign? [0-9]+ '.' [0-9]+
+sign = '+' | '-'
+bool = 'TRUE' | 'FALSE'
+
 anything = < ( !eol . )* > eol
 
 # Includes
@@ -104,9 +113,16 @@ include = include_open 'include' ' '+ '"' < unq_str > '"' include_close
 # Print calls
 print_open = '{{' -
 print_close = - '}}'
-print_var = < id >
-    { balde_template_print_var_block(yytext); }
-print_fn_arg = < ( id | str ) >
+print_var = < id >         { balde_template_print_var_block(yytext); }
+
+print_fn_arg_var = id      { fn_arg_type = BALDE_TEMPLATE_FN_ARG_VAR; }
+print_fn_arg_str = str     { fn_arg_type = BALDE_TEMPLATE_FN_ARG_STRING; }
+print_fn_arg_int = int     { fn_arg_type = BALDE_TEMPLATE_FN_ARG_INT; }
+print_fn_arg_float = float { fn_arg_type = BALDE_TEMPLATE_FN_ARG_FLOAT; }
+print_fn_arg_bool = bool   { fn_arg_type = BALDE_TEMPLATE_FN_ARG_BOOL; }
+
+print_fn_arg = < ( print_fn_arg_bool | print_fn_arg_float | print_fn_arg_int
+    | print_fn_arg_var | print_fn_arg_str ) >
     { balde_template_print_fn_arg(yytext); }
 print_fn_args = - ( print_fn_arg ( - ',' - print_fn_arg )* - )*
 print_fn_id = < id >

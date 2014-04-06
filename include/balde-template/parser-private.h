@@ -23,6 +23,19 @@ typedef struct {
     gchar *variable;
 } balde_template_print_var_block_t;
 
+typedef enum {
+    BALDE_TEMPLATE_FN_ARG_STRING,
+    BALDE_TEMPLATE_FN_ARG_VAR,
+    BALDE_TEMPLATE_FN_ARG_INT,
+    BALDE_TEMPLATE_FN_ARG_FLOAT,
+    BALDE_TEMPLATE_FN_ARG_BOOL,
+} balde_template_fn_arg_type_t;
+
+typedef struct {
+    gchar *content;
+    balde_template_fn_arg_type_t type;
+} balde_template_fn_arg_t;
+
 typedef struct {
     gchar *name;
     GSList *args;

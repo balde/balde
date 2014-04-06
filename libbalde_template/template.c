@@ -44,7 +44,7 @@ balde_template_generate_source(const gchar *template_name,
     balde_template_content_block_t *cblock;
     balde_template_print_var_block_t *vblock;
     balde_template_print_fn_call_block_t *fblock;
-    gchar *arg;
+    balde_template_fn_arg_t *arg;
     gchar *escaped_content;
     GString *fn_args = NULL;
     for (GSList *tmp = blocks; tmp != NULL; tmp = g_slist_next(tmp)) {
@@ -79,11 +79,19 @@ balde_template_generate_source(const gchar *template_name,
                     g_string_append(fn_args, ")");
                 for (GSList *tmp2 = fblock->args; tmp2 != NULL; tmp2 = g_slist_next(tmp2)) {
                     arg = tmp2->data;
-                    if (*arg == '"')
-                        g_string_append_printf(fn_args, "            %s", arg);
-                    else
-                        g_string_append_printf(fn_args,
-                            "            balde_response_get_tmpl_var(response, \"%s\")", arg);
+                    switch (arg->type) {
+                        case BALDE_TEMPLATE_FN_ARG_STRING:
+                        case BALDE_TEMPLATE_FN_ARG_INT:
+                        case BALDE_TEMPLATE_FN_ARG_FLOAT:
+                        case BALDE_TEMPLATE_FN_ARG_BOOL:
+                            g_string_append_printf(fn_args, "            %s", arg->content);
+                            break;
+                        case BALDE_TEMPLATE_FN_ARG_VAR:
+                            g_string_append_printf(fn_args,
+                                "            balde_response_get_tmpl_var(response, \"%s\")",
+                                arg->content);
+                            break;
+                    }
                     if (g_slist_next(tmp2) == NULL)
                         g_string_append(fn_args, ")");
                     else

@@ -17,12 +17,14 @@
 void
 balde_template_free_blocks(GSList *blocks)
 {
+    balde_template_block_t *block;
     balde_template_include_block_t *iblock;
     balde_template_content_block_t *cblock;
     balde_template_print_var_block_t *vblock;
     balde_template_print_fn_call_block_t *fblock;
+    balde_template_fn_arg_t *arg;
     for(GSList *tmp = blocks; tmp != NULL; tmp = g_slist_next(tmp)) {
-        balde_template_block_t *block = tmp->data;
+        block = tmp->data;
         switch(block->type) {
             case BALDE_TEMPLATE_INCLUDE_BLOCK:
                 iblock = block->block;
@@ -39,7 +41,12 @@ balde_template_free_blocks(GSList *blocks)
             case BALDE_TEMPLATE_PRINT_FN_CALL_BLOCK:
                 fblock = block->block;
                 g_free(fblock->name);
-                g_slist_free_full(fblock->args, g_free);
+                for(GSList *tmp2 = fblock->args; tmp2 != NULL; tmp2 = g_slist_next(tmp2)) {
+                    arg = tmp2->data;
+                    g_free(arg->content);
+                    g_free(arg);
+                }
+                g_slist_free(fblock->args);
                 break;
         }
         g_free(block->block);
