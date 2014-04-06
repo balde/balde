@@ -129,6 +129,50 @@ test_app_get_view_from_endpoint_not_found(void)
 }
 
 
+void
+test_app_url_for(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_app_add_url_rule(app, "arcoiro", "/arcoiro/<bola>/<guda>/",
+        BALDE_HTTP_GET, arcoiro_view);
+    balde_app_add_url_rule(app, "arcoiro2", "/arco/<iro>", BALDE_HTTP_GET,
+        arcoiro_view);
+    gchar *url = balde_app_url_for(app, "arcoiro", "chunda", "guto");
+    g_assert_cmpstr(url, ==, "/arcoiro/chunda/guto/");
+    g_free(url);
+    url = balde_app_url_for(app, "arcoiro2", "bola");
+    g_assert_cmpstr(url, ==, "/arco/bola");
+    g_free(url);
+    url = balde_app_url_for(app, "static", "foo/jquery-min.js");
+    g_assert_cmpstr(url, ==, "/static/foo/jquery-min.js");
+    g_free(url);
+    balde_app_free(app);
+}
+
+
+void
+test_app_url_for_with_script_name(void)
+{
+    g_setenv("SCRIPT_NAME", "/foo/bar", TRUE);
+    balde_app_t *app = balde_app_init();
+    balde_app_add_url_rule(app, "arcoiro", "/arcoiro/<bola>/<guda>/",
+        BALDE_HTTP_GET, arcoiro_view);
+    balde_app_add_url_rule(app, "arcoiro2", "/arco/<iro>", BALDE_HTTP_GET,
+        arcoiro_view);
+    gchar *url = balde_app_url_for(app, "arcoiro", "chunda", "guto");
+    g_assert_cmpstr(url, ==, "/foo/bar/arcoiro/chunda/guto/");
+    g_free(url);
+    url = balde_app_url_for(app, "arcoiro2", "bola");
+    g_assert_cmpstr(url, ==, "/foo/bar/arco/bola");
+    g_free(url);
+    url = balde_app_url_for(app, "static", "foo/jquery-min.js");
+    g_assert_cmpstr(url, ==, "/foo/bar/static/foo/jquery-min.js");
+    g_free(url);
+    balde_app_free(app);
+    g_unsetenv("SCRIPT_NAME");
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -141,5 +185,8 @@ main(int argc, char** argv)
         test_app_get_view_from_endpoint);
     g_test_add_func("/app/get_view_from_endpoint_not_found",
         test_app_get_view_from_endpoint_not_found);
+    g_test_add_func("/app/url_for", test_app_url_for);
+    g_test_add_func("/app/url_for_with_script_name",
+        test_app_url_for_with_script_name);
     return g_test_run();
 }

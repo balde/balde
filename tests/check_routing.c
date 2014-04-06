@@ -349,17 +349,26 @@ test_parse_url_rule(void)
     GError *error = NULL;
     match = balde_parse_url_rule("/foo/", &error);
     g_assert_cmpstr(g_regex_get_pattern(match->regex), ==, "^/foo/$");
+    g_assert_cmpstr(match->pieces[0], ==, "/foo/");
+    g_assert(match->pieces[1] == NULL);
     g_assert(match->args[0] == NULL);
     balde_free_url_rule_match(match);
     match = balde_parse_url_rule("/foo/<bar>/", &error);
     g_assert_cmpstr(g_regex_get_pattern(match->regex), ==,
         "^/foo/(?P<bar>[^/]+)/$");
+    g_assert_cmpstr(match->pieces[0], ==, "/foo/");
+    g_assert_cmpstr(match->pieces[1], ==, "/");
+    g_assert(match->pieces[2] == NULL);
     g_assert_cmpstr(match->args[0], ==, "bar");
     g_assert(match->args[1] == NULL);
     balde_free_url_rule_match(match);
     match = balde_parse_url_rule("/foo/<bar>/<path:lol>/", &error);
     g_assert_cmpstr(g_regex_get_pattern(match->regex), ==,
         "^/foo/(?P<bar>[^/]+)/(?P<lol>[^/].*?)/$");
+    g_assert_cmpstr(match->pieces[0], ==, "/foo/");
+    g_assert_cmpstr(match->pieces[1], ==, "/");
+    g_assert_cmpstr(match->pieces[2], ==, "/");
+    g_assert(match->pieces[3] == NULL);
     g_assert_cmpstr(match->args[0], ==, "bar");
     g_assert_cmpstr(match->args[1], ==, "lol");
     g_assert(match->args[2] == NULL);
@@ -368,6 +377,12 @@ test_parse_url_rule(void)
         &error);
     g_assert_cmpstr(g_regex_get_pattern(match->regex), ==,
         "^/foo/(?P<bar>[^/]+)/(?P<lol>[^/].*?)/(?P<baz>[^/].*?)/(?P<kkk>[^/]+)/$");
+    g_assert_cmpstr(match->pieces[0], ==, "/foo/");
+    g_assert_cmpstr(match->pieces[1], ==, "/");
+    g_assert_cmpstr(match->pieces[2], ==, "/");
+    g_assert_cmpstr(match->pieces[3], ==, "/");
+    g_assert_cmpstr(match->pieces[4], ==, "/");
+    g_assert(match->pieces[5] == NULL);
     g_assert_cmpstr(match->args[0], ==, "bar");
     g_assert_cmpstr(match->args[1], ==, "lol");
     g_assert_cmpstr(match->args[2], ==, "baz");
@@ -377,6 +392,9 @@ test_parse_url_rule(void)
     match = balde_parse_url_rule("/foo/<path:foo_bar1>/", &error);
     g_assert_cmpstr(g_regex_get_pattern(match->regex), ==,
         "^/foo/(?P<foo_bar1>[^/].*?)/$");
+    g_assert_cmpstr(match->pieces[0], ==, "/foo/");
+    g_assert_cmpstr(match->pieces[1], ==, "/");
+    g_assert(match->pieces[2] == NULL);
     g_assert_cmpstr(match->args[0], ==, "foo_bar1");
     g_assert(match->args[1] == NULL);
     balde_free_url_rule_match(match);

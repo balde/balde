@@ -15,6 +15,7 @@
 typedef struct {
     GRegex *regex;
     gchar **args;
+    gchar **pieces;
 } balde_url_rule_match_t;
 
 

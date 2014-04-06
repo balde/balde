@@ -98,6 +98,13 @@ void balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint,
     const gchar *rule, const balde_http_method_t method,
     balde_view_func_t view_func);
 
+/** Helper function to get the URL for a given endpoint.
+ *
+ * You should pass the exact number of parameters expected by the view's URL
+ * rule.
+ */
+gchar* balde_app_url_for(balde_app_t *app, const gchar *endpoint, ...);
+
 /** Application main loop.
  *
  * This function does everything needed to run the registered views and dispatch

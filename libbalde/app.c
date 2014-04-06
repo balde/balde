@@ -110,6 +110,34 @@ balde_app_get_view_from_endpoint(balde_app_t *app, const gchar *endpoint)
 }
 
 
+gchar*
+balde_app_url_for(balde_app_t *app, const gchar *endpoint, ...)
+{
+    va_list params;
+    va_start(params, endpoint);
+    gchar *rv = balde_app_url_forv(app, endpoint, params);
+    va_end(params);
+    return rv;
+}
+
+
+gchar*
+balde_app_url_forv(balde_app_t *app, const gchar *endpoint, va_list params)
+{
+    balde_view_t *view = balde_app_get_view_from_endpoint(app, endpoint);
+    if (view == NULL)
+        return NULL;
+    const gchar *script_name = g_getenv("SCRIPT_NAME");
+    GString *rv = g_string_new(script_name == NULL ? "" : script_name);
+    for (guint i = 0; view->url_rule->match->pieces[i] != NULL; i++) {
+        g_string_append(rv, view->url_rule->match->pieces[i]);
+        if (view->url_rule->match->pieces[i + 1] != NULL)
+            g_string_append(rv, va_arg(params, const gchar*));
+    }
+    return g_string_free(rv, FALSE);
+}
+
+
 void
 balde_app_run(balde_app_t *app)
 {

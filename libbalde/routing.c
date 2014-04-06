@@ -152,10 +152,22 @@ balde_parse_url_rule(const gchar *rule, GError **error)
         g_propagate_error(error, tmp_error);
         goto point3;
     }
+    gchar **rule_pieces_arr = g_regex_split(regex_variables, escaped_rule, 0);
+    GSList *rule_pieces = NULL;
+    for (guint i = 0; i < g_strv_length(rule_pieces_arr); i += 4)
+        rule_pieces = g_slist_append(rule_pieces, g_strdup(rule_pieces_arr[i]));
+    g_strfreev(rule_pieces_arr);
+    rule_pieces_arr = g_new(gchar*, g_slist_length(rule_pieces) + 1);
+    guint i = 0;
+    for (GSList *tmp = rule_pieces; tmp != NULL; tmp = g_slist_next(tmp), i++)
+        rule_pieces_arr[i] = (gchar*) tmp->data;
+    g_slist_free(rule_pieces);
+    rule_pieces_arr[i] = NULL;
     rv = g_new(balde_url_rule_match_t, 1);
     rv->regex = regex_final;
     rv->args = g_new(gchar*, g_slist_length(args) + 1);
-    guint i = 0;
+    rv->pieces = rule_pieces_arr;
+    i = 0;
     for (GSList *tmp = args; tmp != NULL; tmp = g_slist_next(tmp), i++)
         rv->args[i] = (gchar*) tmp->data;
     rv->args[i] = NULL;
@@ -176,6 +188,7 @@ balde_free_url_rule_match(balde_url_rule_match_t *match)
 {
     if (match == NULL)
         return;
+    g_strfreev(match->pieces);
     g_strfreev(match->args);
     g_regex_unref(match->regex);
     g_free(match);
