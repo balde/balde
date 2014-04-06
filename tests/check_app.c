@@ -137,13 +137,13 @@ test_app_url_for(void)
         BALDE_HTTP_GET, arcoiro_view);
     balde_app_add_url_rule(app, "arcoiro2", "/arco/<iro>", BALDE_HTTP_GET,
         arcoiro_view);
-    gchar *url = balde_app_url_for(app, "arcoiro", "chunda", "guto");
+    gchar *url = balde_app_url_for(app, "arcoiro", FALSE, "chunda", "guto");
     g_assert_cmpstr(url, ==, "/arcoiro/chunda/guto/");
     g_free(url);
-    url = balde_app_url_for(app, "arcoiro2", "bola");
+    url = balde_app_url_for(app, "arcoiro2", FALSE, "bola");
     g_assert_cmpstr(url, ==, "/arco/bola");
     g_free(url);
-    url = balde_app_url_for(app, "static", "foo/jquery-min.js");
+    url = balde_app_url_for(app, "static", FALSE, "foo/jquery-min.js");
     g_assert_cmpstr(url, ==, "/static/foo/jquery-min.js");
     g_free(url);
     balde_app_free(app);
@@ -159,13 +159,13 @@ test_app_url_for_with_script_name(void)
         BALDE_HTTP_GET, arcoiro_view);
     balde_app_add_url_rule(app, "arcoiro2", "/arco/<iro>", BALDE_HTTP_GET,
         arcoiro_view);
-    gchar *url = balde_app_url_for(app, "arcoiro", "chunda", "guto");
+    gchar *url = balde_app_url_for(app, "arcoiro", FALSE, "chunda", "guto");
     g_assert_cmpstr(url, ==, "/foo/bar/arcoiro/chunda/guto/");
     g_free(url);
-    url = balde_app_url_for(app, "arcoiro2", "bola");
+    url = balde_app_url_for(app, "arcoiro2", FALSE, "bola");
     g_assert_cmpstr(url, ==, "/foo/bar/arco/bola");
     g_free(url);
-    url = balde_app_url_for(app, "static", "foo/jquery-min.js");
+    url = balde_app_url_for(app, "static", FALSE, "foo/jquery-min.js");
     g_assert_cmpstr(url, ==, "/foo/bar/static/foo/jquery-min.js");
     g_free(url);
     balde_app_free(app);

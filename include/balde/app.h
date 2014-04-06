@@ -102,8 +102,12 @@ void balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint,
  *
  * You should pass the exact number of parameters expected by the view's URL
  * rule.
+ *
+ * The 'external' parameter isn't implemented yet, but is planned on the API.
+ * If set to TRUE, the function will return an absolute URL.
  */
-gchar* balde_app_url_for(balde_app_t *app, const gchar *endpoint, ...);
+gchar* balde_app_url_for(balde_app_t *app, const gchar *endpoint, gboolean external,
+    ...);
 
 /** Application main loop.
  *
