@@ -324,7 +324,7 @@ test_template_parse(void)
         "Test\n"
         "\n"
         "   {% include \"bola.h\" %}\n"
-        "foo {{ bola(gude, TRUE, 1.5, -2, \"chunda\", FALSE, xd, +5) }}\n"
+        "foo {{ bola(gude, TRUE, 1.5, -2, \"chunda\", FALSE, xd, +5, \"\") }}\n"
         "  {{ test }} \n"
         "bola\n");
     g_assert(blocks != NULL);
@@ -332,7 +332,7 @@ test_template_parse(void)
     balde_assert_template_include(blocks->next, "bola.h");
     balde_assert_template_content(blocks->next->next, "\nfoo ");
     balde_assert_template_print_function_call(blocks->next->next->next, "bola",
-        "gude", "TRUE", "1.5", "-2", "\"chunda\"", "FALSE", "xd", "+5");
+        "gude", "TRUE", "1.5", "-2", "\"chunda\"", "FALSE", "xd", "+5", "\"\"");
     balde_assert_template_content(blocks->next->next->next->next, "\n  ");
     balde_assert_template_print_var(blocks->next->next->next->next->next, "test");
     balde_assert_template_content(blocks->next->next->next->next->next->next,
