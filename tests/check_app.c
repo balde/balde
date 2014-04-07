@@ -143,6 +143,9 @@ test_app_url_for(void)
     url = balde_app_url_for(app, "arcoiro2", FALSE, "bola");
     g_assert_cmpstr(url, ==, "/arco/bola");
     g_free(url);
+    url = balde_app_url_for(app, "arcoiro2", FALSE, "bo\"la");
+    g_assert_cmpstr(url, ==, "/arco/bo%22la");
+    g_free(url);
     url = balde_app_url_for(app, "static", FALSE, "foo/jquery-min.js");
     g_assert_cmpstr(url, ==, "/static/foo/jquery-min.js");
     g_free(url);
