@@ -26,4 +26,5 @@ main(int argc, char **argv)
         hello);
     balde_app_run(app);
     balde_app_free(app);
+    return 0;
 }

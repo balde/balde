@@ -30,4 +30,5 @@ main(int argc, char **argv)
     balde_app_add_url_rule(app, "profile", "/profile/<name>/", BALDE_HTTP_GET, profile);
     balde_app_run(app);
     balde_app_free(app);
+    return 0;
 }
