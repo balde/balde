@@ -55,6 +55,7 @@ Makefile.in
 /tests/check_routing
 /tests/check_stdin
 /tests/check_template
+/tests/check_template_helpers
 /tests/check_wrappers
 /tests/*.log
 /tests/*.trs
