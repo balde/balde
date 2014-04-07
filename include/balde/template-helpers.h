@@ -6,14 +6,14 @@
  * See the file COPYING.
  */
 
-#ifndef _BALDE_H
-#define _BALDE_H
+#ifndef _BALDE_TEMPLATE_HELPERS_H
+#define _BALDE_TEMPLATE_HELPERS_H
 
+#include <glib.h>
 #include <balde/app.h>
-#include <balde/exceptions.h>
-#include <balde/resources.h>
-#include <balde/routing.h>
-#include <balde/template-helpers.h>
 #include <balde/wrappers.h>
 
-#endif /* _BALDE_H */
+gchar* balde_tmpl_url_for(balde_app_t *app, balde_request_t *request,
+    const gchar *endpoint, gboolean external, ...);
+
+#endif /* _BALDE_TEMPLATE_HELPERS_H */

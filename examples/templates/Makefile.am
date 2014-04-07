@@ -4,11 +4,14 @@ BUILT_SOURCES = \
 	hello.c \
 	hello.h \
 	form.c \
-	form.h
+	form.h \
+	url_for.c \
+	url_for.h
 
 EXTRA_DIST = \
 	hello.html \
-	form.html
+	form.html \
+	url_for.html
 
 clean-local:
 	rm -f *.h *.c

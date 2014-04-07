@@ -6,6 +6,7 @@ libbalde_la_SOURCES = \
 	exceptions.c \
 	resources.c \
 	routing.c \
+	template-helpers.c \
 	wrappers.c
 
 libbalde_la_CFLAGS = \

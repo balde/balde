@@ -59,9 +59,10 @@ balde_template_generate_source(const gchar *template_name,
                 fblock = node->block;
                 g_string_append(parsed, "%s");
                 fn_args = g_string_new("");
-                g_string_append_printf(fn_args, "        %s(", fblock->name);
+                g_string_append_printf(fn_args, "        balde_tmpl_%s(app, request",
+                    fblock->name);
                 if (fblock->args != NULL)
-                    g_string_append(fn_args, "\n");
+                    g_string_append(fn_args, ",\n");
                 else
                     g_string_append(fn_args, ")");
                 for (GSList *tmp2 = fblock->args; tmp2 != NULL; tmp2 = g_slist_next(tmp2)) {
@@ -108,10 +109,11 @@ balde_template_generate_source(const gchar *template_name,
         "#include <glib.h>\n"
         "%s\n"
         "static const gchar *balde_template_%s_format = \"%s\";\n"
-        "extern void balde_template_%s(balde_response_t *response);\n"
+        "extern void balde_template_%s(balde_app_t *app, balde_request_t *request, "
+        "balde_response_t *response);\n"
         "\n"
         "void\n"
-        "balde_template_%s(balde_response_t *response)\n"
+        "balde_template_%s(balde_app_t *app, balde_request_t *request, balde_response_t *response)\n"
         "{\n",
         tmp_includes, template_name, escaped, template_name, template_name);
     g_free(tmp_includes);
@@ -154,7 +156,8 @@ balde_template_generate_header(const gchar *template_name)
         "\n"
         "#include <balde.h>\n"
         "\n"
-        "extern void balde_template_%s(balde_response_t *response);\n"
+        "extern void balde_template_%s(balde_app_t *app, balde_request_t *request, "
+        "balde_response_t *response);\n"
         "\n"
         "#endif\n", template_name, template_name, template_name);
 }

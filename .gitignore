@@ -67,6 +67,7 @@ Makefile.in
 /examples/hello-with-static
 /examples/hello-with-form
 /examples/hello-with-template
+/examples/hello-with-url_for
 /examples/resources.c
 /examples/resources.h
 /examples/templates/*.c

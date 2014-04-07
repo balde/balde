@@ -3,6 +3,7 @@ pkginclude_HEADERS = \
 	exceptions.h \
 	resources.h \
 	routing.h \
+	template-helpers.h \
 	wrappers.h
 
 noinst_HEADERS = \

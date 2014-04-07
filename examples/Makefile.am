@@ -12,7 +12,8 @@ noinst_PROGRAMS = \
 	hello-with-cookies \
 	hello-with-form \
 	hello-with-template \
-	hello-with-static
+	hello-with-static \
+	hello-with-url_for
 
 hello_SOURCES = \
 	hello.c
@@ -36,6 +37,10 @@ nodist_hello_with_static_SOURCES = \
 	resources.c \
 	resources.h
 hello-with-static.$(OBJEXT): resources.c resources.h
+
+hello_with_url_for_SOURCES = \
+	hello-with-url_for.c \
+	templates/url_for.c
 
 AM_CFLAGS = \
 	$(all_includes) \
