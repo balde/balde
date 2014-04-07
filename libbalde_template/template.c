@@ -25,6 +25,9 @@ balde_template_generate_source(const gchar *template_name,
     GSList *blocks = balde_template_parse(template_source);
     GSList *printf_args = NULL;
     GString *includes = g_string_new("");
+    GString *decls = g_string_new("");
+    GString *frees = g_string_new("");
+    guint decl_count = 1;
     GString *parsed = g_string_new("");
     balde_template_block_t *node;
     balde_template_include_block_t *iblock;
@@ -33,7 +36,6 @@ balde_template_generate_source(const gchar *template_name,
     balde_template_print_fn_call_block_t *fblock;
     balde_template_fn_arg_t *arg;
     gchar *escaped_content;
-    GString *fn_args = NULL;
     for (GSList *tmp = blocks; tmp != NULL; tmp = g_slist_next(tmp)) {
         node = tmp->data;
         switch (node->type) {
@@ -58,13 +60,12 @@ balde_template_generate_source(const gchar *template_name,
             case BALDE_TEMPLATE_PRINT_FN_CALL_BLOCK:
                 fblock = node->block;
                 g_string_append(parsed, "%s");
-                fn_args = g_string_new("");
-                g_string_append_printf(fn_args, "        balde_tmpl_%s(app, request",
-                    fblock->name);
+                g_string_append_printf(decls, "    gchar *a%d = balde_tmpl_%s(app, request",
+                    decl_count, fblock->name);
                 if (fblock->args != NULL)
-                    g_string_append(fn_args, ",\n");
+                    g_string_append(decls, ",\n");
                 else
-                    g_string_append(fn_args, ")");
+                    g_string_append(decls, ");\n");
                 for (GSList *tmp2 = fblock->args; tmp2 != NULL; tmp2 = g_slist_next(tmp2)) {
                     arg = tmp2->data;
                     switch (arg->type) {
@@ -72,21 +73,23 @@ balde_template_generate_source(const gchar *template_name,
                         case BALDE_TEMPLATE_FN_ARG_INT:
                         case BALDE_TEMPLATE_FN_ARG_FLOAT:
                         case BALDE_TEMPLATE_FN_ARG_BOOL:
-                            g_string_append_printf(fn_args, "            %s", arg->content);
+                            g_string_append_printf(decls, "        %s", arg->content);
                             break;
                         case BALDE_TEMPLATE_FN_ARG_VAR:
-                            g_string_append_printf(fn_args,
-                                "            balde_response_get_tmpl_var(response, \"%s\")",
+                            g_string_append_printf(decls,
+                                "        balde_response_get_tmpl_var(response, \"%s\")",
                                 arg->content);
                             break;
                     }
                     if (g_slist_next(tmp2) == NULL)
-                        g_string_append(fn_args, ")");
+                        g_string_append(decls, ");\n");
                     else
-                        g_string_append(fn_args, ",\n");
+                        g_string_append(decls, ",\n");
 
                 }
-                printf_args = g_slist_append(printf_args, g_string_free(fn_args, FALSE));
+                printf_args = g_slist_append(printf_args, g_strdup_printf("        a%d",
+                    decl_count));
+                g_string_append_printf(frees, "    g_free(a%d);\n", decl_count++);
                 break;
         }
     }
@@ -100,6 +103,7 @@ balde_template_generate_source(const gchar *template_name,
     g_free(parsed_tmp);
 
     gchar *tmp_includes = g_string_free(includes, FALSE);
+    gchar *tmp_decls = g_string_free(decls, FALSE);
 
     GString *rv = g_string_new("");
     g_string_append_printf(rv,
@@ -114,9 +118,10 @@ balde_template_generate_source(const gchar *template_name,
         "\n"
         "void\n"
         "balde_template_%s(balde_app_t *app, balde_request_t *request, balde_response_t *response)\n"
-        "{\n",
-        tmp_includes, template_name, escaped, template_name, template_name);
+        "{\n%s",
+        tmp_includes, template_name, escaped, template_name, template_name, tmp_decls);
     g_free(tmp_includes);
+    g_free(tmp_decls);
 
     if (printf_args == NULL) {
         g_string_append_printf(rv,
@@ -136,10 +141,12 @@ balde_template_generate_source(const gchar *template_name,
             g_string_append(rv, ");\n");
     }
     g_slist_free_full(printf_args, g_free);
-    g_string_append(rv,
-        "    balde_response_append_body(response, rv);\n"
+    gchar *tmp_frees = g_string_free(frees, FALSE);
+    g_string_append_printf(rv,
+        "    balde_response_append_body(response, rv);\n%s"
         "    g_free(rv);\n"
-        "}\n");
+        "}\n", tmp_frees);
+    g_free(tmp_frees);
     g_free(escaped);
     return g_string_free(rv, FALSE);
 }
