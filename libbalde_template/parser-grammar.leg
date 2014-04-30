@@ -60,7 +60,13 @@ static void
 balde_template_print_fn_arg(const gchar *arg)
 {
     balde_template_fn_arg_t *a = g_new(balde_template_fn_arg_t, 1);
-    a->content = g_strdup(arg);
+    switch (fn_arg_type) {
+        case BALDE_TEMPLATE_FN_ARG_STRING:
+            a->content = g_strdup_printf("\"%s\"", arg);
+            break;
+        default:
+            a->content = g_strdup(arg);
+    }
     a->type = fn_arg_type;
     fn_args = g_slist_append(fn_args, a);
 }
@@ -90,13 +96,15 @@ balde_template_print_block(void)
 page = include | print_call | content | anything
     { g_printerr("Syntax error near: %s\n", yytext); }
 
+
 # Useful rules
 eol = '\n' | '\r\n' | '\r'
 eof = !.
 - = [\t ]*
 id = [a-zA-Z][a-zA-Z0-9_]*
-unq_str = ( '\\' '"' | !'"' . )*
-str = '"' unq_str '"'
+unq_str1 = < ( '\\' '"' | !'"' . )* >
+unq_str2 = < ( '\\' '\'' | !'\'' . )* >
+str = '"' unq_str1 '"' | '\'' unq_str2 '\''
 int = sign? [0-9]+
 float = sign? [0-9]+ '.' [0-9]+
 sign = '+' | '-'
@@ -107,22 +115,22 @@ anything = < ( !eol . )* > eol
 # Includes
 include_open = '{%' -
 include_close = - '%}'
-include = include_open 'include' ' '+ '"' < unq_str > '"' include_close
+include = include_open 'include' ' '+ str include_close
     { balde_template_include_block(yytext); }
 
 # Print calls
 print_open = '{{' -
 print_close = - '}}'
-print_var = < id >         { balde_template_print_var_block(yytext); }
+print_var = < id >             { balde_template_print_var_block(yytext); }
 
-print_fn_arg_var = id      { fn_arg_type = BALDE_TEMPLATE_FN_ARG_VAR; }
-print_fn_arg_str = str     { fn_arg_type = BALDE_TEMPLATE_FN_ARG_STRING; }
-print_fn_arg_int = int     { fn_arg_type = BALDE_TEMPLATE_FN_ARG_INT; }
-print_fn_arg_float = float { fn_arg_type = BALDE_TEMPLATE_FN_ARG_FLOAT; }
-print_fn_arg_bool = bool   { fn_arg_type = BALDE_TEMPLATE_FN_ARG_BOOL; }
+print_fn_arg_var = < id >      { fn_arg_type = BALDE_TEMPLATE_FN_ARG_VAR; }
+print_fn_arg_str = str         { fn_arg_type = BALDE_TEMPLATE_FN_ARG_STRING; }
+print_fn_arg_int = < int >     { fn_arg_type = BALDE_TEMPLATE_FN_ARG_INT; }
+print_fn_arg_float = < float > { fn_arg_type = BALDE_TEMPLATE_FN_ARG_FLOAT; }
+print_fn_arg_bool = < bool >   { fn_arg_type = BALDE_TEMPLATE_FN_ARG_BOOL; }
 
-print_fn_arg = < ( print_fn_arg_bool | print_fn_arg_float | print_fn_arg_int
-    | print_fn_arg_var | print_fn_arg_str ) >
+print_fn_arg = ( print_fn_arg_bool | print_fn_arg_float | print_fn_arg_int
+    | print_fn_arg_var | print_fn_arg_str )
     { balde_template_print_fn_arg(yytext); }
 print_fn_args = - ( print_fn_arg ( - ',' - print_fn_arg )* - )*
 print_fn_id = < id >
