@@ -79,3 +79,5 @@ Makefile.in
 
 # tarballs
 balde-*.tar.xz
+
+/build/
