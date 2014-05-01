@@ -5,7 +5,9 @@
 #
 # They should be installed by hand if you are going to run a Jenkins slave.
 #
-#     $ sudo apt-get install -y libfcgi-dev libmagic-dev gettext
+#     $ sudo apt-get install -y libfcgi-dev libmagic-dev pkg-config gettext \
+#         zlib1g-dev libffi-dev autoconf automake1.11 build-essential libtool \
+#         libxml2-utils
 #
 # Also, it depends on some enviromnent variables, that are setup by Jenkins:
 #
