@@ -40,7 +40,10 @@ rm -rf "${BALDE_BUILD_DIR}"
 
 mkdir -p "${BALDE_BUILD_DIR}"
 pushd "${BALDE_BUILD_DIR}" > /dev/null
-"${BALDE_SRC_DIR}"/configure --enable-examples --with-leg
+"${BALDE_SRC_DIR}"/configure \
+    --enable-examples \
+    --with-leg \
+    --with-valgrind
 popd > /dev/null
 
-make -C "${BALDE_BUILD_DIR}" check
+make -C "${BALDE_BUILD_DIR}" valgrind
