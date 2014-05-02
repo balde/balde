@@ -46,4 +46,6 @@ pushd "${BALDE_BUILD_DIR}" > /dev/null
     --with-valgrind
 popd > /dev/null
 
-make -C "${BALDE_BUILD_DIR}" valgrind
+make \
+    -j"$(($(cat /proc/cpuinfo | grep processor | wc -l)+1))" \
+    -C "${BALDE_BUILD_DIR}" valgrind
