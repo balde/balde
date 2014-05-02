@@ -7,7 +7,7 @@
 #
 #     $ sudo apt-get install -y peg libfcgi-dev libmagic-dev pkg-config gettext \
 #         zlib1g-dev libffi-dev autoconf automake1.11 build-essential libtool \
-#         libxml2-utils
+#         libxml2-utils valgrind
 #
 # To install GLib, run the .build-glib.sh script (see its code for help).
 #
