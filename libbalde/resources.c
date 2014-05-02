@@ -85,7 +85,7 @@ balde_resources_load(balde_app_t *app, GResource *resources)
     if (magic == NULL) {
         balde_abort_set_error_with_description(app, 500,
             "Unable to initialize libmagic.");
-        return;
+        goto point1;
     }
     if (magic_load(magic, NULL) != 0) {
         balde_abort_set_error_with_description(app, 500,
