@@ -7,7 +7,14 @@
 #     $ sudo apt-get install -y pkg-config gettext zlib1g-dev libffi-dev \
 #         autoconf automake1.11 build-essential libtool libxml2-utils
 #
+# To run it, run the following commands:
+#
+#     $ sudo mkdir /opt/glib
+#     $ sudo chown jenkins.jenkins /opt/glib
+#     $ sudo -u jenkins bash .build-glib.sh
+#
 # It will install the bundle to /opt/glib
+#
 
 set -xe
 
