@@ -73,6 +73,7 @@ balde_template_generate_source(const gchar *template_name,
                         case BALDE_TEMPLATE_FN_ARG_INT:
                         case BALDE_TEMPLATE_FN_ARG_FLOAT:
                         case BALDE_TEMPLATE_FN_ARG_BOOL:
+                        case BALDE_TEMPLATE_FN_ARG_NULL:
                             g_string_append_printf(decls, "        %s", arg->content);
                             break;
                         case BALDE_TEMPLATE_FN_ARG_VAR:

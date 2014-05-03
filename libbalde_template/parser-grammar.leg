@@ -101,6 +101,7 @@ int = sign? [0-9]+
 float = sign? [0-9]+ '.' [0-9]+
 sign = '+' | '-'
 bool = 'TRUE' | 'FALSE'
+null = 'NULL'
 
 anything = < ( !eol . )* > eol
 
@@ -120,9 +121,10 @@ print_fn_arg_str = str     { fn_arg_type = BALDE_TEMPLATE_FN_ARG_STRING; }
 print_fn_arg_int = int     { fn_arg_type = BALDE_TEMPLATE_FN_ARG_INT; }
 print_fn_arg_float = float { fn_arg_type = BALDE_TEMPLATE_FN_ARG_FLOAT; }
 print_fn_arg_bool = bool   { fn_arg_type = BALDE_TEMPLATE_FN_ARG_BOOL; }
+print_fn_arg_null = null   { fn_arg_type = BALDE_TEMPLATE_FN_ARG_NULL; }
 
-print_fn_arg = < ( print_fn_arg_bool | print_fn_arg_float | print_fn_arg_int
-    | print_fn_arg_var | print_fn_arg_str ) >
+print_fn_arg = < ( print_fn_arg_bool | print_fn_arg_null | print_fn_arg_float
+    | print_fn_arg_int | print_fn_arg_var | print_fn_arg_str ) >
     { balde_template_print_fn_arg(yytext); }
 print_fn_args = - ( print_fn_arg ( - ',' - print_fn_arg )* - )*
 print_fn_id = < id >

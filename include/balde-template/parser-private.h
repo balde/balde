@@ -29,6 +29,7 @@ typedef enum {
     BALDE_TEMPLATE_FN_ARG_INT,
     BALDE_TEMPLATE_FN_ARG_FLOAT,
     BALDE_TEMPLATE_FN_ARG_BOOL,
+    BALDE_TEMPLATE_FN_ARG_NULL,
 } balde_template_fn_arg_type_t;
 
 typedef struct {
