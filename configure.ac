@@ -110,7 +110,9 @@ AM_CONDITIONAL([USE_LEG], [test "x$have_leg" = "xyes"])
 LEG="$ac_cv_path_leg"
 AC_SUBST(LEG)
 
-GLIB_DEP="glib-2.0 >= 2.34, gio-2.0 >= 2.34"
+# we need to make sure that shared-mime-info is installed, because we need it
+# for accurate mime-type guess
+GLIB_DEP="glib-2.0 >= 2.34, gio-2.0 >= 2.34, shared-mime-info"
 AC_SUBST(GLIB_DEP)
 
 PKG_PROG_PKG_CONFIG
