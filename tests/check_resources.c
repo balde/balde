@@ -60,13 +60,13 @@ test_resources_load(void)
     g_assert(g_slist_length(app->static_resources) == 3);
     balde_assert_resource(app->static_resources, "/static/lol.css",
         "body {\n    background-color: #CCC;\n}\n",
-        "text/plain; charset=us-ascii");
+        "text/css");
     balde_assert_resource(app->static_resources->next, "/static/lol.js",
         "function a() {\n    alert('lol');\n}\n",
-        "text/plain; charset=us-ascii");
+        "application/javascript");
     balde_assert_resource(app->static_resources->next->next, "/static/zz.sh",
         "#!/bin/bash\n\nzz() {\n    :\n}\n",
-        "text/x-shellscript; charset=us-ascii");
+        "application/x-shellscript");
     g_assert(app->static_resources->next->next->next == NULL);
     balde_app_free(app);
 }

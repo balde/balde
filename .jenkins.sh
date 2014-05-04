@@ -5,7 +5,7 @@
 #
 # They should be installed by hand if you are going to run a Jenkins slave.
 #
-#     $ sudo apt-get install -y peg libfcgi-dev libmagic-dev pkg-config gettext \
+#     $ sudo apt-get install -y peg libfcgi-dev pkg-config gettext \
 #         zlib1g-dev libffi-dev autoconf automake1.11 build-essential libtool \
 #         libxml2-utils valgrind clang
 #
