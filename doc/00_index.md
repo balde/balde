@@ -13,6 +13,11 @@ Here you will find all the resources required to get started and develop your we
 
 - [Basic concepts](@ref concepts)
 - [Getting started](@ref getting-started)
+- [Application context](@ref application)
+- [HTTP requests](@ref requests)
+- [HTTP responses](@ref responses)
+- [Template engine](@ref template-engine)
+- [Static resources](@ref static-resources)
 
 
 But what about the name?!
