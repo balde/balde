@@ -71,3 +71,5 @@ that will be translated to:
 @code
 #include "foo.h"
 @endcode
+
+This will include all the declarations available on the header to the template.
