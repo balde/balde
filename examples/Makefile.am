@@ -5,7 +5,7 @@ SUBDIRS = \
 	templates
 
 EXTRA_DIST = \
-	resources.xml
+	static-resources.xml
 
 noinst_PROGRAMS = \
 	hello \
@@ -34,9 +34,9 @@ hello_with_static_SOURCES = \
 	hello-with-static.c
 
 nodist_hello_with_static_SOURCES = \
-	resources.c \
-	resources.h
-hello-with-static.$(OBJEXT): resources.c resources.h
+	static-resources.c \
+	static-resources.h
+hello-with-static.$(OBJEXT): static-resources.c static-resources.h
 
 hello_with_url_for_SOURCES = \
 	hello-with-url_for.c \
@@ -52,15 +52,13 @@ AM_LDFLAGS = \
 	$(top_builddir)/libbalde/libbalde.la
 
 CLEANFILES = \
-	resources.c \
-	resources.h
+	static-resources.c \
+	static-resources.h
 
-resources.xml: $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(srcdir)/static $(srcdir)/resources.xml)
-
-%.c: %.xml
+%.c: %.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(srcdir)/static $(srcdir)/static-resources.xml)
 	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(srcdir)/static --target $@ $<
 
-%.h: %.xml
+%.h: %.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(srcdir)/static $(srcdir)/static-resources.xml)
 	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(srcdir)/static --target $@ $<
 
 endif
