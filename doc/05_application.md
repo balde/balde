@@ -12,3 +12,5 @@ balde provides two functions to handle views. @ref balde_app_add_url_rule is use
 The function @ref balde_app_run is used to run the balde application, and the @ref balde_app_free function is used to free the allocated resources after usage.
 
 When creating a function that gets the context app as argument, it is important to check if the ``error`` property is ``NULL``, because if this property is set, it means that an error ocurred previously.
+
+There is also a ``user_data`` pointer, that can be used to store arbitraty application-related data.
