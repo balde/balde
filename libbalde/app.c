@@ -141,6 +141,12 @@ balde_app_url_forv(balde_app_t *app, const gchar *endpoint, va_list params)
 }
 
 
+/**
+ * \example hello.c
+ *
+ * A hello world!
+ */
+
 void
 balde_app_run(balde_app_t *app)
 {

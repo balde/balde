@@ -76,6 +76,14 @@ balde_resource_free(balde_resource_t *resource)
     g_free(resource);
 }
 
+
+/**
+ * \example hello-with-static.c
+ *
+ * An example with static files.  It depends on more files. Take a look at
+ * it on the balde source code.
+ */
+
 void
 balde_resources_load(balde_app_t *app, GResource *resources)
 {

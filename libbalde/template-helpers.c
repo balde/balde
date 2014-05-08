@@ -16,6 +16,13 @@
 #include <balde/wrappers.h>
 
 
+/**
+ * \example hello-with-url_for.c
+ *
+ * An example with the url_for helper. It depends on more files. Take a look at
+ * it on the balde source code.
+ */
+
 gchar*
 balde_tmpl_url_for(balde_app_t *app, balde_request_t *request,
     const gchar *endpoint, gboolean external, ...)
