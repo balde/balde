@@ -78,6 +78,6 @@ Makefile.in
 /libbalde_template/parser-grammar.c
 
 # tarballs
-balde-*.tar.xz
+balde-*.tar.*
 
 /build/
