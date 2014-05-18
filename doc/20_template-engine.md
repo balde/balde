@@ -73,3 +73,21 @@ that will be translated to:
 @endcode
 
 This will include all the declarations available on the header to the template.
+
+
+How to build templates
+----------------------
+
+Templates should be converted to C source, that should be built and linked to the application binary afterwards. There's a template generation tool bundled with ``balde``, that is called ``balde-template-gen``.
+
+If your project is autotools-based, you can include the following code snippet to the Makefile.am file of the directory that stores your templates:
+
+@code
+%.c: %.html
+	$(AM_V_GEN)balde-template-gen $< $@
+
+%.h: %.html
+	$(AM_V_GEN)balde-template-gen $< $@
+@endcode
+
+These rules will generate headers and sources for you, if you register the generated files as dependencies of the application binary.
