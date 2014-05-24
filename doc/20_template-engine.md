@@ -27,17 +27,23 @@ The template engine can print the value returned by a function call.
 
 The value returned by the function must be a newly allocated string, because it will be free'd with ``g_free()`` by the template engine after usage.
 
-The functions must be called only with variables (strings only), strings, integers, floats, booleans and ``NULL`` as arguments.
+The functions must be called only with variables (strings only), strings (double or single quoted), integers, floats, booleans and ``NULL`` as arguments.
 
 The template engine does some mangling on the function before calling it:
 
 - If the ``foo`` function is called on a template, the actual function that will be called is ``balde_tmpl_foo``.
-- If a function is called with a ``gchar*`` function, it is actually called with a @ref balde_app_t, a @ref balde_request_t and the ``gchar*`` argument. This is useful because most of the functions will want to handle the application and request contexts.
+- If a function is called with a ``gchar*`` argument, it is actually called with a @ref balde_app_t, a @ref balde_request_t and the ``gchar*`` argument. This is useful because most of the functions will want to handle the application and request contexts.
 
 That means that a function call like:
 
 @code
 {{ foo("asd", TRUE) }}
+@endcode
+
+or
+
+@code
+{{ foo('asd', TRUE) }}
 @endcode
 
 would be translated to:
@@ -64,6 +70,12 @@ To be able to run arbitrary functions, the users need to include the header to t
 
 @code
 {% include "foo.h" %}
+@endcode
+
+or
+
+@code
+{% include 'foo.h' %}
 @endcode
 
 that will be translated to:
