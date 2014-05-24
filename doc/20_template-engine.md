@@ -27,7 +27,7 @@ The template engine can print the value returned by a function call.
 
 The value returned by the function must be a newly allocated string, because it will be free'd with ``g_free()`` by the template engine after usage.
 
-The functions must be called only with variables (strings only), strings (double or single quoted), integers, floats, booleans and ``NULL`` as arguments.
+The functions must be called only with variables (strings only), strings (double or single quoted, since ``0.2``), integers, floats, booleans and ``NULL`` as arguments.
 
 The template engine does some mangling on the function before calling it:
 
@@ -40,7 +40,7 @@ That means that a function call like:
 {{ foo("asd", TRUE) }}
 @endcode
 
-or
+or (since ``0.2``)
 
 @code
 {{ foo('asd', TRUE) }}
@@ -72,7 +72,7 @@ To be able to run arbitrary functions, the users need to include the header to t
 {% include "foo.h" %}
 @endcode
 
-or
+or (since ``0.2``)
 
 @code
 {% include 'foo.h' %}
