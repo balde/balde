@@ -15,6 +15,18 @@
 
 
 void
+balde_unescape_single_quoted_strings(gchar** str)
+{
+    GRegex *re_escaped_str = g_regex_new("\\\\'", 0, 0, NULL);
+    gchar *escaped_str = g_regex_replace_literal(re_escaped_str, *str, -1, 0,
+        "'", 0, NULL);
+    g_free(*str);
+    *str = escaped_str;
+    g_regex_unref(re_escaped_str);
+}
+
+
+void
 balde_template_free_blocks(GSList *blocks)
 {
     balde_template_block_t *block;

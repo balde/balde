@@ -28,6 +28,7 @@ balde_template_include_block(const gchar *include)
 {
     balde_template_include_block_t *block = g_new(balde_template_include_block_t, 1);
     block->include = g_strdup(include);
+    balde_unescape_single_quoted_strings(&(block->include));
     balde_template_block_t *node = g_new(balde_template_block_t, 1);
     node->block = block;
     node->type = BALDE_TEMPLATE_INCLUDE_BLOCK;
@@ -63,6 +64,7 @@ balde_template_print_fn_arg(const gchar *arg)
     switch (fn_arg_type) {
         case BALDE_TEMPLATE_FN_ARG_STRING:
             a->content = g_strdup_printf("\"%s\"", arg);
+            balde_unescape_single_quoted_strings(&(a->content));
             break;
         default:
             a->content = g_strdup(arg);
