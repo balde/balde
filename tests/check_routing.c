@@ -22,6 +22,7 @@ static balde_url_rule_t rules[] = {
     {"customer", "/customer/<username>/contracts/", NULL, BALDE_HTTP_GET},
     {"policy", "/policies/", NULL, BALDE_HTTP_GET | BALDE_HTTP_POST},
     {"path", "/foo/<path:p>/bar/", NULL, BALDE_HTTP_GET},
+    {"bola", "/bola", NULL, BALDE_HTTP_ANY},
     {NULL, NULL, NULL, 0}
 };
 
@@ -266,6 +267,7 @@ test_http_method_str2enum(void)
     g_assert(!(method & BALDE_HTTP_PUT));
     g_assert(!(method & BALDE_HTTP_PATCH));
     g_assert(!(method & BALDE_HTTP_DELETE));
+    g_assert(method & BALDE_HTTP_ANY);
 
     method = balde_http_method_str2enum("GET");
     g_assert(!(method & BALDE_HTTP_OPTIONS));
@@ -275,6 +277,7 @@ test_http_method_str2enum(void)
     g_assert(!(method & BALDE_HTTP_PUT));
     g_assert(!(method & BALDE_HTTP_PATCH));
     g_assert(!(method & BALDE_HTTP_DELETE));
+    g_assert(method & BALDE_HTTP_ANY);
 
     method = balde_http_method_str2enum("HEAD");
     g_assert(!(method & BALDE_HTTP_OPTIONS));
@@ -284,6 +287,7 @@ test_http_method_str2enum(void)
     g_assert(!(method & BALDE_HTTP_PUT));
     g_assert(!(method & BALDE_HTTP_PATCH));
     g_assert(!(method & BALDE_HTTP_DELETE));
+    g_assert(method & BALDE_HTTP_ANY);
 
     method = balde_http_method_str2enum("POST");
     g_assert(!(method & BALDE_HTTP_OPTIONS));
@@ -293,6 +297,7 @@ test_http_method_str2enum(void)
     g_assert(!(method & BALDE_HTTP_PUT));
     g_assert(!(method & BALDE_HTTP_PATCH));
     g_assert(!(method & BALDE_HTTP_DELETE));
+    g_assert(method & BALDE_HTTP_ANY);
 
     method = balde_http_method_str2enum("PUT");
     g_assert(!(method & BALDE_HTTP_OPTIONS));
@@ -302,6 +307,7 @@ test_http_method_str2enum(void)
     g_assert(method & BALDE_HTTP_PUT);
     g_assert(!(method & BALDE_HTTP_PATCH));
     g_assert(!(method & BALDE_HTTP_DELETE));
+    g_assert(method & BALDE_HTTP_ANY);
 
     method = balde_http_method_str2enum("PATCH");
     g_assert(!(method & BALDE_HTTP_OPTIONS));
@@ -311,6 +317,7 @@ test_http_method_str2enum(void)
     g_assert(!(method & BALDE_HTTP_PUT));
     g_assert(method & BALDE_HTTP_PATCH);
     g_assert(!(method & BALDE_HTTP_DELETE));
+    g_assert(method & BALDE_HTTP_ANY);
 
     method = balde_http_method_str2enum("DELETE");
     g_assert(!(method & BALDE_HTTP_OPTIONS));
@@ -320,6 +327,7 @@ test_http_method_str2enum(void)
     g_assert(!(method & BALDE_HTTP_PUT));
     g_assert(!(method & BALDE_HTTP_PATCH));
     g_assert(method & BALDE_HTTP_DELETE);
+    g_assert(method & BALDE_HTTP_ANY);
 }
 
 
@@ -338,6 +346,12 @@ test_list_allowed_methods(void)
     g_free(allow);
     allow = balde_list_allowed_methods(rules[3].method);
     g_assert_cmpstr(allow, ==, "GET, POST");
+    g_free(allow);
+    allow = balde_list_allowed_methods(rules[4].method);
+    g_assert_cmpstr(allow, ==, "GET");
+    g_free(allow);
+    allow = balde_list_allowed_methods(rules[5].method);
+    g_assert_cmpstr(allow, ==, "OPTIONS, DELETE, GET, HEAD, POST, PUT, PATCH");
     g_free(allow);
 }
 
