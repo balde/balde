@@ -12,9 +12,15 @@
 #include <glib.h>
 #include <balde/app.h>
 
-#include <fcgi_stdio.h>
-#define BEGIN_LOOP while (FCGI_Accept() >= 0) {
-#define END_LOOP }
+#ifdef ENABLE_FASTCGI
+#  include <fcgi_stdio.h>
+#  define BEGIN_LOOP while (FCGI_Accept() >= 0) {
+#  define END_LOOP }
+#else
+#  include <stdio.h>
+#  define BEGIN_LOOP do {
+#  define END_LOOP } while(0);
+#endif
 
 void balde_stderr_handler(const gchar *str);
 gchar* balde_stdin_read(balde_app_t *app);
