@@ -59,6 +59,7 @@ Makefile.in
 /tests/check_wrappers
 /tests/*.log
 /tests/*.trs
+/tests/valgrind-*.xml
 /tests/resources.c
 /tests/resources.h
 

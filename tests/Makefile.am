@@ -63,7 +63,7 @@ AM_LDFLAGS = \
 	$(top_builddir)/libbalde/libbalde.la
 
 if USE_VALGRIND
-valgrind:
+valgrind: clean
 	$(MAKE) check TESTS_ENVIRONMENT=" \
 		G_SLICE=always-malloc \
 		G_DEBUG=gc-friendly \
@@ -71,6 +71,8 @@ valgrind:
 			--mode=execute \
 			$(VALGRIND) \
 				--tool=memcheck \
+				--xml=yes \
+				--xml-file=valgrind-%p.xml \
 				--leak-check=full \
 				--leak-resolution=high \
 				--num-callers=20 \
@@ -80,6 +82,9 @@ endif
 CLEANFILES = \
 	resources.c \
 	resources.h
+
+clean-local:
+	-rm -rf valgrind-*.xml
 
 resources.xml: $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(srcdir)/static $(srcdir)/resources.xml)
 
