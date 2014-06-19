@@ -71,6 +71,19 @@ valgrind: clean
 			--mode=execute \
 			$(VALGRIND) \
 				--tool=memcheck \
+				--leak-check=full \
+				--leak-resolution=high \
+				--num-callers=20 \
+				--show-possibly-lost=no"
+
+valgrind-ci: clean
+	$(MAKE) check TESTS_ENVIRONMENT=" \
+		G_SLICE=always-malloc \
+		G_DEBUG=gc-friendly \
+		$(LIBTOOL) \
+			--mode=execute \
+			$(VALGRIND) \
+				--tool=memcheck \
 				--xml=yes \
 				--xml-file=valgrind-%p.xml \
 				--leak-check=full \

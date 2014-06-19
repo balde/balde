@@ -46,4 +46,7 @@ endif
 if USE_VALGRIND
 valgrind: all
 	$(MAKE) -C tests valgrind
+
+valgrind-ci: all
+	$(MAKE) -C tests valgrind-ci
 endif
