@@ -389,11 +389,37 @@ test_parse_cookies(void)
 
 
 void
+test_parse_authorization(void)
+{
+    g_assert(balde_parse_authorization(NULL) == NULL);
+    g_assert(balde_parse_authorization("") == NULL);
+    g_assert(balde_parse_authorization("Bola afddsfsdfdsgfdg") == NULL);
+    g_assert(balde_parse_authorization("Basic Ym9sYQ==") == NULL);  // bola
+    balde_authorization_t *a = balde_parse_authorization("Basic Ym9sYTpndWRh");  // bola:guda
+    g_assert(a != NULL);
+    g_assert_cmpstr(a->username, ==, "bola");
+    g_assert_cmpstr(a->password, ==, "guda");
+    balde_authorization_free(a);
+    a = balde_parse_authorization("Basic Ym9sYTo=");  // bola:
+    g_assert(a != NULL);
+    g_assert_cmpstr(a->username, ==, "bola");
+    g_assert_cmpstr(a->password, ==, "");
+    balde_authorization_free(a);
+    a = balde_parse_authorization("Basic Ym9sYTpndWRhOmxvbA==");  // bola:guda:lol
+    g_assert(a != NULL);
+    g_assert_cmpstr(a->username, ==, "bola");
+    g_assert_cmpstr(a->password, ==, "guda:lol");
+    balde_authorization_free(a);
+}
+
+
+void
 test_make_request(void)
 {
     g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
     g_setenv("HTTP_XD_KKK", "asdf", TRUE);
     g_setenv("HTTP_COOKIE", "asd=\"qwe\"; bola=guda", TRUE);
+    g_setenv("HTTP_AUTHORIZATION", "Basic Ym9sYTpndWRhOmxvbA==", TRUE);
     g_setenv("PATH_INFO", "/", TRUE);
     g_setenv("REQUEST_METHOD", "GET", TRUE);
     g_setenv("QUERY_STRING", "asd=lol&xd=hehe", TRUE);
@@ -402,9 +428,12 @@ test_make_request(void)
     balde_request_t *request = balde_make_request(app);
     g_assert_cmpstr(request->path, ==, "/");
     g_assert(request->method == BALDE_HTTP_GET);
-    g_assert(g_hash_table_size(request->headers) == 3);
+    g_assert(g_hash_table_size(request->headers) == 4);
     g_assert(g_hash_table_size(request->args) == 2);
     g_assert(g_hash_table_size(request->cookies) == 2);
+    g_assert(request->authorization != NULL);
+    g_assert_cmpstr(request->authorization->username, ==, "bola");
+    g_assert_cmpstr(request->authorization->password, ==, "guda:lol");
     g_assert(request->view_args == NULL);
     balde_request_free(request);
     balde_app_free(app);
@@ -553,6 +582,7 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/urldecode", test_urldecode);
     g_test_add_func("/wrappers/parse_query_string", test_parse_query_string);
     g_test_add_func("/wrappers/parse_cookies", test_parse_cookies);
+    g_test_add_func("/wrappers/parse_authorization", test_parse_authorization);
     g_test_add_func("/wrappers/make_request", test_make_request);
     g_test_add_func("/wrappers/request_get_header", test_request_get_header);
     g_test_add_func("/wrappers/request_get_arg", test_request_get_arg);

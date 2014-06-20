@@ -27,6 +27,8 @@ GHashTable* balde_request_headers(void);
 gchar* balde_urldecode(const gchar* str);
 GHashTable* balde_parse_query_string(const gchar *query_string);
 GHashTable* balde_parse_cookies(const gchar *cookie_header);
+balde_authorization_t* balde_parse_authorization(const gchar *authorization);
+void balde_authorization_free(balde_authorization_t *authorization);
 balde_request_t* balde_make_request(balde_app_t *app);
 void balde_request_free(balde_request_t *request);
 

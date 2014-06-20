@@ -13,7 +13,8 @@ noinst_PROGRAMS = \
 	hello-with-form \
 	hello-with-template \
 	hello-with-static \
-	hello-with-url_for
+	hello-with-url_for \
+	hello-with-auth
 
 hello_SOURCES = \
 	hello.c
@@ -41,6 +42,9 @@ hello-with-static.$(OBJEXT): static-resources.c static-resources.h
 hello_with_url_for_SOURCES = \
 	hello-with-url_for.c \
 	templates/url_for.c
+
+hello_with_auth_SOURCES = \
+	hello-with-auth.c
 
 AM_CFLAGS = \
 	$(all_includes) \

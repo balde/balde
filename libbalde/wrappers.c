@@ -367,6 +367,61 @@ point1:
 }
 
 
+balde_authorization_t*
+balde_parse_authorization(const gchar *authorization)
+{
+    if (authorization == NULL)
+        return NULL;
+    balde_authorization_t *rv = NULL;
+    gchar **p = g_strsplit(authorization, " ", 2);
+    if (g_strv_length(p) != 2)
+        goto point1;
+    gchar *type = g_ascii_strdown(p[0], -1);
+    if (g_strcmp0(type, "basic") == 0) {
+        gsize len;
+        guchar *raw = g_base64_decode(p[1], &len);
+        gchar *safe_raw = g_strndup(raw, len);
+        g_free(raw);
+        gchar **b = g_strsplit(safe_raw, ":", 2);
+        g_free(safe_raw);
+        if (g_strv_length(b) != 2) {
+            g_strfreev(b);
+            goto point2;
+        }
+        rv = g_new(balde_authorization_t, 1);
+        rv->username = g_strdup(b[0]);
+        rv->password = g_strdup(b[1]);
+        g_strfreev(b);
+    }
+    /*
+     * FIXME: implement HTTP digest support.
+    else if (g_strcmp0(type, "digest") == 0) {
+        //
+    }
+    */
+    else {
+        g_free(rv);
+        rv = NULL;
+    }
+point2:
+    g_free(type);
+point1:
+    g_strfreev(p);
+    return rv;
+}
+
+
+void
+balde_authorization_free(balde_authorization_t *authorization)
+{
+    if (authorization == NULL)
+        return;
+    g_free((gchar*) authorization->username);
+    g_free((gchar*) authorization->password);
+    g_free(authorization);
+}
+
+
 balde_request_t*
 balde_make_request(balde_app_t *app)
 {
@@ -380,6 +435,7 @@ balde_make_request(balde_app_t *app)
     request->args = balde_parse_query_string(g_getenv("QUERY_STRING"));
     request->view_args = NULL;
     request->cookies = balde_parse_cookies(g_getenv("HTTP_COOKIE"));
+    request->authorization = balde_parse_authorization(g_getenv("HTTP_AUTHORIZATION"));
     if (request->method & (BALDE_HTTP_POST | BALDE_HTTP_PUT | BALDE_HTTP_PATCH)) {
         request->stream = balde_stdin_read(app);
         // TODO: do not load form if content-type isn't form
@@ -465,5 +521,6 @@ balde_request_free(balde_request_t *request)
         g_hash_table_destroy(request->form);
     if (request->cookies != NULL)
         g_hash_table_destroy(request->cookies);
+    balde_authorization_free(request->authorization);
     g_free(request);
 }

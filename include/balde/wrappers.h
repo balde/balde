@@ -17,6 +17,35 @@
  * \file balde/wrappers.h
  */
 
+/**
+ * \example hello-with-auth.c
+ *
+ * An example with Basic HTTP authentication.
+ */
+
+/** balde HTTP authorization context.
+ *
+ * This struct stores everything related to authorization data sent by the
+ * HTTP request.
+ *
+ * Added in balde 0.2.
+ */
+typedef struct {
+
+    /**
+     * User name.
+     */
+    const gchar* username;
+
+    /**
+     * User password.
+     */
+    const gchar* password;
+
+    // FIXME: Add HTTP digest support
+
+} balde_authorization_t;
+
 /** balde request context
  *
  * This struct stores everything related to the request context. It stays
@@ -62,6 +91,11 @@ typedef struct {
      * instead.
      */
     GHashTable *cookies;
+
+    /**
+     * A structure that stores the authorization data received from the client.
+     */
+    balde_authorization_t *authorization;
 
     /**
      * Request path.

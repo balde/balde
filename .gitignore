@@ -70,6 +70,7 @@ Makefile.in
 /examples/hello-with-form
 /examples/hello-with-template
 /examples/hello-with-url_for
+/examples/hello-with-auth
 /examples/static-resources.c
 /examples/static-resources.h
 /examples/templates/*.c
