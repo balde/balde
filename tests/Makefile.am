@@ -63,7 +63,7 @@ AM_LDFLAGS = \
 	$(top_builddir)/libbalde/libbalde.la
 
 if USE_VALGRIND
-valgrind: clean
+valgrind:
 	$(MAKE) check TESTS_ENVIRONMENT=" \
 		G_SLICE=always-malloc \
 		G_DEBUG=gc-friendly \
@@ -76,7 +76,7 @@ valgrind: clean
 				--num-callers=20 \
 				--show-possibly-lost=no"
 
-valgrind-ci: clean
+valgrind-ci: clean-local
 	$(MAKE) check TESTS_ENVIRONMENT=" \
 		G_SLICE=always-malloc \
 		G_DEBUG=gc-friendly \
