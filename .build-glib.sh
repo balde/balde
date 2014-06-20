@@ -18,7 +18,7 @@
 
 set -xe
 
-GLIB_VERSIONS=( 2.34.3 2.38.2 2.40.0 )
+GLIB_VERSIONS=( 2.34.3 2.38.2 2.40.0 2.41.0 )
 
 OUTPUT_DIR="/opt/glib"
 BUILD_DIR="/tmp/glib-build"
@@ -31,6 +31,7 @@ for release in ${GLIB_VERSIONS[@]}; do
     local_src_dir="${BUILD_DIR}/glib-${release}"
     local_build_dir="${BUILD_DIR}/glib-${release}-build"
     local_output_dir="${OUTPUT_DIR}/${release}"
+    [[ -d "${local_output_dir}" ]] && continue
     wget \
         --directory-prefix="${BUILD_DIR}" \
         "http://ftp.gnome.org/pub/gnome/sources/glib/${version}/glib-${release}.tar.xz"
