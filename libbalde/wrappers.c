@@ -380,7 +380,7 @@ balde_parse_authorization(const gchar *authorization)
     if (g_strcmp0(type, "basic") == 0) {
         gsize len;
         guchar *raw = g_base64_decode(p[1], &len);
-        gchar *safe_raw = g_strndup(raw, len);
+        gchar *safe_raw = g_strndup((const gchar*) raw, len);
         g_free(raw);
         gchar **b = g_strsplit(safe_raw, ":", 2);
         g_free(safe_raw);
