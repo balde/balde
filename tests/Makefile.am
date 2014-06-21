@@ -9,9 +9,11 @@ check_PROGRAMS = \
 	check_exceptions \
 	check_resources \
 	check_routing \
+	check_sessions \
 	check_stdin \
 	check_template \
 	check_template_helpers \
+	check_utils \
 	check_wrappers
 
 TESTS = \
@@ -36,6 +38,9 @@ check_resources.$(OBJEXT): resources.c resources.h
 check_routing_SOURCES = \
 	check_routing.c
 
+check_sessions_SOURCES = \
+	check_sessions.c
+
 check_stdin_SOURCES = \
 	check_stdin.c \
 	mock_getc.c
@@ -49,6 +54,9 @@ check_template_LDADD = \
 check_template_helpers_SOURCES = \
 	check_template_helpers.c
 
+check_utils_SOURCES = \
+	check_utils.c
+
 check_wrappers_SOURCES = \
 	check_wrappers.c \
 	mock_datetime.c
@@ -56,10 +64,12 @@ check_wrappers_SOURCES = \
 AM_CFLAGS = \
 	$(all_includes) \
 	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/include
 
 AM_LDFLAGS = \
 	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
 	$(top_builddir)/libbalde/libbalde.la
 
 if USE_VALGRIND

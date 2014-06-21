@@ -13,6 +13,7 @@
 #include <balde/exceptions.h>
 #include <balde/resources.h>
 #include <balde/routing.h>
+#include <balde/sessions.h>
 #include <balde/template-helpers.h>
 #include <balde/wrappers.h>
 

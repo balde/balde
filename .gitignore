@@ -53,9 +53,11 @@ Makefile.in
 /tests/check_exceptions
 /tests/check_resources
 /tests/check_routing
+/tests/check_sessions
 /tests/check_stdin
 /tests/check_template
 /tests/check_template_helpers
+/tests/check_utils
 /tests/check_wrappers
 /tests/*.log
 /tests/*.trs
