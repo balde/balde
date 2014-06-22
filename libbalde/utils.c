@@ -11,6 +11,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
+#include <string.h>
+#include <balde/utils-private.h>
 
 
 /*
@@ -51,4 +53,41 @@ balde_base64_decode(const gchar *text, gsize *out_len)
     g_regex_unref(re_underscore);
     g_regex_unref(re_dash);
     return raw;
+}
+
+
+gint64
+balde_timestamp(void) {
+    GDateTime *now = g_date_time_new_now_utc();
+    gint64 now_uts = g_date_time_to_unix(now);
+    g_date_time_unref(now);
+    return now_uts - BALDE_EPOCH;
+}
+
+
+gchar*
+balde_encoded_timestamp(void) {
+    gint64 now = balde_timestamp();
+    gchar *now_str = g_strdup_printf("%" G_GINT64_FORMAT, now);
+    gchar *rv = balde_base64_encode((guchar*) now_str, strlen(now_str));
+    g_free(now_str);
+    return rv;
+}
+
+
+gboolean
+balde_validate_timestamp(const gchar* timestamp, gint64 max_delta)
+{
+    gint64 now = balde_timestamp();
+    gsize len;
+    gchar *ts = (gchar*) balde_base64_decode(timestamp, &len);
+    gchar *endptr;
+    gint64 old = g_ascii_strtoll(ts, &endptr, 10);
+    if (strlen(endptr)){
+        // something wrong ocurred during convertion!
+        g_free(ts);
+        return FALSE;
+    }
+    g_free(ts);
+    return now <= (old + max_delta);
 }

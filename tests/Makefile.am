@@ -39,7 +39,8 @@ check_routing_SOURCES = \
 	check_routing.c
 
 check_sessions_SOURCES = \
-	check_sessions.c
+	check_sessions.c \
+	mock_encoded_timestamp.c
 
 check_stdin_SOURCES = \
 	check_stdin.c \
@@ -55,7 +56,8 @@ check_template_helpers_SOURCES = \
 	check_template_helpers.c
 
 check_utils_SOURCES = \
-	check_utils.c
+	check_utils.c \
+	mock_datetime_utils.c
 
 check_wrappers_SOURCES = \
 	check_wrappers.c \

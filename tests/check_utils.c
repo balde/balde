@@ -36,11 +36,43 @@ test_base64_decode(void)
 }
 
 
+void
+test_timestamp(void)
+{
+    g_assert(balde_timestamp() == 100000);
+}
+
+
+void
+test_encoded_timestamp(void)
+{
+    gchar *now = balde_encoded_timestamp();
+    g_assert_cmpstr(now, ==, "MTAwMDAw");
+    g_free(now);
+}
+
+
+void
+test_validate_timestamp(void)
+{
+    // token generated at 99950, "now" is 100000.
+    g_assert(balde_validate_timestamp("OTk5NTA=", 100));
+    g_assert(balde_validate_timestamp("OTk5NTA=", 50));
+    g_assert(!balde_validate_timestamp("OTk5NTA=", 40));
+
+    // guda
+    g_assert(!balde_validate_timestamp("Z3VkYQ==", 100));
+}
+
+
 int
 main(int argc, char** argv)
 {
     g_test_init(&argc, &argv, NULL);
     g_test_add_func("/utils/base64_encode", test_base64_encode);
     g_test_add_func("/utils/base64_decode", test_base64_decode);
+    g_test_add_func("/utils/timestamp", test_timestamp);
+    g_test_add_func("/utils/encoded_timestamp", test_encoded_timestamp);
+    g_test_add_func("/utils/validate_timestamp", test_validate_timestamp);
     return g_test_run();
 }

@@ -60,6 +60,16 @@ test_session_unserialize_wrong_type(void)
 }
 
 
+void
+test_session_sign(void)
+{
+    gchar *signed_str = balde_session_sign((guchar*) "guda", 4, "bola");
+    g_assert_cmpstr(signed_str, ==,
+        "bola.MTAwMDAw.3ef42ac08471c2b19c65d27b82a5542d47d8c145");
+    g_free(signed_str);
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -70,5 +80,6 @@ main(int argc, char** argv)
         test_session_unserialize_broken_json);
     g_test_add_func("/sessions/unserialize_wrong_type",
         test_session_unserialize_wrong_type);
+    g_test_add_func("/sessions/sign", test_session_sign);
     return g_test_run();
 }

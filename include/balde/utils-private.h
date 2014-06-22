@@ -11,7 +11,13 @@
 
 #include <glib.h>
 
+// Tue Jan  1 00:00:00 UTC 2013
+#define BALDE_EPOCH 1356998400
+
 gchar* balde_base64_encode(const guchar *data, gsize len);
 guchar* balde_base64_decode(const gchar *text, gsize *out_len);
+gint64 balde_timestamp(void);
+gchar* balde_encoded_timestamp(void);
+gboolean balde_validate_timestamp(const gchar* timestamp, gint64 max_delta);
 
 #endif /* _BALDE_UTILS_PRIVATE_H */
