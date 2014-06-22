@@ -100,14 +100,14 @@ point1:
 
 
 gchar*
-balde_session_sign(const guchar *key, gsize key_len, const gchar* text)
+balde_session_sign(const guchar *key, gsize key_len, const gchar *content)
 {
-    // text should be nul-terminated.
+    // content should be nul-terminated.
     // FIXME: key should/could be derived.
     gchar *sign = g_compute_hmac_for_string(G_CHECKSUM_SHA1, key, key_len,
-        text, strlen(text));
+        content, strlen(content));
     gchar *timestamp = balde_encoded_timestamp();
-    gchar *rv = g_strdup_printf("%s.%s.%s", text, timestamp, sign);
+    gchar *rv = g_strdup_printf("%s.%s.%s", content, timestamp, sign);
     g_free(timestamp);
     g_free(sign);
     return rv;
