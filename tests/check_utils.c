@@ -65,6 +65,18 @@ test_validate_timestamp(void)
 }
 
 
+void
+test_constant_time_compare(void)
+{
+    g_assert(balde_constant_time_compare("bola", "bola"));
+    g_assert(!balde_constant_time_compare("bola", "guda"));
+    g_assert(!balde_constant_time_compare("guda", "gude"));
+    g_assert(balde_constant_time_compare("\xd3V\xbeo\xf7\x1d", "\xd3V\xbeo\xf7\x1d"));
+    g_assert(balde_constant_time_compare("ação", "ação"));
+    g_assert(!balde_constant_time_compare("ação", "açã"));
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -74,5 +86,6 @@ main(int argc, char** argv)
     g_test_add_func("/utils/timestamp", test_timestamp);
     g_test_add_func("/utils/encoded_timestamp", test_encoded_timestamp);
     g_test_add_func("/utils/validate_timestamp", test_validate_timestamp);
+    g_test_add_func("/utils/constant_time_compare", test_constant_time_compare);
     return g_test_run();
 }

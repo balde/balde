@@ -19,5 +19,6 @@ guchar* balde_base64_decode(const gchar *text, gsize *out_len);
 gint64 balde_timestamp(void);
 gchar* balde_encoded_timestamp(void);
 gboolean balde_validate_timestamp(const gchar* timestamp, gint64 max_delta);
+gboolean balde_constant_time_compare(const gchar *v1, const gchar *v2);
 
 #endif /* _BALDE_UTILS_PRIVATE_H */

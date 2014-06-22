@@ -56,6 +56,12 @@ balde_base64_decode(const gchar *text, gsize *out_len)
 }
 
 
+
+/*
+ * The following functions are provided to handle timestamps used to sign
+ * cookies.
+ */
+
 gint64
 balde_timestamp(void) {
     GDateTime *now = g_date_time_new_now_utc();
@@ -90,4 +96,36 @@ balde_validate_timestamp(const gchar* timestamp, gint64 max_delta)
     }
     g_free(ts);
     return now <= (old + max_delta);
+}
+
+
+/*
+ * The following function is provided to compare signatures in a time constant
+ * way, avoiding time-based attacks.
+ *
+ * Function somewhat based on the following references:
+ *
+ * https://cryptocoding.net/index.php/Coding_rules#Solution
+ * https://github.com/mitsuhiko/itsdangerous/blob/master/itsdangerous.py
+ */
+
+gboolean
+balde_constant_time_compare(const gchar *v1, const gchar *v2)
+{
+    const guchar *_v1 = (const guchar*) v1;
+    const guchar *_v2 = (const guchar*) v2;
+    const guchar *left;
+    guchar rv;
+    if (strlen(v1) == strlen(v2)) {
+        rv = 0;
+        left = _v1;
+    }
+    else {
+        rv = 1;
+        left = _v2;
+    }
+    const gsize size = strlen(v2);
+    for (gsize i = 0; i < size; i++)
+        rv |= left[i] ^ _v2[i];
+    return rv == 0;
 }
