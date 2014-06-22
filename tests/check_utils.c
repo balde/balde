@@ -71,7 +71,10 @@ test_constant_time_compare(void)
     g_assert(balde_constant_time_compare("bola", "bola"));
     g_assert(!balde_constant_time_compare("bola", "guda"));
     g_assert(!balde_constant_time_compare("guda", "gude"));
-    g_assert(balde_constant_time_compare("\xd3V\xbeo\xf7\x1d", "\xd3V\xbeo\xf7\x1d"));
+    g_assert(balde_constant_time_compare("\xd3V\xbeo\xf7\x1d",
+        "\xd3V\xbeo\xf7\x1d"));
+    g_assert(!balde_constant_time_compare("\xd3V\xbeo\xf7\x1d",
+        "\xd3V\xbe\xf7\x1d"));
     g_assert(balde_constant_time_compare("ação", "ação"));
     g_assert(!balde_constant_time_compare("ação", "açã"));
 }
