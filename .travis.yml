@@ -11,6 +11,8 @@ env:
   - PEG_RELEASE=0.1.15 GLIB_RELEASE=2.41.0
 
 before_install:
+  - sudo apt-get update
+  - sudo apt-get upgrade
   - sudo apt-get install -y libfcgi-dev valgrind
 
 install:
