@@ -5,16 +5,16 @@ compiler:
   - clang
 
 env:
-  - PEG_VERSION=0.1.15 GLIB_RELEASE=2.34.3
-  - PEG_VERSION=0.1.15 GLIB_RELEASE=2.38.2
-  - PEG_VERSION=0.1.15 GLIB_RELEASE=2.40.0
-  - PEG_VERSION=0.1.15 GLIB_RELEASE=2.41.0
+  - PEG_RELEASE=0.1.15 GLIB_RELEASE=2.34.3
+  - PEG_RELEASE=0.1.15 GLIB_RELEASE=2.38.2
+  - PEG_RELEASE=0.1.15 GLIB_RELEASE=2.40.0
+  - PEG_RELEASE=0.1.15 GLIB_RELEASE=2.41.0
 
 before_install:
   - sudo apt-get install -y libfcgi-dev libmagic-dev
 
 install:
-  - ./.travis-install.sh
+  - ./.travis-install.sh "0.1" "${PEG_RELEASE}"
 
 script:
-  - ./.travis.sh
+  - ./.travis.sh "${GLIB_RELEASE}" "${PEG_RELEASE}"
