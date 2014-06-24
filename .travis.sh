@@ -20,7 +20,7 @@ export PKG_CONFIG_PATH="${GLIB_BASE_DIR}/lib/pkgconfig:/usr/share/pkgconfig"
 export PATH="${GLIB_BASE_DIR}/bin:${PATH}"
 
 GLIB_VERSION_PKGCONFIG="$(pkg-config --modversion glib-2.0)"
-if [[ "${GLIB_VERSION_PKGCONFIG}" != "${GLIB_VERSION}" ]]; then
+if [[ "${GLIB_VERSION_PKGCONFIG}" != "${GLIB_RELEASE}" ]]; then
     exit 1
 fi
 
