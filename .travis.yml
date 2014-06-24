@@ -11,7 +11,7 @@ env:
   - PEG_RELEASE=0.1.15 GLIB_RELEASE=2.41.0
 
 before_install:
-  - sudo apt-get install -y libfcgi-dev libmagic-dev
+  - sudo apt-get install -y libfcgi-dev valgrind
 
 install:
   - ./.travis-install.sh "0.1" "${PEG_RELEASE}"
