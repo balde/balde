@@ -14,7 +14,7 @@ before_install:
   - sudo apt-get install -y libfcgi-dev valgrind
 
 install:
-  - ./.travis-install.sh "0.1" "${PEG_RELEASE}"
+  - ./.travis-install.sh "0.1_1" "${PEG_RELEASE}"
 
 script:
   - ./.travis.sh "${GLIB_RELEASE}" "${PEG_RELEASE}"
