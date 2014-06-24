@@ -11,7 +11,7 @@ BUNDLE="balde-ci-dep-bundle_${BUNDLE_RELEASE}_amd64.deb"
 
 wget \
     --continue \
-    "https://github.com/balde/ci-dep-bundle/releases/download/v${BUNDLE_RELEASE}/${BUNDLE}"
+    "https://github.com/balde/ci-dep-bundle/releases/download/v${BUNDLE_RELEASE%_*}/${BUNDLE}"
 
 sudo dpkg -i "${BUNDLE}"
 
