@@ -10,7 +10,7 @@ CI_DEP_BUNDLE_DEB="balde-ci-dep-bundle_${CI_DEP_BUNDLE_VERSION}_amd64.deb"
 
 export DEBIAN_FRONTEND=noninteractive
 
-sudo apt-get -y install \
+sudo apt-get -y -qq install \
     wget \
     build-essential \
     autoconf \
@@ -26,11 +26,12 @@ sudo apt-get -y install \
     libxml2-utils
 
 wget \
-    --directory-prefix=~ \
+    --directory-prefix="${HOME}" \
     --continue \
+    --quiet \
     "https://github.com/balde/ci-dep-bundle/releases/download/v${CI_DEP_BUNDLE_VERSION}/${CI_DEP_BUNDLE_DEB}"
 
-sudo dpkg -i ~/"${CI_DEP_BUNDLE_DEB}"
+sudo dpkg -i "${HOME}/${CI_DEP_BUNDLE_DEB}"
 
 ## GLib variables
 GLIB_BASE_DIR="/opt/glib/${GLIB_VERSION}"
