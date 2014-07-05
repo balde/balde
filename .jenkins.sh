@@ -1,20 +1,36 @@
 #!/bin/bash
 #
-# This script assumes that balde dependencies are already installed on the
-# system.
+# balde test runner for Jenkins CI.
 #
-# They should be installed by hand if you are going to run a Jenkins slave.
-#
-#     $ sudo apt-get install -y peg libfcgi-dev shared-mime-info pkg-config gettext \
-#         zlib1g-dev libffi-dev autoconf automake1.11 build-essential libtool \
-#         libxml2-utils valgrind clang
-#
-# To install GLib, run the .build-glib.sh script (see its code for help).
-#
-# Also, it depends on some enviromnent variables, that are setup by Jenkins:
-#
-#     GLIB_VERSION (e.g. 2.34.3)
-#
+
+## Install dependencies
+
+CI_DEP_BUNDLE_VERSION=0.2
+CI_DEP_BUNDLE_DEB="balde-ci-dep-bundle_${CI_DEP_BUNDLE_VERSION}_amd64.deb"
+
+export DEBIAN_FRONTEND=noninteractive
+
+sudo apt-get -y install \
+    wget \
+    build-essential \
+    autoconf \
+    automake1.11 \
+    libtool \
+    pkg-config \
+    valgrind \
+    gcc \
+    clang \
+    libfcgi-dev \
+    shared-mime-info \
+    peg \
+    libxml2-utils
+
+wget \
+    --directory-prefix=~ \
+    --continue \
+    "https://github.com/balde/ci-dep-bundle/releases/download/v${CI_DEP_BUNDLE_VERSION}/${CI_DEP_BUNDLE_DEB}"
+
+sudo dpkg -i ~/"${CI_DEP_BUNDLE_DEB}"
 
 ## GLib variables
 GLIB_BASE_DIR="/opt/glib/${GLIB_VERSION}"
