@@ -1,19 +1,6 @@
 #!/bin/bash
 #
-# This script assumes that balde dependencies are already installed on the
-# system.
-#
-# They should be installed by hand if you are going to run a Jenkins slave.
-#
-#     $ sudo apt-get install -y peg libfcgi-dev shared-mime-info pkg-config gettext \
-#         zlib1g-dev libffi-dev autoconf automake1.11 build-essential libtool \
-#         libxml2-utils valgrind clang
-#
-# To install GLib, run the .build-glib.sh script (see its code for help).
-#
-# Also, it depends on some enviromnent variables, that are setup by Jenkins:
-#
-#     GLIB_VERSION (e.g. 2.34.3)
+# balde test runner for Jenkins CI.
 #
 
 ## GLib variables
