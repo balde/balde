@@ -17,6 +17,8 @@ BALDE_BUILD_DIR="${BALDE_SRC_DIR}/build"
 export PKG_CONFIG_LIBDIR="${GLIB_BASE_DIR}/lib/pkgconfig"
 export PKG_CONFIG_PATH="${GLIB_BASE_DIR}/lib/pkgconfig:${JSON_GLIB_BASE_DIR}/lib/pkgconfig:/usr/share/pkgconfig"
 export PATH="${GLIB_BASE_DIR}/bin:${PATH}"
+export LD_LIBRARY_PATH="${GLIB_BASE_DIR}/lib:${JSON_GLIB_BASE_DIR}/lib:${LD_LIBRARY_PATH}"
+
 
 GLIB_VERSION_PKGCONFIG="$(pkg-config --modversion glib-2.0)"
 if [[ "${GLIB_VERSION_PKGCONFIG}" != "${GLIB_VERSION}" ]]; then
