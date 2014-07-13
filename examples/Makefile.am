@@ -49,10 +49,12 @@ hello_with_auth_SOURCES = \
 AM_CFLAGS = \
 	$(all_includes) \
 	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/include
 
 AM_LDFLAGS = \
 	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
 	$(top_builddir)/libbalde/libbalde.la
 
 CLEANFILES = \
