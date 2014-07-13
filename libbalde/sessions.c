@@ -28,6 +28,9 @@ balde_session_serialize_hash_table_item(gchar* key, gchar* value,
 gchar*
 balde_session_serialize(GHashTable *session)
 {
+#if !GLIB_CHECK_VERSION(2, 35, 0)
+    g_type_init();
+#endif
     JsonBuilder *builder = json_builder_new();
     json_builder_begin_object(builder);
     g_hash_table_foreach(session,
@@ -77,6 +80,9 @@ balde_session_unserialize_hash_table_item(JsonObject *object,
 GHashTable*
 balde_session_unserialize(const gchar* text)
 {
+#if !GLIB_CHECK_VERSION(2, 35, 0)
+    g_type_init();
+#endif
     GHashTable *session = NULL;
     JsonParser *parser = json_parser_new();
     gsize len;

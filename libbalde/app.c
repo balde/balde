@@ -27,9 +27,6 @@
 balde_app_t*
 balde_app_init(void)
 {
-#if !GLIB_CHECK_VERSION(2, 35, 0)
-    g_type_init();
-#endif
     balde_app_t *app = g_new(balde_app_t, 1);
     app->views = NULL;
     app->static_resources = NULL;
