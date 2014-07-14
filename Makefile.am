@@ -16,6 +16,7 @@ AM_DISTCHECK_CONFIGURE_FLAGS = \
 EXTRA_DIST = \
 	$(top_srcdir)/autogen.sh \
 	$(top_srcdir)/.version \
+	$(top_srcdir)/build-aux/git-version-gen \
 	$(top_srcdir)/README.md
 
 BUILT_SOURCES = \
