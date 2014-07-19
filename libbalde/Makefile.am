@@ -4,10 +4,12 @@ libbalde_la_SOURCES = \
 	app.c \
 	cgi.c \
 	exceptions.c \
+	httpd.c \
 	resources.c \
 	routing.c \
 	template-helpers.c \
-	wrappers.c
+	wrappers.c \
+	http-parser/http_parser.c
 
 libbalde_la_CFLAGS = \
 	$(AM_CFLAGS) \

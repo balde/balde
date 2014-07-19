@@ -10,6 +10,7 @@ noinst_HEADERS = \
 	app-private.h \
 	cgi-private.h \
 	exceptions-private.h \
+	httpd-private.h \
 	resources-private.h \
 	routing-private.h \
 	wrappers-private.h

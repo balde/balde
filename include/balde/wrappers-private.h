@@ -14,6 +14,16 @@
 #include <balde/routing.h>
 #include <balde/wrappers.h>
 
+typedef struct {
+    const gchar *script_name;
+    const gchar *request_method;
+    const gchar *path_info;
+    const gchar *query_string;
+    GHashTable *headers;
+    guint64 content_length;
+    const gchar *body;
+} balde_request_env_t;
+
 void balde_response_headers_free(gpointer l);
 void balde_response_free(balde_response_t *response);
 balde_response_t* balde_make_response_from_gstring(GString *content);
@@ -31,5 +41,6 @@ balde_authorization_t* balde_parse_authorization(const gchar *authorization);
 void balde_authorization_free(balde_authorization_t *authorization);
 balde_request_t* balde_make_request(balde_app_t *app);
 void balde_request_free(balde_request_t *request);
+void balde_request_env_free(balde_request_env_t *request);
 
 #endif /* _BALDE_WRAPPERS_PRIVATE_H */

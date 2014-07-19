@@ -7,6 +7,7 @@ EXTRA_DIST = \
 check_PROGRAMS = \
 	check_app \
 	check_exceptions \
+	check_httpd \
 	check_resources \
 	check_routing \
 	check_stdin \
@@ -24,6 +25,9 @@ check_app_SOURCES = \
 
 check_exceptions_SOURCES = \
 	check_exceptions.c
+
+check_httpd_SOURCES = \
+	check_httpd.c
 
 check_resources_SOURCES = \
 	check_resources.c
