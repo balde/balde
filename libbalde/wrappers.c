@@ -139,7 +139,8 @@ static const gchar* months[] = {
 void
 balde_response_set_cookie(balde_response_t *response, const gchar *name,
     const gchar *value, const gint max_age, const gint64 expires,
-    const gchar *path, const gchar *domain, const gboolean secure)
+    const gchar *path, const gchar *domain, const gboolean secure,
+    const gboolean http_only)
 {
     GSList *pieces = NULL;
     pieces = g_slist_append(pieces, g_strdup_printf("%s=\"%s\"", name, value));
@@ -168,6 +169,8 @@ balde_response_set_cookie(balde_response_t *response, const gchar *name,
         pieces = g_slist_append(pieces, g_strdup_printf("Max-Age=%d", max_age));
     if (secure)
         pieces = g_slist_append(pieces, g_strdup("Secure"));
+    if (http_only)
+        pieces = g_slist_append(pieces, g_strdup("HttpOnly"));
     pieces = g_slist_append(pieces, g_strdup_printf("Path=%s",
         (path != NULL) ? path : "/"));
     GString *val = g_string_new("");
@@ -187,7 +190,7 @@ void
 balde_response_delete_cookie(balde_response_t *response, const gchar *name,
     const gchar *path, const gchar *domain)
 {
-    balde_response_set_cookie(response, name, "", 0, 0, path, domain, FALSE);
+    balde_response_set_cookie(response, name, "", 0, 0, path, domain, FALSE, FALSE);
 }
 
 
