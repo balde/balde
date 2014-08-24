@@ -12,8 +12,7 @@ libbalde_template_la_CFLAGS = \
 
 libbalde_template_la_LDFLAGS = \
 	$(AM_LDADD) \
-	$(GLIB_LIBS) \
-	-version-info $(LIBBALDE_TEMPLATE_LT_VERSION_INFO)
+	$(GLIB_LIBS)
 
 EXTRA_DIST = \
 	parser-grammar.leg
