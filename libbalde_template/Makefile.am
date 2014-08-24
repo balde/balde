@@ -1,4 +1,4 @@
-lib_LTLIBRARIES = libbalde_template.la
+noinst_LTLIBRARIES = libbalde_template.la
 
 libbalde_template_la_SOURCES = \
 	template.c \
