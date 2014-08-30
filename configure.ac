@@ -17,7 +17,7 @@ AC_SUBST(LIBBALDE_LT_VERSION_INFO)
 
 AM_INIT_AUTOMAKE([1.13 foreign dist-bzip2 dist-xz subdir-objects serial-tests])
 AC_CONFIG_HEADERS([config.h])
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+AM_SILENT_RULES([yes])
 
 LT_INIT
 
