@@ -10,8 +10,7 @@ libbalde_template_la_CFLAGS = \
 	$(GLIB_CFLAGS) \
 	-I$(top_srcdir)/include
 
-libbalde_template_la_LDFLAGS = \
-	$(AM_LDADD) \
+libbalde_template_la_LIBADD = \
 	$(GLIB_LIBS)
 
 EXTRA_DIST = \

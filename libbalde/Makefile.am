@@ -14,7 +14,8 @@ libbalde_la_CFLAGS = \
 	$(GLIB_CFLAGS) \
 	-I$(top_srcdir)/include
 
+libbalde_la_LIBADD = \
+	$(GLIB_LIBS)
+
 libbalde_la_LDFLAGS = \
-	$(AM_LDADD) \
-	$(GLIB_LIBS) \
 	-version-info $(LIBBALDE_LT_VERSION_INFO)

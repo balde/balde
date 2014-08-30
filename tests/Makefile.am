@@ -4,6 +4,10 @@ SUBDIRS = \
 EXTRA_DIST = \
 	resources.xml
 
+CLEANFILES = \
+	resources.c \
+	resources.h
+
 check_PROGRAMS = \
 	check_app \
 	check_exceptions \
@@ -17,13 +21,19 @@ check_PROGRAMS = \
 TESTS = \
 	$(check_PROGRAMS)
 
-mock_getc.o: mock_getc.c $(top_builddir)/libbalde/cgi.c
-
 check_app_SOURCES = \
 	check_app.c
 
+check_app_LDADD = \
+	$(GLIB_LIBS) \
+	$(top_builddir)/libbalde/libbalde.la
+
 check_exceptions_SOURCES = \
 	check_exceptions.c
+
+check_exceptions_LDADD = \
+	$(GLIB_LIBS) \
+	$(top_builddir)/libbalde/libbalde.la
 
 check_resources_SOURCES = \
 	check_resources.c
@@ -31,27 +41,48 @@ check_resources_SOURCES = \
 nodist_check_resources_SOURCES = \
 	resources.c \
 	resources.h
-check_resources.$(OBJEXT): resources.c resources.h
+
+check_resources_LDADD = \
+	$(GLIB_LIBS) \
+	$(top_builddir)/libbalde/libbalde.la
 
 check_routing_SOURCES = \
 	check_routing.c
+
+check_routing_LDADD = \
+	$(GLIB_LIBS) \
+	$(top_builddir)/libbalde/libbalde.la
 
 check_stdin_SOURCES = \
 	check_stdin.c \
 	mock_getc.c
 
+check_stdin_LDADD = \
+	$(GLIB_LIBS) \
+	$(top_builddir)/libbalde/libbalde.la
+
 check_template_SOURCES = \
 	check_template.c
 
 check_template_LDADD = \
+	$(GLIB_LIBS) \
+	$(top_builddir)/libbalde/libbalde.la \
 	$(top_builddir)/libbalde_template/libbalde_template.la
 
 check_template_helpers_SOURCES = \
 	check_template_helpers.c
 
+check_template_helpers_LDADD = \
+	$(GLIB_LIBS) \
+	$(top_builddir)/libbalde/libbalde.la
+
 check_wrappers_SOURCES = \
 	check_wrappers.c \
 	mock_datetime.c
+
+check_wrappers_LDADD = \
+	$(GLIB_LIBS) \
+	$(top_builddir)/libbalde/libbalde.la
 
 AM_CFLAGS = \
 	$(all_includes) \
@@ -59,8 +90,7 @@ AM_CFLAGS = \
 	-I$(top_srcdir)/include
 
 AM_LDFLAGS = \
-	$(GLIB_LIBS) \
-	$(top_builddir)/libbalde/libbalde.la
+	-no-install
 
 if USE_VALGRIND
 valgrind:
@@ -91,10 +121,6 @@ valgrind-ci: clean-local
 				--num-callers=20 \
 				--show-possibly-lost=no"
 endif
-
-CLEANFILES = \
-	resources.c \
-	resources.h
 
 clean-local:
 	-rm -rf valgrind-*.xml
