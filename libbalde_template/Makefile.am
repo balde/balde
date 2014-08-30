@@ -1,4 +1,4 @@
-lib_LTLIBRARIES = libbalde_template.la
+noinst_LTLIBRARIES = libbalde_template.la
 
 libbalde_template_la_SOURCES = \
 	template.c \
@@ -10,10 +10,8 @@ libbalde_template_la_CFLAGS = \
 	$(GLIB_CFLAGS) \
 	-I$(top_srcdir)/include
 
-libbalde_template_la_LDFLAGS = \
-	$(AM_LDADD) \
-	$(GLIB_LIBS) \
-	-version-info $(LIBBALDE_TEMPLATE_LT_VERSION_INFO)
+libbalde_template_la_LIBADD = \
+	$(GLIB_LIBS)
 
 EXTRA_DIST = \
 	parser-grammar.leg
