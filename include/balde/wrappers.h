@@ -196,10 +196,13 @@ const gchar* balde_response_get_tmpl_var(balde_response_t *response,
  *
  * If the 'expires' argument is less than 0 and 'max_age' is provided, it
  * will be evaluated automatically for you.
+ *
+ * Changed in 0.2: added HttpOnly support.
  */
 void balde_response_set_cookie(balde_response_t *response, const gchar *name,
     const gchar *value, const gint max_age, const gint64 expires,
-    const gchar *path, const gchar *domain, const gboolean secure);
+    const gchar *path, const gchar *domain, const gboolean secure,
+    const gboolean http_only);
 
 /** Deletes a cookie from client.
  *

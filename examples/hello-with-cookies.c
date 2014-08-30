@@ -5,7 +5,7 @@ balde_response_t*
 hello(balde_app_t *app, balde_request_t *request)
 {
     balde_response_t *rv = balde_make_response(balde_request_get_cookie(request, "bola"));
-    balde_response_set_cookie(rv, "bola", "guda", 60, -1, NULL, NULL, FALSE);
+    balde_response_set_cookie(rv, "bola", "guda", 60, -1, NULL, NULL, FALSE, FALSE);
     return rv;
 }
 
