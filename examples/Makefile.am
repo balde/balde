@@ -57,6 +57,7 @@ hello_with_static_SOURCES = \
 nodist_hello_with_static_SOURCES = \
 	static-resources.c \
 	static-resources.h
+hello-with-static.$(OBJEXT): static-resources.c static-resources.h
 
 hello_with_static_LDADD = \
 	$(GLIB_LIBS) \

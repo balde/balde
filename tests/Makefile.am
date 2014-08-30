@@ -41,6 +41,7 @@ check_resources_SOURCES = \
 nodist_check_resources_SOURCES = \
 	resources.c \
 	resources.h
+check_resources.$(OBJEXT): resources.c resources.h
 
 check_resources_LDADD = \
 	$(GLIB_LIBS) \
