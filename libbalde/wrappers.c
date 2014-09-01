@@ -426,27 +426,43 @@ balde_authorization_free(balde_authorization_t *authorization)
 
 
 balde_request_t*
-balde_make_request(balde_app_t *app)
+balde_make_request(balde_app_t *app, balde_request_env_t *env)
 {
     balde_request_t *request = g_new(balde_request_t, 1);
-    const gchar *path = g_getenv("PATH_INFO");
-    if (path == NULL)
-        path = "/";
-    request->path = g_strdup(path);
-    request->method = balde_http_method_str2enum(g_getenv("REQUEST_METHOD"));
-    request->headers = balde_request_headers();
-    request->args = balde_parse_query_string(g_getenv("QUERY_STRING"));
     request->view_args = NULL;
-    request->cookies = balde_parse_cookies(g_getenv("HTTP_COOKIE"));
-    request->authorization = balde_parse_authorization(g_getenv("HTTP_AUTHORIZATION"));
-    if (request->method & (BALDE_HTTP_POST | BALDE_HTTP_PUT | BALDE_HTTP_PATCH)) {
-        request->stream = balde_stdin_read(app);
-        // TODO: do not load form if content-type isn't form
-        request->form = balde_parse_query_string(request->stream);
+    request->stream = NULL;
+    request->form = NULL;
+    if (env != NULL) {
+        request->path = env->path_info;
+        request->method = balde_http_method_str2enum(env->request_method);
+        request->headers = env->headers;
+        request->args = balde_parse_query_string(env->query_string);
+        request->cookies = balde_parse_cookies(
+            balde_request_get_header(request, "cookie"));
+        request->authorization = balde_parse_authorization(
+            balde_request_get_header(request, "authorization"));
+        if (request->method & (BALDE_HTTP_POST | BALDE_HTTP_PUT | BALDE_HTTP_PATCH)) {
+            request->stream = env->body;
+            request->form = balde_parse_query_string(request->stream);
+        }
+        g_free(env->query_string);
+        g_free(env->request_method);
     }
     else {
-        request->stream = NULL;
-        request->form = NULL;
+        const gchar *path = g_getenv("PATH_INFO");
+        if (path == NULL)
+            path = "/";
+        request->path = g_strdup(path);
+        request->method = balde_http_method_str2enum(g_getenv("REQUEST_METHOD"));
+        request->headers = balde_request_headers();
+        request->args = balde_parse_query_string(g_getenv("QUERY_STRING"));
+        request->cookies = balde_parse_cookies(g_getenv("HTTP_COOKIE"));
+        request->authorization = balde_parse_authorization(g_getenv("HTTP_AUTHORIZATION"));
+        if (request->method & (BALDE_HTTP_POST | BALDE_HTTP_PUT | BALDE_HTTP_PATCH)) {
+            request->stream = balde_stdin_read(app);
+            // TODO: do not load form if content-type isn't form
+            request->form = balde_parse_query_string(request->stream);
+        }
     }
     return request;
 }

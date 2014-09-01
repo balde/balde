@@ -24,6 +24,6 @@ void balde_app_free_views(balde_view_t *view);
 balde_view_t* balde_app_get_view_from_endpoint(balde_app_t *app,
     const gchar *endpoint);
 gchar* balde_app_url_forv(balde_app_t *app, const gchar *endpoint, va_list params);
-void balde_app_main_loop(balde_app_t *app);
+void balde_app_main_loop(balde_app_t *app, balde_request_env_t *env);
 
 #endif /* _BALDE_APP_PRIVATE_H */

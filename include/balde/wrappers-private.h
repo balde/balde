@@ -15,13 +15,13 @@
 #include <balde/wrappers.h>
 
 typedef struct {
-    const gchar *script_name;
-    const gchar *request_method;
-    const gchar *path_info;
-    const gchar *query_string;
+    gchar *script_name;
+    gchar *request_method;
+    gchar *path_info;
+    gchar *query_string;
     GHashTable *headers;
     guint64 content_length;
-    const gchar *body;
+    gchar *body;
 } balde_request_env_t;
 
 void balde_response_headers_free(gpointer l);
@@ -39,7 +39,7 @@ GHashTable* balde_parse_query_string(const gchar *query_string);
 GHashTable* balde_parse_cookies(const gchar *cookie_header);
 balde_authorization_t* balde_parse_authorization(const gchar *authorization);
 void balde_authorization_free(balde_authorization_t *authorization);
-balde_request_t* balde_make_request(balde_app_t *app);
+balde_request_t* balde_make_request(balde_app_t *app, balde_request_env_t *env);
 void balde_request_free(balde_request_t *request);
 void balde_request_env_free(balde_request_env_t *request);
 

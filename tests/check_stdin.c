@@ -44,7 +44,7 @@ void
 test_stream(void) {
     set_headers();
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app);
+    balde_request_t *request = balde_make_request(app, NULL);
     g_assert_cmpstr(request->stream, ==, "guda=bola&moises=arcoiro");
     balde_request_free(request);
     balde_app_free(app);
@@ -55,7 +55,7 @@ void
 test_form(void) {
     set_headers();
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app);
+    balde_request_t *request = balde_make_request(app, NULL);
     g_assert(request->form != NULL);
     g_assert(g_hash_table_size(request->form) == 2);
     g_assert_cmpstr(g_hash_table_lookup(request->form, "guda"), ==, "bola");

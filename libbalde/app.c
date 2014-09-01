@@ -155,7 +155,7 @@ balde_app_run(balde_app_t *app)
 
 BEGIN_LOOP
 
-    balde_app_main_loop(app);
+    balde_app_main_loop(app, NULL);
 
 END_LOOP
 
@@ -163,7 +163,7 @@ END_LOOP
 
 
 void
-balde_app_main_loop(balde_app_t *app)
+balde_app_main_loop(balde_app_t *app, balde_request_env_t *env)
 {
     balde_request_t *request;
     balde_response_t *response;
@@ -179,7 +179,7 @@ balde_app_main_loop(balde_app_t *app)
         return;
     }
 
-    request = balde_make_request(app);
+    request = balde_make_request(app, env);
     with_body = ! (request->method & BALDE_HTTP_HEAD);
 
     // get the view
