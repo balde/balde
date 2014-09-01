@@ -31,7 +31,6 @@ balde_httpd_url_cb(http_parser* parser, const char* chunk, size_t len)
         u.field_data[UF_PATH].len);
     data->request->query_string = g_strndup(url + u.field_data[UF_QUERY].off,
         u.field_data[UF_QUERY].len);
-    data->request->script_name = g_strdup("");
     g_free(url);
     return 0;
 }
@@ -100,7 +99,6 @@ balde_httpd_parse_request(const gchar* request, gsize len)
     data->body = NULL;
     data->header_key = NULL;
     data->request = g_new(balde_request_env_t, 1);
-    data->request->script_name = NULL;
     data->request->path_info = NULL;
     data->request->request_method = NULL;
     data->request->query_string = NULL;

@@ -15,7 +15,6 @@
 #include <balde/wrappers.h>
 
 typedef struct {
-    gchar *script_name;
     gchar *request_method;
     gchar *path_info;
     gchar *query_string;

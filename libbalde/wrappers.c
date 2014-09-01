@@ -548,11 +548,10 @@ balde_request_free(balde_request_t *request)
 void
 balde_request_env_free(balde_request_env_t *request)
 {
-    g_free((gchar*) request->script_name);
-    g_free((gchar*) request->path_info);
-    g_free((gchar*) request->request_method);
-    g_free((gchar*) request->query_string);
+    g_free(request->path_info);
+    g_free(request->request_method);
+    g_free(request->query_string);
     g_hash_table_destroy(request->headers);
-    g_free((gchar*) request->body);
+    g_free(request->body);
     g_free(request);
 }

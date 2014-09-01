@@ -28,7 +28,6 @@ test_httpd_parse_request(void)
         "XD=asd\r\n";
     balde_request_env_t *req = balde_httpd_parse_request(test, strlen(test));
     g_assert(req != NULL);
-    g_assert_cmpstr(req->script_name, ==, "");
     g_assert_cmpstr(req->request_method, ==, "GET");
     g_assert_cmpstr(req->path_info, ==, "/bola");
     g_assert_cmpstr(req->query_string, ==, "foo=bar&baz=lol");
