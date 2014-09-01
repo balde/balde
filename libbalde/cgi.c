@@ -14,28 +14,12 @@
 #include <balde/app.h>
 #include <balde/cgi-private.h>
 #include <balde/exceptions.h>
-#include <balde/wrappers-private.h>
 
 
 void
 balde_stderr_handler(const gchar *str)
 {
     fprintf(stderr, "%s", (char*) str);
-}
-
-
-balde_request_env_t*
-balde_cgi_parse_request(void)
-{
-    balde_request_env_t *req = g_new(balde_request_env_t, 1);
-    req->script_name = NULL;
-    req->path_info = NULL;
-    req->request_method = NULL;
-    req->query_string = NULL;
-    req->headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    req->content_length = 0;
-    req->body = NULL;
-    return req;
 }
 
 
