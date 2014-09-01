@@ -447,6 +447,7 @@ balde_make_request(balde_app_t *app, balde_request_env_t *env)
         }
         g_free(env->query_string);
         g_free(env->request_method);
+        g_free(env);
     }
     else {
         const gchar *path = g_getenv("PATH_INFO");
