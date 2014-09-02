@@ -27,7 +27,9 @@ test_httpd_parse_request(void)
         "Content-Length: 6\r\n"
         "\r\n"
         "XD=asd\r\n";
-    balde_request_env_t *req = balde_httpd_parse_request(test, strlen(test));
+    GString *tmp = g_string_new(test);
+    balde_request_env_t *req = balde_httpd_parse_request(tmp);
+    g_string_free(tmp, TRUE);
     g_assert(req != NULL);
     g_assert_cmpstr(req->request_method, ==, "GET");
     g_assert_cmpstr(req->path_info, ==, "/bola");
@@ -54,7 +56,9 @@ test_httpd_parse_request_without_query_string(void)
         "Content-Length: 6\r\n"
         "\r\n"
         "XD=asd\r\n";
-    balde_request_env_t *req = balde_httpd_parse_request(test, strlen(test));
+    GString *tmp = g_string_new(test);
+    balde_request_env_t *req = balde_httpd_parse_request(tmp);
+    g_string_free(tmp, TRUE);
     g_assert(req != NULL);
     g_assert_cmpstr(req->request_method, ==, "GET");
     g_assert_cmpstr(req->path_info, ==, "/bola");

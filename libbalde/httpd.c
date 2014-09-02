@@ -20,6 +20,10 @@
 #include <balde/wrappers-private.h>
 #include "http-parser/http_parser.h"
 
+#ifndef SOCKET_BUFFER_SIZE
+#define SOCKET_BUFFER_SIZE 4096
+#endif
+
 static http_parser_settings settings;
 
 
@@ -100,7 +104,7 @@ balde_httpd_headers_complete_cb(http_parser* parser) {
 
 
 balde_request_env_t*
-balde_httpd_parse_request(const gchar* request, gsize len)
+balde_httpd_parse_request(GString *request)
 {
     settings.on_url = balde_httpd_url_cb;
     settings.on_body = balde_httpd_body_cb;
@@ -122,7 +126,7 @@ balde_httpd_parse_request(const gchar* request, gsize len)
     http_parser parser;
     parser.data = data;
     http_parser_init(&parser, HTTP_REQUEST);
-    http_parser_execute(&parser, &settings, request, len);
+    http_parser_execute(&parser, &settings, request->str, request->len);
     balde_request_env_t *rv = data->request;
     g_free(data->header_key);
     g_free(data);
@@ -159,14 +163,22 @@ balde_incoming_callback(GSocketService *service, GSocketConnection *connection,
 {
     GError *error = NULL;
     GInputStream * istream = g_io_stream_get_input_stream(G_IO_STREAM(connection));
-    gchar message[65537];
-    gssize message_len = g_input_stream_read(istream, message, 65537, NULL, &error);
-    if (error != NULL) {
-        g_printerr("Failed to read: %s\n", error->message);
-        g_error_free(error);
-        return TRUE;
+    gchar message[SOCKET_BUFFER_SIZE];
+    gssize message_len;
+    GString *content = g_string_new("");
+    do {
+        message_len = g_input_stream_read(istream, message, SOCKET_BUFFER_SIZE,
+            NULL, &error);
+        if (error != NULL) {
+            g_printerr("Failed to read: %s\n", error->message);
+            g_error_free(error);
+            return TRUE;
+        }
+        g_string_append_len(content, message, message_len);
     }
-    balde_request_env_t *env = balde_httpd_parse_request(message, message_len);
+    while(message_len == SOCKET_BUFFER_SIZE || message_len == 0);
+    balde_request_env_t *env = balde_httpd_parse_request(content);
+    g_string_free(content, TRUE);
     balde_app_t *app = (balde_app_t*) user_data;
     GString *response = balde_app_main_loop(app, env, balde_httpd_response_render);
     GOutputStream *ostream = g_io_stream_get_output_stream(G_IO_STREAM(connection));
