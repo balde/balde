@@ -10,6 +10,7 @@ CLEANFILES = \
 
 check_PROGRAMS = \
 	check_app \
+	check_datetime \
 	check_exceptions \
 	check_httpd \
 	check_resources \
@@ -26,6 +27,13 @@ check_app_SOURCES = \
 	check_app.c
 
 check_app_LDADD = \
+	$(GLIB_LIBS) \
+	$(top_builddir)/libbalde/libbalde.la
+
+check_datetime_SOURCES = \
+	check_datetime.c
+
+check_datetime_LDADD = \
 	$(GLIB_LIBS) \
 	$(top_builddir)/libbalde/libbalde.la
 

@@ -152,6 +152,7 @@ balde_app_url_forv(balde_app_t *app, const gchar *endpoint, va_list params)
 static gboolean runserver = FALSE;
 static gchar *host = NULL;
 static gint16 port = 8080;
+static gint max_threads = 10;
 static GOptionEntry entries[] =
 {
     {"runserver", 's', 0, G_OPTION_ARG_NONE, &runserver,
@@ -160,6 +161,8 @@ static GOptionEntry entries[] =
         "Embedded server host. (default: 127.0.0.1)", "HOST"},
     {"port", 'p', 0, G_OPTION_ARG_INT, &port,
         "Embedded server port. (default: 8080)", "PORT"},
+    {"max-threads", 'm', 0, G_OPTION_ARG_INT, &max_threads,
+        "Max number of threads for embedded server. (default: 10)", "THREADS"},
     {NULL}
 };
 
@@ -175,7 +178,7 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
         exit(1);
     }
     if (runserver)
-        balde_httpd_run(app, host, port);
+        balde_httpd_run(app, host, port, max_threads);
     else {
         g_set_printerr_handler(balde_stderr_handler);
 

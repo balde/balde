@@ -80,7 +80,8 @@ test_httpd_response_render(void)
     balde_response_t *res = balde_make_response("lol");
     GString *out = balde_httpd_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
-        "HTTP/1.1 200 Ok\r\n"
+        "HTTP/1.1 200 OK\r\n"
+        "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Connection: close\r\n"
         "Content-Type: text/html; charset=utf-8\r\n"
         "Content-Length: 3\r\n"
@@ -98,7 +99,8 @@ test_httpd_response_render_with_custom_mime_type(void)
     balde_response_set_header(res, "content-type", "text/plain");
     GString *out = balde_httpd_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
-        "HTTP/1.1 200 Ok\r\n"
+        "HTTP/1.1 200 OK\r\n"
+        "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Connection: close\r\n"
         "Content-Type: text/plain\r\n"
         "Content-Length: 3\r\n"
@@ -118,12 +120,13 @@ test_httpd_response_render_with_multiple_cookies(void)
     balde_response_set_cookie(res, "xd", ":D", -1, -1, "/bola/", NULL, TRUE, FALSE);
     GString *out = balde_httpd_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
-        "HTTP/1.1 200 Ok\r\n"
-        "Connection: close\r\n"
+        "HTTP/1.1 200 OK\r\n"
+        "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Set-Cookie: bola=\"guda\"; Expires=Fri, 13-Feb-2009 23:32:30 GMT; Max-Age=60; Path=/\r\n"
         "Set-Cookie: asd=\"qwe\"; HttpOnly; Path=/\r\n"
         "Set-Cookie: xd=\":D\"; Secure; Path=/bola/\r\n"
         "Content-Type: text/html; charset=utf-8\r\n"
+        "Connection: close\r\n"
         "Content-Length: 3\r\n"
         "\r\n"
         "lol");
@@ -138,7 +141,8 @@ test_httpd_response_render_without_body(void)
     balde_response_t *res = balde_make_response("lol");
     GString *out = balde_httpd_response_render(res, FALSE);
     g_assert_cmpstr(out->str, ==,
-        "HTTP/1.1 200 Ok\r\n"
+        "HTTP/1.1 200 OK\r\n"
+        "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Connection: close\r\n"
         "Content-Type: text/html; charset=utf-8\r\n"
         "Content-Length: 3\r\n"
@@ -158,6 +162,7 @@ test_httpd_response_render_exception(void)
     GString *out = balde_httpd_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
         "HTTP/1.1 404 Not Found\r\n"
+        "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Connection: close\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"
         "Content-Length: 136\r\n"
@@ -180,6 +185,7 @@ test_httpd_response_render_exception_without_body(void)
     GString *out = balde_httpd_response_render(res, FALSE);
     g_assert_cmpstr(out->str, ==,
         "HTTP/1.1 404 Not Found\r\n"
+        "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Connection: close\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"
         "Content-Length: 136\r\n"

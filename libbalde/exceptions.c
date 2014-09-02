@@ -22,7 +22,7 @@
 const static balde_http_exception_t exceptions[] = {
     {
         .code = BALDE_HTTP_OK,  // 200
-        .name = "Ok",
+        .name = "OK",
         .description = ""
     },
     {

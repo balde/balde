@@ -14,6 +14,7 @@
 #include <string.h>
 #include <balde/app.h>
 #include <balde/cgi-private.h>
+#include <balde/datetime-private.h>
 #include <balde/exceptions.h>
 #include <balde/exceptions-private.h>
 #include <balde/resources-private.h>
@@ -109,33 +110,6 @@ balde_response_get_tmpl_var(balde_response_t *response, const gchar *name)
 }
 
 
-static const gchar* days[] = {
-    "Mon",
-    "Tue",
-    "Wed",
-    "Thu",
-    "Fri",
-    "Sat",
-    "Sun",
-};
-
-
-static const gchar* months[] = {
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-};
-
-
 void
 balde_response_set_cookie(balde_response_t *response, const gchar *name,
     const gchar *value, const gint max_age, const gint64 expires,
@@ -156,12 +130,9 @@ balde_response_set_cookie(balde_response_t *response, const gchar *name,
         else {
             exp = g_date_time_new_from_unix_utc(expires);
         }
-        gchar *tmp = g_strdup_printf("Expires=%s, %02d-%s-%04d %02d:%02d:%02d GMT",
-            days[g_date_time_get_day_of_week(exp) - 1],
-            g_date_time_get_day_of_month(exp),
-            months[g_date_time_get_month(exp) - 1], g_date_time_get_year(exp),
-            g_date_time_get_hour(exp), g_date_time_get_minute(exp),
-            g_date_time_get_second(exp));
+        gchar *dt = balde_datetime_rfc6265(exp);
+        gchar *tmp = g_strdup_printf("Expires=%s", dt);
+        g_free(dt);
         g_date_time_unref(exp);
         pieces = g_slist_append(pieces, tmp);
     }
@@ -174,9 +145,9 @@ balde_response_set_cookie(balde_response_t *response, const gchar *name,
     pieces = g_slist_append(pieces, g_strdup_printf("Path=%s",
         (path != NULL) ? path : "/"));
     GString *val = g_string_new("");
-    for (GSList *tmp = pieces; tmp != NULL; tmp = g_slist_next(tmp)) {
-        val = g_string_append(val, (gchar*) tmp->data);
-        if (g_slist_next(tmp) != NULL)
+    for (GSList *tmp2 = pieces; tmp2 != NULL; tmp2 = g_slist_next(tmp2)) {
+        val = g_string_append(val, (gchar*) tmp2->data);
+        if (g_slist_next(tmp2) != NULL)
             val = g_string_append(val, "; ");
     }
     g_slist_free_full(pieces, g_free);

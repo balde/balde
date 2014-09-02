@@ -6,6 +6,7 @@ noinst_HEADERS = \
 libbalde_la_SOURCES = \
 	app.c \
 	cgi.c \
+	datetime.c \
 	exceptions.c \
 	httpd.c \
 	resources.c \
