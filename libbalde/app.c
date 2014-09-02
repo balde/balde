@@ -12,11 +12,13 @@
 
 #include <glib.h>
 #include <locale.h>
+#include <stdlib.h>
 #include <balde/app.h>
 #include <balde/app-private.h>
 #include <balde/cgi-private.h>
 #include <balde/exceptions.h>
 #include <balde/exceptions-private.h>
+#include <balde/httpd-private.h>
 #include <balde/resources-private.h>
 #include <balde/routing.h>
 #include <balde/routing-private.h>
@@ -147,36 +149,66 @@ balde_app_url_forv(balde_app_t *app, const gchar *endpoint, va_list params)
  * A hello world!
  */
 
+static gboolean runserver = FALSE;
+static gchar *host = NULL;
+static gint16 port = 8080;
+static GOptionEntry entries[] =
+{
+    {"runserver", 's', 0, G_OPTION_ARG_NONE, &runserver,
+        "Run embedded server.", NULL},
+    {"host", 't', 0, G_OPTION_ARG_STRING, &host,
+        "Embedded server host. (default: 127.0.0.1)", "HOST"},
+    {"port", 'p', 0, G_OPTION_ARG_INT, &port,
+        "Embedded server port. (default: 8080)", "PORT"},
+    {NULL}
+};
+
 void
 balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 {
     setlocale(LC_ALL, "");
-    g_set_printerr_handler(balde_stderr_handler);
+    GError *err = NULL;
+    GOptionContext *context = g_option_context_new ("- a balde application ;-)");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &err)) {
+        g_printerr("Option parsing failed: %s\n", err->message);
+        exit(1);
+    }
+    if (runserver)
+        balde_httpd_run(app, host, port);
+    else {
+        g_set_printerr_handler(balde_stderr_handler);
 
 BEGIN_LOOP
 
-    balde_app_main_loop(app, NULL);
+        GString *response = balde_app_main_loop(app, NULL,
+            balde_response_render);
+        balde_response_print(response);
 
 END_LOOP
 
+    }
+    g_free(host);
 }
 
 
-void
-balde_app_main_loop(balde_app_t *app, balde_request_env_t *env)
+GString*
+balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
+    balde_response_render_t render)
 {
     balde_request_t *request;
     balde_response_t *response;
     balde_response_t *error_response;
     gchar *endpoint;
     gboolean with_body = TRUE;
+    GString *rv = NULL;
 
     // render startup error, if any
     if (app->error != NULL) {
         error_response = balde_make_response_from_exception(app->error);
-        balde_response_print(error_response, with_body);
+        rv = render(error_response, with_body);
         balde_response_free(error_response);
-        return;
+        return rv;
     }
 
     request = balde_make_request(app, env);
@@ -215,12 +247,13 @@ balde_app_main_loop(balde_app_t *app, balde_request_env_t *env)
 
     if (app->error != NULL) {
         error_response = balde_make_response_from_exception(app->error);
-        balde_response_print(error_response, with_body);
+        rv = render(error_response, with_body);
         balde_response_free(error_response);
         g_clear_error(&app->error);
-        return;
+        return rv;
     }
 
-    balde_response_print(response, with_body);
+    rv = render(response, with_body);
     balde_response_free(response);
+    return rv;
 }

@@ -10,6 +10,7 @@
 #define _BALDE_HTTPD_PRIVATE_H
 
 #include <glib.h>
+#include <balde/app.h>
 #include <balde/wrappers-private.h>
 
 typedef struct {
@@ -19,5 +20,7 @@ typedef struct {
 } balde_httpd_parser_data_t;
 
 balde_request_env_t* balde_httpd_parse_request(const gchar* request, gsize len);
+void balde_httpd_run(balde_app_t *app, const gchar *host, gint16 port);
+GString* balde_httpd_response_render(balde_response_t *response, const gboolean with_body);
 
 #endif /* _BALDE_HTTPD_PRIVATE_H */

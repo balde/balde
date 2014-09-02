@@ -21,6 +21,11 @@
 
 const static balde_http_exception_t exceptions[] = {
     {
+        .code = BALDE_HTTP_OK,  // 200
+        .name = "Ok",
+        .description = ""
+    },
+    {
         .code = BALDE_HTTP_BAD_REQUEST,  // 400
         .name = "Bad Request",
         .description =

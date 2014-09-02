@@ -277,11 +277,10 @@ balde_response_render(balde_response_t *response, const gboolean with_body)
 
 
 void
-balde_response_print(balde_response_t *response, const gboolean with_body)
+balde_response_print(GString *response)
 {
-    GString *resp = balde_response_render(response, with_body);
-    fwrite(resp->str, sizeof(gchar), resp->len/sizeof(gchar), stdout);
-    g_string_free(resp, TRUE);
+    fwrite(response->str, sizeof(gchar), response->len/sizeof(gchar), stdout);
+    g_string_free(response, TRUE);
 }
 
 

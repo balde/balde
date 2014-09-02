@@ -37,7 +37,8 @@ check_exceptions_LDADD = \
 	$(top_builddir)/libbalde/libbalde.la
 
 check_httpd_SOURCES = \
-	check_httpd.c
+	check_httpd.c \
+	mock_datetime2.c
 
 check_httpd_LDADD = \
 	$(GLIB_LIBS) \
