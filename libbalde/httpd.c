@@ -190,16 +190,21 @@ balde_httpd_run(balde_app_t *app, const gchar *host, gint16 port)
     GSocketService *service = g_socket_service_new();
     GInetAddress* addr_host = g_inet_address_new_from_string(final_host);
     GSocketAddress *address = g_inet_socket_address_new(addr_host, port);
-    g_object_unref(addr_host);
     g_socket_listener_add_address((GSocketListener*) service, address,
         G_SOCKET_TYPE_STREAM, G_SOCKET_PROTOCOL_TCP, NULL, NULL, &error);
     if (error != NULL) {
         g_printerr("Failed to listen: %s\n", error->message);
         g_error_free(error);
+        g_object_unref(service);
+        g_object_unref(addr_host);
+        g_object_unref(address);
         return;
     }
     g_signal_connect(service, "incoming", G_CALLBACK(balde_incoming_callback), app);
     g_socket_service_start(service);
+    g_object_unref(service);
+    g_object_unref(addr_host);
+    g_object_unref(address);
     GMainLoop *loop = g_main_loop_new(NULL, FALSE);
     g_main_loop_run(loop);
 }
