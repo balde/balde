@@ -8,7 +8,7 @@ main(int argc, char **argv)
 {
     balde_app_t *app = balde_app_init();
     balde_resources_load(app, static_resources_get_resource());
-    balde_app_run(app);
+    balde_app_run(app, argc, argv);
     balde_app_free(app);
     return 0;
 }
