@@ -1,5 +1,8 @@
 lib_LTLIBRARIES = libbalde.la
 
+noinst_HEADERS = \
+	http-parser/http_parser.h
+
 libbalde_la_SOURCES = \
 	app.c \
 	cgi.c \
