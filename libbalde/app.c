@@ -168,7 +168,7 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 {
     setlocale(LC_ALL, "");
     GError *err = NULL;
-    GOptionContext *context = g_option_context_new ("- a balde application ;-)");
+    GOptionContext *context = g_option_context_new("- a balde application ;-)");
     g_option_context_add_main_entries(context, entries, NULL);
     if (!g_option_context_parse(context, &argc, &argv, &err)) {
         g_printerr("Option parsing failed: %s\n", err->message);
@@ -188,6 +188,7 @@ BEGIN_LOOP
 END_LOOP
 
     }
+    g_option_context_free(context);
     g_free(host);
 }
 
