@@ -1,7 +1,7 @@
-AC_PREREQ(2.68)
+AC_PREREQ([2.69])
 
-AC_INIT([balde], m4_esyscmd([build-aux/git-version-gen .tarball-version]),
-    [https://github.com/balde/balde], [balde], [http://balde.io])
+AC_INIT([balde], [m4_esyscmd(build-aux/git-version-gen .tarball-version)],
+  [https://github.com/balde/balde], [balde], [http://balde.io])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -65,7 +65,8 @@ AS_IF([test "x$build_webserver" = "xyes"], [
     ])
     AC_CACHE_CHECK([for system http-parser >= 2.3],
       balde_cv_http_parser_version, [
-        AC_TRY_RUN([
+        AC_RUN_IFELSE([
+          AC_LANG_SOURCE([[
 #include <http_parser.h>
 
 int main(void) {
@@ -73,14 +74,17 @@ int main(void) {
         return 0;
     return 1;
 }
-        ],
-        balde_cv_http_parser_version=yes, [
+          ]])
+        ], [
+          balde_cv_http_parser_version=yes
+        ], [
           balde_cv_http_parser_version=no
           AC_MSG_ERROR([http-parser < 2.3. update it or retry with --with-http-parser=internal])
-        ],
-        balde_cv_http_parser_version=yes
-      )
-    ])
+        ], [
+          balde_cv_http_parser_version=yes
+        ])
+      ]
+    )
     use_system_http_parser=yes
     AC_DEFINE([SYSTEM_HTTP_PARSER], [], [build against system http-parser library])
     WEBSERVER="${WEBSERVER} (system http-parser)"
