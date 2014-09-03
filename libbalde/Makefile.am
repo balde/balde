@@ -10,17 +10,6 @@ libbalde_la_SOURCES = \
 	template-helpers.c \
 	wrappers.c
 
-if BUILD_WEBSERVER
-
-noinst_HEADERS = \
-	http-parser/http_parser.h
-
-libbalde_la_SOURCES += \
-	httpd.c \
-	http-parser/http_parser.c
-
-endif
-
 libbalde_la_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS) \
@@ -31,3 +20,20 @@ libbalde_la_LIBADD = \
 
 libbalde_la_LDFLAGS = \
 	-version-info $(LIBBALDE_LT_VERSION_INFO)
+
+if BUILD_WEBSERVER
+
+libbalde_la_SOURCES += \
+	httpd.c
+
+if !USE_SYSTEM_HTTP_PARSER
+
+noinst_HEADERS = \
+	http-parser/http_parser.h
+
+libbalde_la_SOURCES += \
+	http-parser/http_parser.c
+
+endif
+
+endif
