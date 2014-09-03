@@ -38,6 +38,18 @@ AS_IF([test "x$enable_fastcgi" != "xno"], [
   FASTCGI="disabled"
 ])
 
+AC_ARG_ENABLE([webserver], AS_HELP_STRING([--disable-webserver], [disable embedded webserver]))
+AS_IF([test "x$enable_webserver" != "xno"], [
+  build_webserver=yes
+  AC_DEFINE([BUILD_WEBSERVER], [], [embedded webserver enabled])
+  WEBSERVER="enabled"
+], [
+  build_webserver=no
+  WEBSERVER="disabled"
+])
+AM_CONDITIONAL([BUILD_WEBSERVER], [test "x$build_webserver" = "xyes"])
+
+
 AC_ARG_ENABLE([examples], AS_HELP_STRING([--enable-examples], [build examples]))
 AS_IF([test "x$enable_examples" = "xyes"], [
   build_examples=yes
@@ -156,6 +168,7 @@ AS_ECHO("
         ldflags:      ${LDFLAGS}
 
         fastcgi:      ${FASTCGI}
+        webserver:    ${WEBSERVER}
         examples:     ${EXAMPLES}
 
         doxygen:      ${DOXYGEN}

@@ -12,13 +12,27 @@ check_PROGRAMS = \
 	check_app \
 	check_datetime \
 	check_exceptions \
-	check_httpd \
 	check_resources \
 	check_routing \
 	check_stdin \
 	check_template \
 	check_template_helpers \
 	check_wrappers
+
+if BUILD_WEBSERVER
+
+check_PROGRAMS += \
+	check_httpd
+
+check_httpd_SOURCES = \
+	check_httpd.c \
+	mock_datetime2.c
+
+check_httpd_LDADD = \
+	$(GLIB_LIBS) \
+	$(top_builddir)/libbalde/libbalde.la
+
+endif
 
 TESTS = \
 	$(check_PROGRAMS)
@@ -41,14 +55,6 @@ check_exceptions_SOURCES = \
 	check_exceptions.c
 
 check_exceptions_LDADD = \
-	$(GLIB_LIBS) \
-	$(top_builddir)/libbalde/libbalde.la
-
-check_httpd_SOURCES = \
-	check_httpd.c \
-	mock_datetime2.c
-
-check_httpd_LDADD = \
 	$(GLIB_LIBS) \
 	$(top_builddir)/libbalde/libbalde.la
 

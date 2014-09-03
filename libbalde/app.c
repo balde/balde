@@ -18,13 +18,15 @@
 #include <balde/cgi-private.h>
 #include <balde/exceptions.h>
 #include <balde/exceptions-private.h>
-#include <balde/httpd-private.h>
 #include <balde/resources-private.h>
 #include <balde/routing.h>
 #include <balde/routing-private.h>
 #include <balde/wrappers.h>
 #include <balde/wrappers-private.h>
 
+#ifdef BUILD_WEBSERVER
+#include <balde/httpd-private.h>
+#endif
 
 balde_app_t*
 balde_app_init(void)
@@ -149,6 +151,8 @@ balde_app_url_forv(balde_app_t *app, const gchar *endpoint, va_list params)
  * A hello world!
  */
 
+#ifdef BUILD_WEBSERVER
+
 static gboolean runserver = FALSE;
 static gchar *host = NULL;
 static gint16 port = 8080;
@@ -166,10 +170,15 @@ static GOptionEntry entries[] =
     {NULL}
 };
 
+#endif
+
 void
 balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 {
     setlocale(LC_ALL, "");
+
+#ifdef BUILD_WEBSERVER
+
     GError *err = NULL;
     GOptionContext *context = g_option_context_new("- a balde application ;-)");
     g_option_context_add_main_entries(context, entries, NULL);
@@ -180,6 +189,9 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
     if (runserver)
         balde_httpd_run(app, host, port, max_threads);
     else {
+
+#endif
+
         g_set_printerr_handler(balde_stderr_handler);
 
 BEGIN_LOOP
@@ -190,9 +202,14 @@ BEGIN_LOOP
 
 END_LOOP
 
+#ifdef BUILD_WEBSERVER
+
     }
     g_option_context_free(context);
     g_free(host);
+
+#endif
+
 }
 
 

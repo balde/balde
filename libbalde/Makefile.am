@@ -1,19 +1,25 @@
 lib_LTLIBRARIES = libbalde.la
 
-noinst_HEADERS = \
-	http-parser/http_parser.h
-
 libbalde_la_SOURCES = \
 	app.c \
 	cgi.c \
 	datetime.c \
 	exceptions.c \
-	httpd.c \
 	resources.c \
 	routing.c \
 	template-helpers.c \
-	wrappers.c \
+	wrappers.c
+
+if BUILD_WEBSERVER
+
+noinst_HEADERS = \
+	http-parser/http_parser.h
+
+libbalde_la_SOURCES += \
+	httpd.c \
 	http-parser/http_parser.c
+
+endif
 
 libbalde_la_CFLAGS = \
 	$(AM_CFLAGS) \
