@@ -180,6 +180,10 @@ balde_incoming_callback(GThreadedSocketService *service,
                 (GInetSocketAddress*) remote_socket);
             remote_ip = g_inet_address_to_string(remote_addr);
             break;
+        case G_SOCKET_FAMILY_UNIX:
+        case G_SOCKET_FAMILY_INVALID:
+            // -EDONTCARE
+            break;
     }
     g_object_unref(remote_socket);
     GInputStream * istream = g_io_stream_get_input_stream(G_IO_STREAM(connection));
