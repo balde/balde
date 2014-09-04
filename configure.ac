@@ -1,7 +1,7 @@
-AC_PREREQ(2.68)
+AC_PREREQ([2.69])
 
-AC_INIT([balde], m4_esyscmd([build-aux/git-version-gen .tarball-version]),
-    [https://github.com/balde/balde], [balde], [http://balde.io])
+AC_INIT([balde], [m4_esyscmd(build-aux/git-version-gen .tarball-version)],
+  [https://github.com/balde/balde], [balde], [http://balde.io])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -37,6 +37,64 @@ AS_IF([test "x$enable_fastcgi" != "xno"], [
 ], [
   FASTCGI="disabled"
 ])
+
+AC_ARG_ENABLE([webserver], AS_HELP_STRING([--disable-webserver], [disable embedded webserver]))
+AS_IF([test "x$enable_webserver" != "xno"], [
+  build_webserver=yes
+  AC_DEFINE([BUILD_WEBSERVER], [], [embedded webserver enabled])
+  WEBSERVER="enabled"
+], [
+  build_webserver=no
+  WEBSERVER="disabled"
+])
+AM_CONDITIONAL([BUILD_WEBSERVER], [test "x$build_webserver" = "xyes"])
+
+AC_ARG_WITH([http-parser],
+  AS_HELP_STRING([--with-http-parser=@<:@internal/system@:>@],
+    [whether to use system http-parser library [default=internal]]))
+use_system_http_parser=no
+AS_IF([test "x$build_webserver" = "xyes"], [
+  AS_IF([test "x$with_http_parser" = "xsystem"], [
+    AC_SEARCH_LIBS([http_parser_init], [http_parser], ,
+      AC_MSG_ERROR([http_parser_init not found. please install http-parser or retry with --with-http-parser=internal])
+    )
+    balde_found_http_parser_headers=no
+    AC_CHECK_HEADERS([http_parser.h], [balde_found_http_parser_headers=yes; break;])
+    AS_IF([test "x$balde_found_http_parser_headers" != "xyes"], [
+      AC_MSG_ERROR([Unable to find http-parser header.])
+    ])
+    AC_CACHE_CHECK([for system http-parser >= 2.3],
+      balde_cv_http_parser_version, [
+        AC_RUN_IFELSE([
+          AC_LANG_SOURCE([[
+#include <http_parser.h>
+
+int main(void) {
+    if (HTTP_PARSER_VERSION_MAJOR == 2 && HTTP_PARSER_VERSION_MINOR >= 3)
+        return 0;
+    return 1;
+}
+          ]])
+        ], [
+          balde_cv_http_parser_version=yes
+        ], [
+          balde_cv_http_parser_version=no
+          AC_MSG_ERROR([http-parser < 2.3. update it or retry with --with-http-parser=internal])
+        ], [
+          balde_cv_http_parser_version=yes
+        ])
+      ]
+    )
+    use_system_http_parser=yes
+    AC_DEFINE([SYSTEM_HTTP_PARSER], [], [build against system http-parser library])
+    WEBSERVER="${WEBSERVER} (system http-parser)"
+  ], [
+    WEBSERVER="${WEBSERVER} (internal http-parser)"
+  ])
+],)
+AM_CONDITIONAL(USE_SYSTEM_HTTP_PARSER, [test "x$use_system_http_parser" = "xyes"])
+
+
 
 AC_ARG_ENABLE([examples], AS_HELP_STRING([--enable-examples], [build examples]))
 AS_IF([test "x$enable_examples" = "xyes"], [
@@ -160,6 +218,7 @@ AS_ECHO("
 
         fastcgi:      ${FASTCGI}
         examples:     ${EXAMPLES}
+        webserver:    ${WEBSERVER}
 
         doxygen:      ${DOXYGEN}
         valgrind:     ${VALGRIND}

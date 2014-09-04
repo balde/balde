@@ -455,7 +455,40 @@ test_make_request(void)
     g_setenv("QUERY_STRING", "asd=lol&xd=hehe", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app);
+    balde_request_t *request = balde_make_request(app, NULL);
+    g_assert_cmpstr(request->path, ==, "/");
+    g_assert(request->method == BALDE_HTTP_GET);
+    g_assert(g_hash_table_size(request->headers) == 4);
+    g_assert(g_hash_table_size(request->args) == 2);
+    g_assert(g_hash_table_size(request->cookies) == 2);
+    g_assert(request->authorization != NULL);
+    g_assert_cmpstr(request->authorization->username, ==, "bola");
+    g_assert_cmpstr(request->authorization->password, ==, "guda:lol");
+    g_assert(request->view_args == NULL);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
+test_make_request_with_env(void)
+{
+    balde_request_env_t *env = g_new(balde_request_env_t, 1);
+    env->path_info = g_strdup("/");
+    env->request_method = g_strdup("GET");
+    env->query_string = g_strdup("asd=lol&xd=hehe");
+    env->headers = g_hash_table_new_full(g_str_hash, g_str_equal,
+        g_free, g_free);
+    g_hash_table_replace(env->headers, g_strdup("lol-hehe"), g_strdup("12345"));
+    g_hash_table_replace(env->headers, g_strdup("xd"), g_strdup("asdf"));
+    g_hash_table_replace(env->headers, g_strdup("cookie"),
+        g_strdup("asd=\"qwe\"; bola=guda"));
+    g_hash_table_replace(env->headers, g_strdup("authorization"),
+        g_strdup("Basic Ym9sYTpndWRhOmxvbA=="));
+    env->content_length = 0;
+    env->body = NULL;
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, env);
     g_assert_cmpstr(request->path, ==, "/");
     g_assert(request->method == BALDE_HTTP_GET);
     g_assert(g_hash_table_size(request->headers) == 4);
@@ -477,7 +510,7 @@ test_request_get_header(void)
     g_setenv("HTTP_XD_KKK", "asdf", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app);
+    balde_request_t *request = balde_make_request(app, NULL);
     g_assert_cmpstr(balde_request_get_header(request, "Lol-Hehe"), ==, "12345");
     g_assert_cmpstr(balde_request_get_header(request, "XD-KKK"), ==, "asdf");
     g_assert(balde_request_get_header(request, "foo") == NULL);
@@ -492,7 +525,7 @@ test_request_get_arg(void)
     g_setenv("QUERY_STRING", "lol=hehe", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app);
+    balde_request_t *request = balde_make_request(app, NULL);
     g_assert_cmpstr(balde_request_get_arg(request, "lol"), == , "hehe");
     g_assert(balde_request_get_header(request, "xd") == NULL);
     balde_request_free(request);
@@ -506,7 +539,7 @@ test_request_get_form(void)
     g_setenv("REQUEST_METHOD", "GET", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app);
+    balde_request_t *request = balde_make_request(app, NULL);
     g_assert(request->stream == NULL);
     g_assert(request->form == NULL);
     g_assert(balde_request_get_form(request, "lol") == NULL);
@@ -522,7 +555,7 @@ test_request_get_form_with_empty_body(void)
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
     // ommited CONTENT_LENGTH
-    balde_request_t *request = balde_make_request(app);
+    balde_request_t *request = balde_make_request(app, NULL);
     g_assert(request->stream == NULL);
     g_assert(g_hash_table_size(request->form) == 0);
     g_assert(balde_request_get_form(request, "lol") == NULL);
@@ -535,7 +568,7 @@ void
 test_request_get_view_arg(void)
 {
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app);
+    balde_request_t *request = balde_make_request(app, NULL);
     request->view_args = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_replace(request->view_args, g_strdup("foo"), g_strdup("bar"));
     g_assert_cmpstr(balde_request_get_view_arg(request, "foo"), == , "bar");
@@ -549,7 +582,7 @@ void
 test_request_get_cookie(void)
 {
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app);
+    balde_request_t *request = balde_make_request(app, NULL);
     g_hash_table_replace(request->cookies, g_strdup("foo"), g_strdup("bar"));
     g_assert_cmpstr(balde_request_get_cookie(request, "foo"), == , "bar");
     g_assert(balde_request_get_cookie(request, "xd") == NULL);
@@ -618,6 +651,7 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/parse_cookies", test_parse_cookies);
     g_test_add_func("/wrappers/parse_authorization", test_parse_authorization);
     g_test_add_func("/wrappers/make_request", test_make_request);
+    g_test_add_func("/wrappers/make_request_with_env", test_make_request_with_env);
     g_test_add_func("/wrappers/request_get_header", test_request_get_header);
     g_test_add_func("/wrappers/request_get_arg", test_request_get_arg);
     g_test_add_func("/wrappers/request_get_form", test_request_get_form);

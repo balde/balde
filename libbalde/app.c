@@ -12,6 +12,7 @@
 
 #include <glib.h>
 #include <locale.h>
+#include <stdlib.h>
 #include <balde/app.h>
 #include <balde/app-private.h>
 #include <balde/cgi-private.h>
@@ -23,6 +24,9 @@
 #include <balde/wrappers.h>
 #include <balde/wrappers-private.h>
 
+#ifdef BUILD_WEBSERVER
+#include <balde/httpd-private.h>
+#endif
 
 balde_app_t*
 balde_app_init(void)
@@ -147,39 +151,88 @@ balde_app_url_forv(balde_app_t *app, const gchar *endpoint, va_list params)
  * A hello world!
  */
 
+#ifdef BUILD_WEBSERVER
+
+static gboolean runserver = FALSE;
+static gchar *host = NULL;
+static gint16 port = 8080;
+static gint max_threads = 10;
+static GOptionEntry entries[] =
+{
+    {"runserver", 's', 0, G_OPTION_ARG_NONE, &runserver,
+        "Run embedded server.", NULL},
+    {"host", 't', 0, G_OPTION_ARG_STRING, &host,
+        "Embedded server host. (default: 127.0.0.1)", "HOST"},
+    {"port", 'p', 0, G_OPTION_ARG_INT, &port,
+        "Embedded server port. (default: 8080)", "PORT"},
+    {"max-threads", 'm', 0, G_OPTION_ARG_INT, &max_threads,
+        "Max number of threads for embedded server. (default: 10)", "THREADS"},
+    {NULL}
+};
+
+#endif
+
 void
-balde_app_run(balde_app_t *app)
+balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 {
     setlocale(LC_ALL, "");
-    g_set_printerr_handler(balde_stderr_handler);
+
+#ifdef BUILD_WEBSERVER
+
+    GError *err = NULL;
+    GOptionContext *context = g_option_context_new("- a balde application ;-)");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &err)) {
+        g_printerr("Option parsing failed: %s\n", err->message);
+        exit(1);
+    }
+    if (runserver)
+        balde_httpd_run(app, host, port, max_threads);
+    else {
+
+#endif
+
+        g_set_printerr_handler(balde_stderr_handler);
 
 BEGIN_LOOP
 
-    balde_app_main_loop(app);
+        GString *response = balde_app_main_loop(app, NULL,
+            balde_response_render);
+        balde_response_print(response);
 
 END_LOOP
+
+#ifdef BUILD_WEBSERVER
+
+    }
+    g_option_context_free(context);
+    g_free(host);
+
+#endif
 
 }
 
 
-void
-balde_app_main_loop(balde_app_t *app)
+GString*
+balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
+    balde_response_render_t render)
 {
     balde_request_t *request;
     balde_response_t *response;
     balde_response_t *error_response;
     gchar *endpoint;
     gboolean with_body = TRUE;
+    GString *rv = NULL;
 
     // render startup error, if any
     if (app->error != NULL) {
         error_response = balde_make_response_from_exception(app->error);
-        balde_response_print(error_response, with_body);
+        rv = render(error_response, with_body);
         balde_response_free(error_response);
-        return;
+        return rv;
     }
 
-    request = balde_make_request(app);
+    request = balde_make_request(app, env);
     with_body = ! (request->method & BALDE_HTTP_HEAD);
 
     // get the view
@@ -215,12 +268,13 @@ balde_app_main_loop(balde_app_t *app)
 
     if (app->error != NULL) {
         error_response = balde_make_response_from_exception(app->error);
-        balde_response_print(error_response, with_body);
+        rv = render(error_response, with_body);
         balde_response_free(error_response);
         g_clear_error(&app->error);
-        return;
+        return rv;
     }
 
-    balde_response_print(response, with_body);
+    rv = render(response, with_body);
     balde_response_free(response);
+    return rv;
 }

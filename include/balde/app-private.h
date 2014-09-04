@@ -20,10 +20,13 @@ typedef struct {
     balde_view_func_t view_func;
 } balde_view_t;
 
+typedef GString* (*balde_response_render_t) (balde_response_t*, const gboolean);
+
 void balde_app_free_views(balde_view_t *view);
 balde_view_t* balde_app_get_view_from_endpoint(balde_app_t *app,
     const gchar *endpoint);
 gchar* balde_app_url_forv(balde_app_t *app, const gchar *endpoint, va_list params);
-void balde_app_main_loop(balde_app_t *app);
+GString* balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
+    balde_response_render_t render);
 
 #endif /* _BALDE_APP_PRIVATE_H */

@@ -28,7 +28,7 @@ main(int argc, char **argv)
     balde_app_t *app = balde_app_init();
     balde_app_add_url_rule(app, "home", "/", BALDE_HTTP_GET, home);
     balde_app_add_url_rule(app, "profile", "/profile/<name>/", BALDE_HTTP_GET, profile);
-    balde_app_run(app);
+    balde_app_run(app, argc, argv);
     balde_app_free(app);
     return 0;
 }

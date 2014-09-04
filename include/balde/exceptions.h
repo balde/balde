@@ -23,6 +23,7 @@
 
 /** Supported HTTP status codes */
 typedef enum {
+    BALDE_HTTP_OK = 200,
     BALDE_HTTP_BAD_REQUEST = 400,
     BALDE_HTTP_UNAUTHORIZED = 401,
     BALDE_HTTP_FORBIDDEN = 403,

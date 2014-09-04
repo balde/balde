@@ -114,6 +114,6 @@ gchar* balde_app_url_for(balde_app_t *app, const gchar *endpoint, gboolean exter
  * This function does everything needed to run the registered views and dispatch
  * requests.
  */
-void balde_app_run(balde_app_t *app);
+void balde_app_run(balde_app_t *app, gint argc, gchar **argv);
 
 #endif /* _BALDE_APP_H */

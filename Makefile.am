@@ -11,6 +11,8 @@ SUBDIRS = \
 ACLOCAL_AMFLAGS = -I m4
 AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-examples \
+	--enable-webserver \
+	--with-http-parser=internal \
 	--without-leg
 
 EXTRA_DIST = \

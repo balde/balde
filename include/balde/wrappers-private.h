@@ -14,6 +14,15 @@
 #include <balde/routing.h>
 #include <balde/wrappers.h>
 
+typedef struct {
+    gchar *request_method;
+    gchar *path_info;
+    gchar *query_string;
+    GHashTable *headers;
+    guint64 content_length;
+    gchar *body;
+} balde_request_env_t;
+
 void balde_response_headers_free(gpointer l);
 void balde_response_free(balde_response_t *response);
 balde_response_t* balde_make_response_from_gstring(GString *content);
@@ -22,14 +31,15 @@ void balde_fix_header_name(gchar *name);
 void balde_header_render(const gchar *key, GSList *value, GString *str);
 GString* balde_response_render(balde_response_t *response,
     const gboolean with_body);
-void balde_response_print(balde_response_t *response, const gboolean with_body);
+void balde_response_print(GString *response);
 GHashTable* balde_request_headers(void);
 gchar* balde_urldecode(const gchar* str);
 GHashTable* balde_parse_query_string(const gchar *query_string);
 GHashTable* balde_parse_cookies(const gchar *cookie_header);
 balde_authorization_t* balde_parse_authorization(const gchar *authorization);
 void balde_authorization_free(balde_authorization_t *authorization);
-balde_request_t* balde_make_request(balde_app_t *app);
+balde_request_t* balde_make_request(balde_app_t *app, balde_request_env_t *env);
 void balde_request_free(balde_request_t *request);
+void balde_request_env_free(balde_request_env_t *request);
 
 #endif /* _BALDE_WRAPPERS_PRIVATE_H */

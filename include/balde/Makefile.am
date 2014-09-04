@@ -10,7 +10,9 @@ pkginclude_HEADERS = \
 noinst_HEADERS = \
 	app-private.h \
 	cgi-private.h \
+	datetime-private.h \
 	exceptions-private.h \
+	httpd-private.h \
 	resources-private.h \
 	routing-private.h \
 	sessions-private.h \
