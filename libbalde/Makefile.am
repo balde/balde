@@ -1,5 +1,8 @@
 lib_LTLIBRARIES = libbalde.la
 
+EXTRA_DIST = \
+	http-parser/COPYING
+
 libbalde_la_SOURCES = \
 	app.c \
 	cgi.c \
