@@ -32,6 +32,7 @@ check_httpd_SOURCES = \
 
 check_httpd_LDADD = \
 	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
 	$(top_builddir)/libbalde/libbalde.la
 
 endif
@@ -52,6 +53,7 @@ check_datetime_SOURCES = \
 
 check_datetime_LDADD = \
 	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
 	$(top_builddir)/libbalde/libbalde.la
 
 check_exceptions_SOURCES = \
