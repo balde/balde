@@ -1,3 +1,5 @@
+## Autotools settings
+
 ACLOCAL_AMFLAGS = -I m4
 
 AM_DISTCHECK_CONFIGURE_FLAGS = \
@@ -5,6 +7,9 @@ AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-webserver \
 	--with-http-parser=internal \
 	--without-leg
+
+
+## File listings
 
 EXTRA_DIST = \
 	autogen.sh \
@@ -86,28 +91,7 @@ noinst_LTLIBRARIES = \
 bin_PROGRAMS = \
 	bin/balde-template-gen
 
-if BUILD_EXAMPLES
-
-BUILT_SOURCES += \
-	examples/templates/hello.c \
-	examples/templates/hello.h \
-	examples/templates/form.c \
-	examples/templates/form.h \
-	examples/templates/url_for.c \
-	examples/templates/url_for.h \
-	examples/static-resources.c \
-	examples/static-resources.h
-
-noinst_PROGRAMS = \
-	examples/hello \
-	examples/hello-with-cookies \
-	examples/hello-with-form \
-	examples/hello-with-template \
-	examples/hello-with-static \
-	examples/hello-with-url_for \
-	examples/hello-with-auth
-
-endif
+noinst_PROGRAMS =
 
 check_PROGRAMS = \
 	tests/check_app \
@@ -120,7 +104,11 @@ check_PROGRAMS = \
 	tests/check_template_helpers \
 	tests/check_wrappers
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = balde.pc
 
+
+## Build rules: libbalde
 
 libbalde_libbalde_la_SOURCES = \
 	libbalde/app.c \
@@ -157,10 +145,10 @@ libbalde_libbalde_la_SOURCES += \
 	libbalde/http-parser/http_parser.c
 
 endif
-
 endif
 
 
+## Build rules: balde-template-gen
 
 libbalde_template_libbalde_template_la_SOURCES = \
 	libbalde_template/template.c \
@@ -180,8 +168,6 @@ libbalde_template/parser-grammar.c: libbalde_template/parser-grammar.leg
 	$(AM_V_GEN)$(LEG) -o $@ $<
 endif
 
-
-
 bin_balde_template_gen_SOURCES = \
 	bin/balde-template-gen.c
 
@@ -194,8 +180,18 @@ bin_balde_template_gen_LDADD = \
 	libbalde_template/libbalde_template.la
 
 
+## Build rules: examples
 
 if BUILD_EXAMPLES
+
+noinst_PROGRAMS += \
+	examples/hello \
+	examples/hello-with-cookies \
+	examples/hello-with-form \
+	examples/hello-with-template \
+	examples/hello-with-static \
+	examples/hello-with-url_for \
+	examples/hello-with-auth
 
 examples_hello_SOURCES = \
 	examples/hello.c
@@ -234,8 +230,8 @@ nodist_examples_hello_with_form_SOURCES = \
 	examples/templates/form.c \
 	examples/templates/form.h
 
-#examples/examples_hello_with_form-hello-with-form.$(OBJEXT): \
-#	$(nodist_examples_hello_with_form_SOURCES)
+examples/examples_hello_with_form-hello-with-form.$(OBJEXT): \
+	$(nodist_examples_hello_with_form_SOURCES)
 
 examples_hello_with_form_CFLAGS = \
 	$(GLIB_CFLAGS) \
@@ -256,6 +252,9 @@ nodist_examples_hello_with_template_SOURCES = \
 	examples/templates/hello.c \
 	examples/templates/hello.h
 
+examples/examples_hello_with_template-hello-with-template.$(OBJEXT): \
+	$(nodist_examples_hello_with_template_SOURCES)
+
 examples_hello_with_template_CFLAGS = \
 	$(GLIB_CFLAGS) \
 	-I$(top_srcdir)/include \
@@ -274,7 +273,9 @@ examples_hello_with_static_SOURCES = \
 nodist_examples_hello_with_static_SOURCES = \
 	examples/static-resources.c \
 	examples/static-resources.h
-#examples/hello-with-static.$(OBJEXT): examples/static-resources.c examples/static-resources.h
+
+examples/examples_hello_with_static-hello-with-static.$(OBJEXT): \
+	$(nodist_examples_hello_with_static_SOURCES)
 
 examples_hello_with_static_CFLAGS = \
 	$(GLIB_CFLAGS) \
@@ -294,6 +295,9 @@ examples_hello_with_url_for_SOURCES = \
 nodist_examples_hello_with_url_for_SOURCES = \
 	examples/templates/url_for.c \
 	examples/templates/url_for.h
+
+examples/examples_hello_with_url_for-hello-with-url_for.$(OBJEXT): \
+	$(nodist_examples_hello_with_url_for_SOURCES)
 
 examples_hello_with_url_for_CFLAGS = \
 	$(GLIB_CFLAGS) \
@@ -336,7 +340,7 @@ examples/templates/%.h: examples/templates/%.html bin/balde-template-gen
 	$(AM_V_GEN)bin/balde-template-gen $< $@
 
 
-
+## Build rules: tests
 
 if BUILD_WEBSERVER
 
@@ -504,6 +508,9 @@ tests/resources.h: tests/resources.xml $(shell $(GLIB_COMPILE_RESOURCES) --gener
 TESTS = \
 	$(check_PROGRAMS)
 
+
+## Helpers: Valgrind runners
+
 if USE_VALGRIND
 valgrind: all
 	$(MAKE) check TESTS_ENVIRONMENT=" \
@@ -535,9 +542,7 @@ valgrind-ci: all clean-local
 endif
 
 
-
-
-
+# Helpers: Git version
 
 .version:
 	echo $(VERSION) > $@-t && mv $@-t $@
@@ -545,12 +550,15 @@ endif
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
+
+# Helpers: Cleanup of helper files
+
 clean-local:
 	-rm -rf doc/build/
 	-rm -rf tests/valgrind-*.xml
 
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = balde.pc
+
+# Helpers: Documentation
 
 if BUILD_DOCS
 doxygen: Doxyfile
