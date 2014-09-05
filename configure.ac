@@ -183,20 +183,6 @@ AC_SUBST(GLIB_COMPILE_RESOURCES)
 
 AC_CONFIG_FILES([
     Makefile
-    artwork/Makefile
-    doc/Makefile
-    examples/Makefile
-    examples/static/Makefile
-    examples/static/asd/Makefile
-    examples/templates/Makefile
-    bin/Makefile
-    include/Makefile
-    include/balde/Makefile
-    include/balde-template/Makefile
-    libbalde/Makefile
-    libbalde_template/Makefile
-    tests/Makefile
-    tests/static/Makefile
     balde.pc
     Doxyfile
 ])
