@@ -555,7 +555,7 @@ dist-hook:
 
 clean-local:
 	-rm -rf doc/build/
-	-rm -rf tests/valgrind-*.xml
+	-rm -rf valgrind-*.xml
 
 
 # Helpers: Documentation
