@@ -16,6 +16,7 @@ EXTRA_DIST = \
 	.version \
 	build-aux/git-version-gen \
 	README.md \
+	COPYING-http_parser \
 	artwork/README.md \
 	artwork/balde-logo.ico \
 	artwork/balde-logo.png \
@@ -30,7 +31,6 @@ EXTRA_DIST = \
 	doc/15_responses.md \
 	doc/20_template-engine.md \
 	doc/25-static-resources.md \
-	libbalde/http-parser/COPYING \
 	libbalde_template/parser-grammar.leg \
 	examples/static-resources.xml \
 	examples/static/foo.js \
@@ -148,10 +148,10 @@ libbalde_libbalde_la_SOURCES += \
 if !USE_SYSTEM_HTTP_PARSER
 
 noinst_HEADERS += \
-	libbalde/http-parser/http_parser.h
+	libbalde/http_parser/http_parser.h
 
 libbalde_libbalde_la_SOURCES += \
-	libbalde/http-parser/http_parser.c
+	libbalde/http_parser/http_parser.c
 
 endif
 endif
@@ -631,7 +631,7 @@ dist-hook:
 
 clean-local:
 	-rm -rf doc/build/
-	-rm -rf tests/valgrind-*.xml
+	-rm -rf valgrind-*.xml
 
 
 # Helpers: Documentation
