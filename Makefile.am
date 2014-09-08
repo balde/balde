@@ -561,8 +561,7 @@ clean-local:
 # Helpers: Documentation
 
 if BUILD_DOCS
-doxygen: Doxyfile
-	$(MAKE) clean-local
+doxygen: clean-local Doxyfile
 	$(DOXYGEN) Doxyfile
 
 if PUBLISH_DOCS
