@@ -1,4 +1,4 @@
-Basic concepts {#concepts}
+Basic concepts {#basic-concepts}
 ==============
 
 balde is a micro-framework, it just does the basic and tries to do it quite well. As a micro-framework, it will not stay on your way, and will let you do almost anything that you may want, but you may have to do some extra work to get complex stuff done.

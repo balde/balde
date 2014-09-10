@@ -1,4 +1,4 @@
-HTTP responses {#responses}
+HTTP responses {#http-responses}
 ==============
 
 The HTTP responses are handle by the @ref balde_response_t data structure. It must be built and initialized by the application view and returned. balde will use it to render the HTTP response, and free its resources afterwards.

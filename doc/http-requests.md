@@ -1,4 +1,4 @@
-HTTP requests {#requests}
+HTTP requests {#http-requests}
 =============
 
 The HTTP requests are handle by the @ref balde_request_t data structure. This structure stores everything request-related, and its lifetime is a single HTTP request. This data structure is created and initialized by balde by default, and passed to all the views.
