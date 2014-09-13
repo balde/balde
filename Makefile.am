@@ -23,18 +23,18 @@ EXTRA_DIST = \
 	artwork/balde-logo-small.png \
 	artwork/balde-logo.svg \
 	doc/style.css \
-	doc/additional-notes.md \
-	doc/api-changes.md \
-	doc/api-reference.md \
-	doc/application.md \
-	doc/basic-concepts.md \
-	doc/getting-started.md \
-	doc/http-requests.md \
-	doc/http-responses.md \
-	doc/index.md \
-	doc/static-resources.md \
-	doc/template-engine.md \
-	doc/user-guide.md \
+	doc/00_index.md \
+	doc/20_user-guide.md \
+	doc/21_basic-concepts.md \
+	doc/22_getting-started.md \
+	doc/24_application.md \
+	doc/26_http-requests.md \
+	doc/27_http-responses.md \
+	doc/29_template-engine.md \
+	doc/30_static-resources.md \
+	doc/40_api-reference.md \
+	doc/60_additional-notes.md \
+	doc/70_api-changes.md \
 	libbalde_template/parser-grammar.leg \
 	examples/static-resources.xml \
 	examples/static/foo.js \
