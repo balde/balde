@@ -49,6 +49,22 @@ balde_app_set_config(balde_app_t *app, const gchar *name, const gchar *value)
 }
 
 
+void
+balde_app_set_config_from_envvar(balde_app_t *app, const gchar *name,
+    const gchar *env_name, gboolean silent)
+{
+    const gchar *value = g_getenv(env_name);
+    if (value == NULL && !silent) {
+        gchar *msg = g_strdup_printf("%s environment variable must be set",
+            env_name);
+        balde_abort_set_error_with_description(app, 500, msg);
+        g_free(msg);
+        return;
+    }
+    balde_app_set_config(app, name, value);
+}
+
+
 const gchar*
 balde_app_get_config(balde_app_t *app, const gchar *name)
 {
