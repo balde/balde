@@ -14,5 +14,6 @@
 gchar* balde_datetime_rfc6265(GDateTime *dt);
 gchar* balde_datetime_rfc5322(GDateTime *dt);
 gchar* balde_datetime_logging(GDateTime *dt);
+GDateTime* balde_datetime_parse(const gchar *value);
 
 #endif /* _BALDE_DATETIME_PRIVATE_H */

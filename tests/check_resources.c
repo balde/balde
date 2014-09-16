@@ -33,7 +33,8 @@ test_resources_list_files(void)
 
 
 void
-balde_assert_resource(GSList *l, gchar *name, gchar *content, gchar *type)
+balde_assert_resource(GSList *l, gchar *name, gchar *content, gchar *type,
+    gchar *hash_name, gchar *hash_content)
 {
     balde_resource_t *resource = (balde_resource_t*) l->data;
     if (name != NULL)
@@ -48,6 +49,14 @@ balde_assert_resource(GSList *l, gchar *name, gchar *content, gchar *type)
         g_assert_cmpstr(resource->type, ==, type);
     else
         g_assert(resource->type == NULL);
+    if (hash_name != NULL)
+        g_assert_cmpstr(resource->hash_name, ==, hash_name);
+    else
+        g_assert(resource->hash_name == NULL);
+    if (hash_content != NULL)
+        g_assert_cmpstr(resource->hash_content, ==, hash_content);
+    else
+        g_assert(resource->hash_content == NULL);
 }
 
 
@@ -60,13 +69,16 @@ test_resources_load(void)
     g_assert(g_slist_length(app->static_resources) == 3);
     balde_assert_resource(app->static_resources, "/static/lol.css",
         "body {\n    background-color: #CCC;\n}\n",
-        "text/css");
+        "text/css", "daab60b9178fd56656840a7fb9fc491c",
+        "48536785a0d37e65c9ebc6d7ee25119a");
     balde_assert_resource(app->static_resources->next, "/static/lol.js",
         "function a() {\n    alert('lol');\n}\n",
-        "application/javascript");
+        "application/javascript", "5338df6146fde6cc4034e3c47972d268",
+        "d14c4623de381fa7a3a3f9b509cecbc3");
     balde_assert_resource(app->static_resources->next->next, "/static/zz.sh",
         "#!/bin/bash\n\nzz() {\n    :\n}\n",
-        "application/x-shellscript");
+        "application/x-shellscript", "09284640fe6904d369629d7b04dc1387",
+        "e3f8e345860a9caf1eb8d57e04308ccb");
     g_assert(app->static_resources->next->next->next == NULL);
     balde_app_free(app);
 }
