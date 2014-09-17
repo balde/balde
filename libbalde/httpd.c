@@ -176,7 +176,6 @@ balde_incoming_callback(GThreadedSocketService *service,
     GError *error = NULL;
     gchar *remote_ip = NULL;
     gchar *request_line = NULL;
-    gchar *response_line = NULL;
     GSocketAddress *remote_socket = g_socket_connection_get_remote_address(
         connection, NULL);
     GInetAddress *remote_addr;
@@ -215,13 +214,11 @@ balde_incoming_callback(GThreadedSocketService *service,
     balde_request_env_t *env = balde_httpd_parse_request(content);
     g_string_free(content, TRUE);
     balde_app_t *app = (balde_app_t*) user_data;
-    GString *response = balde_app_main_loop(app, env, balde_httpd_response_render);
+    balde_http_exception_code_t status_code = BALDE_HTTP_INTERNAL_SERVER_ERROR;
+    GString *response = balde_app_main_loop(app, env, balde_httpd_response_render,
+        &status_code);
     GOutputStream *ostream = g_io_stream_get_output_stream(G_IO_STREAM(connection));
     g_output_stream_write(ostream, response->str, response->len, NULL, &error);
-    gchar **splitted_response = g_strsplit(response->str, "\r\n", 2);
-    if (splitted_response[0] != NULL)
-        response_line = g_strdup(splitted_response[0]);
-    g_strfreev(splitted_response);
     g_string_free(response, TRUE);
     if (error != NULL) {
         g_printerr("Failed to send: %s\n", error->message);
@@ -231,8 +228,8 @@ balde_incoming_callback(GThreadedSocketService *service,
     GDateTime *dt = g_date_time_new_now_local();
     gchar *dt_format = balde_datetime_logging(dt);
     g_date_time_unref(dt);
-    g_printerr("%s - - [%s] - \"%s\" - \"%s\"\n", remote_ip, dt_format,
-        request_line, response_line);
+    g_printerr("%s - - [%s] - \"%s\" - %d\n", remote_ip, dt_format, request_line,
+        status_code);
     g_free(dt_format);
     g_io_stream_close(G_IO_STREAM(connection), NULL, &error);
     if (error != NULL) {
@@ -241,7 +238,6 @@ balde_incoming_callback(GThreadedSocketService *service,
     }
 point2:
     g_free(request_line);
-    g_free(response_line);
 point1:
     g_free(remote_ip);
     return FALSE;

@@ -11,6 +11,7 @@
 
 #include <glib.h>
 #include <balde/app.h>
+#include <balde/exceptions.h>
 #include <balde/routing-private.h>
 #include <balde/wrappers.h>
 #include <balde/wrappers-private.h>
@@ -27,6 +28,6 @@ balde_view_t* balde_app_get_view_from_endpoint(balde_app_t *app,
     const gchar *endpoint);
 gchar* balde_app_url_forv(balde_app_t *app, const gchar *endpoint, va_list params);
 GString* balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
-    balde_response_render_t render);
+    balde_response_render_t render, balde_http_exception_code_t *status_code);
 
 #endif /* _BALDE_APP_PRIVATE_H */
