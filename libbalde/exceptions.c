@@ -26,6 +26,41 @@ const static balde_http_exception_t exceptions[] = {
         .description = ""
     },
     {
+        .code = BALDE_HTTP_MULTIPLE_CHOICES,  // 300
+        .name = "Multiple Choices",
+        .description = ""
+    },
+    {
+        .code = BALDE_HTTP_MOVED_PERMANENTLY,  // 301
+        .name = "Moved Permanently",
+        .description = ""
+    },
+    {
+        .code = BALDE_HTTP_FOUND,  // 302
+        .name = "Found",
+        .description = ""
+    },
+    {
+        .code = BALDE_HTTP_SEE_OTHER,  // 303
+        .name = "See Other",
+        .description = ""
+    },
+    {
+        .code = BALDE_HTTP_NOT_MODIFIED,  // 304
+        .name = "Not Modified",
+        .description = ""
+    },
+    {
+        .code = BALDE_HTTP_USE_PROXY,  // 305
+        .name = "Use Proxy",
+        .description = ""
+    },
+    {
+        .code = BALDE_HTTP_TEMPORARY_REDIRECT,  // 307
+        .name = "Temporary Redirect",
+        .description = ""
+    },
+    {
         .code = BALDE_HTTP_BAD_REQUEST,  // 400
         .name = "Bad Request",
         .description =
