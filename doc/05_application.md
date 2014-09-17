@@ -5,7 +5,7 @@ The application context stores everything that is used by the balde application 
 
 The function @ref balde_app_init creates a brand new application context.
 
-The functions @ref balde_app_set_config and @ref balde_app_get_config are used to handle configuration settings.
+The functions @ref balde_app_set_config, @ref balde_app_set_config_from_envvar and @ref balde_app_get_config are used to handle configuration settings.
 
 balde provides two functions to handle views. @ref balde_app_add_url_rule is used to register a view, and @ref balde_app_url_for is used to retrieve the url generated for a given endpoint, that was defined when registering the view with ``balde_app_add_url_rule``. This function accepts a boolean argument called ``external``, that would be used to build complete URLs, suitable for be used on external resources, but this isn't implemented yet.
 

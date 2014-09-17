@@ -342,7 +342,7 @@ test_response_render_exception(void)
     g_assert(res != NULL);
     GString *out = balde_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
-        "Status: 404 Not Found\r\n"
+        "Status: 404 NOT FOUND\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"
         "Content-Length: 136\r\n"
         "\r\n"
@@ -363,7 +363,7 @@ test_response_render_exception_without_body(void)
     g_assert(res != NULL);
     GString *out = balde_response_render(res, FALSE);
     g_assert_cmpstr(out->str, ==,
-        "Status: 404 Not Found\r\n"
+        "Status: 404 NOT FOUND\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"
         "Content-Length: 136\r\n"
         "\r\n");

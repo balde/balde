@@ -46,6 +46,47 @@ test_app_set_config(void)
 
 
 void
+test_app_set_config_from_envvar(void)
+{
+    g_setenv("BOLA_CONFIG_ENVVAR", "guda", TRUE);
+    balde_app_t *app = balde_app_init();
+    balde_app_set_config_from_envvar(app, "foo", "BOLA_CONFIG_ENVVAR", FALSE);
+    g_assert(g_hash_table_size(app->config) == 1);
+    g_assert_cmpstr(g_hash_table_lookup(app->config, "foo"), ==, "guda");
+    balde_app_free(app);
+}
+
+
+void
+test_app_set_config_from_envvar_not_found(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_app_set_config_from_envvar(app, "foo", "BOLA_CONFIG_ENVVAR2", FALSE);
+    g_assert(app->error != NULL);
+    g_assert_cmpstr(app->error->message, ==,
+        "The server encountered an internal error and was unable to complete "
+        "your request. Either the server is overloaded or there is an error in "
+        "the application.\n"
+        "\n"
+        "BOLA_CONFIG_ENVVAR2 environment variable must be set");
+    g_assert(g_hash_table_size(app->config) == 0);
+    balde_app_free(app);
+}
+
+
+void
+test_app_set_config_from_envvar_not_found_silent(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_app_set_config_from_envvar(app, "foo", "BOLA_CONFIG_ENVVAR3", TRUE);
+    g_assert(app->error == NULL);
+    g_assert(g_hash_table_size(app->config) == 1);
+    g_assert(g_hash_table_lookup(app->config, "foo") == NULL);
+    balde_app_free(app);
+}
+
+
+void
 test_app_get_config(void)
 {
     balde_app_t *app = balde_app_init();
@@ -182,6 +223,12 @@ main(int argc, char** argv)
     g_test_init(&argc, &argv, NULL);
     g_test_add_func("/app/init", test_app_init);
     g_test_add_func("/app/set_config", test_app_set_config);
+    g_test_add_func("/app/set_config_from_envvar",
+        test_app_set_config_from_envvar);
+    g_test_add_func("/app/set_config_from_envvar_not_found",
+        test_app_set_config_from_envvar_not_found);
+    g_test_add_func("/app/set_config_from_envvar_not_found_silent",
+        test_app_set_config_from_envvar_not_found_silent);
     g_test_add_func("/app/get_config", test_app_get_config);
     g_test_add_func("/app/add_url_rule", test_app_add_url_rule);
     g_test_add_func("/app/get_view_from_endpoint",

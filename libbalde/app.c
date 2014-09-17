@@ -34,6 +34,7 @@ balde_app_init(void)
     balde_app_t *app = g_new(balde_app_t, 1);
     app->views = NULL;
     app->static_resources = NULL;
+    app->user_data = NULL;
     app->config = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     app->error = NULL;
     balde_app_add_url_rule(app, "static", "/static/<path:file>", BALDE_HTTP_GET,
@@ -46,6 +47,22 @@ void
 balde_app_set_config(balde_app_t *app, const gchar *name, const gchar *value)
 {
     g_hash_table_replace(app->config, g_utf8_strdown(name, -1), g_strdup(value));
+}
+
+
+void
+balde_app_set_config_from_envvar(balde_app_t *app, const gchar *name,
+    const gchar *env_name, gboolean silent)
+{
+    const gchar *value = g_getenv(env_name);
+    if (value == NULL && !silent) {
+        gchar *msg = g_strdup_printf("%s environment variable must be set",
+            env_name);
+        balde_abort_set_error_with_description(app, 500, msg);
+        g_free(msg);
+        return;
+    }
+    balde_app_set_config(app, name, value);
 }
 
 
@@ -157,6 +174,7 @@ static gboolean runserver = FALSE;
 static gchar *host = NULL;
 static gint16 port = 8080;
 static gint max_threads = 10;
+static gboolean version = FALSE;
 static GOptionEntry entries[] =
 {
     {"runserver", 's', 0, G_OPTION_ARG_NONE, &runserver,
@@ -167,6 +185,8 @@ static GOptionEntry entries[] =
         "Embedded server port. (default: 8080)", "PORT"},
     {"max-threads", 'm', 0, G_OPTION_ARG_INT, &max_threads,
         "Max number of threads for embedded server. (default: 10)", "THREADS"},
+    {"version", 0, 0, G_OPTION_ARG_NONE, &version,
+        "Show balde's version number and exit.", NULL},
     {NULL}
 };
 
@@ -186,7 +206,9 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
         g_printerr("Option parsing failed: %s\n", err->message);
         exit(1);
     }
-    if (runserver)
+    if (version)
+        g_printerr("%s\n", PACKAGE_STRING);
+    else if (runserver)
         balde_httpd_run(app, host, port, max_threads);
     else {
 
@@ -197,7 +219,7 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 BEGIN_LOOP
 
         GString *response = balde_app_main_loop(app, NULL,
-            balde_response_render);
+            balde_response_render, NULL);
         balde_response_print(response);
 
 END_LOOP
@@ -215,7 +237,7 @@ END_LOOP
 
 GString*
 balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
-    balde_response_render_t render)
+    balde_response_render_t render, balde_http_exception_code_t *status_code)
 {
     balde_request_t *request;
     balde_response_t *response;
@@ -228,6 +250,8 @@ balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
     if (app->error != NULL) {
         error_response = balde_make_response_from_exception(app->error);
         rv = render(error_response, with_body);
+        if (status_code != NULL)
+            *status_code = error_response->status_code;
         balde_response_free(error_response);
         return rv;
     }
@@ -269,12 +293,16 @@ balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
     if (app->error != NULL) {
         error_response = balde_make_response_from_exception(app->error);
         rv = render(error_response, with_body);
+        if (status_code != NULL)
+            *status_code = error_response->status_code;
         balde_response_free(error_response);
         g_clear_error(&app->error);
         return rv;
     }
 
     rv = render(response, with_body);
+    if (status_code != NULL)
+        *status_code = response->status_code;
     balde_response_free(response);
     return rv;
 }

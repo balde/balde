@@ -10,9 +10,11 @@
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
 
+#include <string.h>
 #include <glib.h>
 #include <gio/gio.h>
 #include <balde/app.h>
+#include <balde/datetime-private.h>
 #include <balde/exceptions.h>
 #include <balde/resources-private.h>
 #include <balde/wrappers-private.h>
@@ -73,6 +75,8 @@ balde_resource_free(balde_resource_t *resource)
     g_free(resource->name);
     g_string_free(resource->content, TRUE);
     g_free(resource->type);
+    g_free(resource->hash_name);
+    g_free(resource->hash_content);
     g_free(resource);
 }
 
@@ -109,6 +113,9 @@ balde_resources_load(balde_app_t *app, GResource *resources)
         resource->content = g_string_new_len((const gchar*) data, size);
         resource->type = g_content_type_guess(resources_list[i], (const guchar*) data,
             size, NULL);
+        resource->hash_name = g_compute_checksum_for_string(G_CHECKSUM_MD5,
+            resources_list[i], strlen(resources_list[i]));
+        resource->hash_content = g_compute_checksum_for_bytes(G_CHECKSUM_MD5, b);
         app->static_resources = g_slist_append(app->static_resources, resource);
         g_bytes_unref(b);
     }
@@ -116,16 +123,42 @@ balde_resources_load(balde_app_t *app, GResource *resources)
 }
 
 
-static balde_response_t*
-balde_make_response_from_static_resource(balde_app_t *app, const gchar *name)
+balde_response_t*
+balde_make_response_from_static_resource(balde_app_t *app, balde_request_t *request,
+    const gchar *name)
 {
     if (app->static_resources == NULL)
-        return NULL;
+        return balde_abort(app, 404);
     for (GSList *tmp = app->static_resources; tmp != NULL; tmp = g_slist_next(tmp)) {
         balde_resource_t *resource = tmp->data;
         if (0 == g_strcmp0(name, resource->name)) {
-            GString *tmp = g_string_new_len(resource->content->str, resource->content->len);
-            balde_response_t *response = balde_make_response_from_gstring(tmp);
+            balde_response_t *response = balde_make_response("");
+
+            gint64 cache_timeout = 60 * 60 * 12;
+            gchar *cache_control = g_strdup_printf("public, max-age=%" G_GINT64_FORMAT,
+                cache_timeout);
+            balde_response_set_header(response, "Cache-Control", cache_control);
+            g_free(cache_control);
+
+            GDateTime *now = g_date_time_new_now_utc();
+            GDateTime *expires_dt = g_date_time_add(now, G_TIME_SPAN_SECOND * cache_timeout);
+            g_date_time_unref(now);
+            gchar *expires = balde_datetime_rfc5322(expires_dt);
+            g_date_time_unref(expires_dt);
+            balde_response_set_header(response, "Expires", expires);
+            g_free(expires);
+
+            gchar *etag = g_strdup_printf("\"balde-%s-%s\"", resource->hash_name,
+                resource->hash_content);
+            balde_response_set_header(response, "Etag", etag);
+            const gchar *if_none_match = balde_request_get_header(request,
+                "If-None-Match");
+            if (if_none_match != NULL && (g_strcmp0(if_none_match, etag) == 0))
+                response->status_code = 304;
+            else
+                balde_response_append_body_len(response, resource->content->str,
+                    resource->content->len);
+            g_free(etag);
             if (resource->type != NULL)
                 balde_response_set_header(response, "Content-Type", resource->type);
             return response;
@@ -140,7 +173,7 @@ balde_resource_view(balde_app_t *app, balde_request_t *request)
 {
     const gchar* p = balde_request_get_view_arg(request, "file");
     gchar *tmp = g_strdup_printf("/static/%s", p);
-    balde_response_t *rv = balde_make_response_from_static_resource(app, tmp);
+    balde_response_t *rv = balde_make_response_from_static_resource(app, request, tmp);
     g_free(tmp);
     return rv;
 }
