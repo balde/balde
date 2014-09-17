@@ -231,9 +231,12 @@ balde_response_render(balde_response_t *response, const gboolean with_body)
     if (response == NULL)
         return NULL;
     GString *str = g_string_new("");
-    if (response->status_code != 200)
-        g_string_append_printf(str, "Status: %d %s\r\n", response->status_code,
-            balde_exception_get_name_from_code(response->status_code));
+    if (response->status_code != 200) {
+        gchar *n = g_ascii_strup(
+            balde_exception_get_name_from_code(response->status_code), -1);
+        g_string_append_printf(str, "Status: %d %s\r\n", response->status_code, n);
+        g_free(n);
+    }
     gchar *len = g_strdup_printf("%zu", response->body->len);
     balde_response_set_header(response, "Content-Length", len);
     g_free(len);

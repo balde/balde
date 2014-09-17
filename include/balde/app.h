@@ -77,6 +77,18 @@ balde_app_t* balde_app_init(void);
 void balde_app_set_config(balde_app_t *app, const gchar *name, const gchar *value);
 
 
+/** Sets a configuration parameter with the value of an environment variable.
+ *
+ * The parameter name is case-insensitive, but the parameter env_name is case
+ * sensitive.
+ *
+ * If the parameter silent is false, this function will raise an error if the
+ * environment variable isn't found or is NULL.
+ */
+void balde_app_set_config_from_envvar(balde_app_t *app, const gchar *name,
+    const gchar *env_name, gboolean silent);
+
+
 /** Gets a configuration parameter.
  *
  * The parameter name is case-insensitive.
