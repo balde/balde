@@ -132,8 +132,8 @@ balde_make_response_from_static_resource(balde_app_t *app, balde_request_t *requ
     for (GSList *tmp = app->static_resources; tmp != NULL; tmp = g_slist_next(tmp)) {
         balde_resource_t *resource = tmp->data;
         if (0 == g_strcmp0(name, resource->name)) {
-            GString *tmp = g_string_new_len(resource->content->str, resource->content->len);
-            balde_response_t *response = balde_make_response_from_gstring(tmp);
+            balde_response_t *response = balde_make_response("");
+
             gint64 cache_timeout = 60 * 60 * 12;
             gchar *cache_control = g_strdup_printf("public, max-age=%" G_GINT64_FORMAT,
                 cache_timeout);
@@ -147,17 +147,17 @@ balde_make_response_from_static_resource(balde_app_t *app, balde_request_t *requ
             g_date_time_unref(expires_dt);
             balde_response_set_header(response, "Expires", expires);
             g_free(expires);
+
             gchar *etag = g_strdup_printf("\"balde-%s-%s\"", resource->hash_name,
                 resource->hash_content);
             balde_response_set_header(response, "Etag", etag);
-            if (request->method == BALDE_HTTP_GET || request->method == BALDE_HTTP_HEAD) {
-                const gchar *if_none_match = balde_request_get_header(request,
-                    "If-None-Match");
-                g_print("%s\n", if_none_match);
-                if (if_none_match != NULL)
-                    if (g_strcmp0(if_none_match, etag) == 0)
-                        balde_abort_set_error(app, 304);
-            }
+            const gchar *if_none_match = balde_request_get_header(request,
+                "If-None-Match");
+            if (if_none_match != NULL && (g_strcmp0(if_none_match, etag) == 0))
+                response->status_code = 304;
+            else
+                balde_response_append_body_len(response, resource->content->str,
+                    resource->content->len);
             g_free(etag);
             if (resource->type != NULL)
                 balde_response_set_header(response, "Content-Type", resource->type);
