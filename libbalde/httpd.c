@@ -146,8 +146,10 @@ balde_httpd_response_render(balde_response_t *response, const gboolean with_body
     if (response == NULL)
         return NULL;
     GString *str = g_string_new("");
-    g_string_append_printf(str, "HTTP/1.1 %d %s\r\n", response->status_code,
-        balde_exception_get_name_from_code(response->status_code));
+    gchar *n = g_ascii_strup(
+        balde_exception_get_name_from_code(response->status_code), -1);
+    g_string_append_printf(str, "HTTP/1.1 %d %s\r\n", response->status_code, n);
+    g_free(n);
     gchar *len = g_strdup_printf("%zu", response->body->len);
     GDateTime *dt = g_date_time_new_now_utc();
     gchar *date = balde_datetime_rfc5322(dt);

@@ -161,7 +161,7 @@ test_httpd_response_render_exception(void)
     g_assert(res != NULL);
     GString *out = balde_httpd_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
-        "HTTP/1.1 404 Not Found\r\n"
+        "HTTP/1.1 404 NOT FOUND\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Connection: close\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"
@@ -184,7 +184,7 @@ test_httpd_response_render_exception_without_body(void)
     g_assert(res != NULL);
     GString *out = balde_httpd_response_render(res, FALSE);
     g_assert_cmpstr(out->str, ==,
-        "HTTP/1.1 404 Not Found\r\n"
+        "HTTP/1.1 404 NOT FOUND\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Connection: close\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"
