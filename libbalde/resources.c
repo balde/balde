@@ -123,7 +123,7 @@ balde_resources_load(balde_app_t *app, GResource *resources)
 }
 
 
-static balde_response_t*
+balde_response_t*
 balde_make_response_from_static_resource(balde_app_t *app, balde_request_t *request,
     const gchar *name)
 {

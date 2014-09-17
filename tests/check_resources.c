@@ -14,6 +14,7 @@
 #include <balde/app.h>
 #include <balde/resources.h>
 #include <balde/resources-private.h>
+#include <balde/wrappers-private.h>
 #include "resources.h"
 
 
@@ -84,11 +85,94 @@ test_resources_load(void)
 }
 
 
+void
+test_make_response_from_static_resource(void)
+{
+    g_unsetenv("HTTP_IF_NONE_MATCH");
+    balde_app_t *app = balde_app_init();
+    balde_resources_load(app, resources_get_resource());
+    balde_request_t *request = balde_make_request(app, NULL);
+    balde_response_t *response = balde_make_response_from_static_resource(app,
+        request, "/static/lol.css");
+    g_assert(response != NULL);
+    g_assert_cmpint(response->status_code, ==, 200);
+    g_assert_cmpint(g_hash_table_size(response->headers), ==, 4);
+    GSList *tmp = g_hash_table_lookup(response->headers, "cache-control");
+    g_assert_cmpstr(tmp->data, ==, "public, max-age=43200");
+    tmp = g_hash_table_lookup(response->headers, "expires");
+    g_assert(g_str_has_suffix(tmp->data, " GMT"));
+    tmp = g_hash_table_lookup(response->headers, "etag");
+    g_assert_cmpstr(tmp->data, ==,
+        "\"balde-daab60b9178fd56656840a7fb9fc491c-48536785a0d37e65c9ebc6d7ee25119a\"");
+    tmp = g_hash_table_lookup(response->headers, "content-type");
+    g_assert_cmpstr(tmp->data, ==, "text/css");
+    g_assert_cmpstr(response->body->str, ==,
+        "body {\n"
+        "    background-color: #CCC;\n"
+        "}\n");
+    balde_response_free(response);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
+test_make_response_from_static_resource_304(void)
+{
+    g_setenv("HTTP_IF_NONE_MATCH",
+        "\"balde-daab60b9178fd56656840a7fb9fc491c-48536785a0d37e65c9ebc6d7ee25119a\"",
+        TRUE);
+    balde_app_t *app = balde_app_init();
+    balde_resources_load(app, resources_get_resource());
+    balde_request_t *request = balde_make_request(app, NULL);
+    balde_response_t *response = balde_make_response_from_static_resource(app,
+        request, "/static/lol.css");
+    g_assert(response != NULL);
+    g_assert_cmpint(response->status_code, ==, 304);
+    g_assert_cmpint(g_hash_table_size(response->headers), ==, 4);
+    GSList *tmp = g_hash_table_lookup(response->headers, "cache-control");
+    g_assert_cmpstr(tmp->data, ==, "public, max-age=43200");
+    tmp = g_hash_table_lookup(response->headers, "expires");
+    g_assert(g_str_has_suffix(tmp->data, " GMT"));
+    tmp = g_hash_table_lookup(response->headers, "etag");
+    g_assert_cmpstr(tmp->data, ==,
+        "\"balde-daab60b9178fd56656840a7fb9fc491c-48536785a0d37e65c9ebc6d7ee25119a\"");
+    tmp = g_hash_table_lookup(response->headers, "content-type");
+    g_assert_cmpstr(tmp->data, ==, "text/css");
+    g_assert_cmpstr(response->body->str, ==, "");
+    balde_response_free(response);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
+test_make_response_from_static_resource_404(void)
+{
+    g_unsetenv("HTTP_IF_NONE_MATCH");
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    balde_response_t *response = balde_make_response_from_static_resource(app,
+        request, "/static/lol.css");
+    g_assert(response != NULL);
+    g_assert_cmpint(response->status_code, ==, 404);
+    balde_response_free(response);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
 int
 main(int argc, char** argv)
 {
     g_test_init(&argc, &argv, NULL);
     g_test_add_func("/resources/list_files", test_resources_list_files);
     g_test_add_func("/resources/load", test_resources_load);
+    g_test_add_func("/resources/make_response_from_static_resource",
+        test_make_response_from_static_resource);
+    g_test_add_func("/resources/make_response_from_static_resource_304",
+        test_make_response_from_static_resource_304);
+    g_test_add_func("/resources/make_response_from_static_resource_404",
+        test_make_response_from_static_resource_404);
     return g_test_run();
 }
