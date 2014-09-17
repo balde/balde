@@ -11,6 +11,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
+#include <string.h>
 #include <balde/datetime-private.h>
 
 // these functions are needed because we want locale-independent date formats.
