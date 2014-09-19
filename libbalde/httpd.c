@@ -206,11 +206,13 @@ balde_incoming_callback(GThreadedSocketService *service,
         }
         g_string_append_len(content, message, message_len);
     }
-    while(message_len == SOCKET_BUFFER_SIZE || message_len == 0);
-    gchar **splitted_content = g_strsplit(content->str, "\r\n", 2);
-    if (splitted_content[0] != NULL)
-        request_line = g_strdup(splitted_content[0]);
-    g_strfreev(splitted_content);
+    while (message_len == SOCKET_BUFFER_SIZE || message_len == 0);
+    for (guint i = 0; i < content->len; i++) {
+        if (content->str[i] == '\r' || content->str[i] == '\n') {
+            request_line = g_strndup(content->str, i);
+            break;
+        }
+    }
     balde_request_env_t *env = balde_httpd_parse_request(content);
     g_string_free(content, TRUE);
     balde_app_t *app = (balde_app_t*) user_data;
@@ -228,7 +230,7 @@ balde_incoming_callback(GThreadedSocketService *service,
     GDateTime *dt = g_date_time_new_now_local();
     gchar *dt_format = balde_datetime_logging(dt);
     g_date_time_unref(dt);
-    g_printerr("%s - - [%s] - \"%s\" - %d\n", remote_ip, dt_format, request_line,
+    g_printerr("%s - - [%s] \"%s\" %d\n", remote_ip, dt_format, request_line,
         status_code);
     g_free(dt_format);
     g_io_stream_close(G_IO_STREAM(connection), NULL, &error);
