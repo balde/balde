@@ -193,20 +193,17 @@ balde_incoming_callback(GThreadedSocketService *service,
     }
     g_object_unref(remote_socket);
     GInputStream * istream = g_io_stream_get_input_stream(G_IO_STREAM(connection));
-    gchar message[SOCKET_BUFFER_SIZE];
-    gssize message_len;
+    gchar m[SOCKET_BUFFER_SIZE];
+    gssize mlen;
     GString *content = g_string_new("");
-    do {
-        message_len = g_input_stream_read(istream, message, SOCKET_BUFFER_SIZE,
-            NULL, &error);
+    while ((mlen = g_input_stream_read(istream, m, sizeof(m), NULL, &error)) > 0) {
         if (error != NULL) {
             g_printerr("Failed to read: %s\n", error->message);
             g_error_free(error);
             goto point1;
         }
-        g_string_append_len(content, message, message_len);
+        g_string_append_len(content, m, mlen);
     }
-    while (message_len == SOCKET_BUFFER_SIZE || message_len == 0);
     for (guint i = 0; i < content->len; i++) {
         if (content->str[i] == '\r' || content->str[i] == '\n') {
             request_line = g_strndup(content->str, i);
