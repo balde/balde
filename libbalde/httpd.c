@@ -242,7 +242,7 @@ point2:
     g_free(request_line);
 point1:
     g_free(remote_ip);
-    return FALSE;
+    return TRUE;
 }
 
 
