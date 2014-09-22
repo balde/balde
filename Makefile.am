@@ -75,6 +75,7 @@ noinst_HEADERS = \
 	include/balde/cgi-private.h \
 	include/balde/datetime-private.h \
 	include/balde/exceptions-private.h \
+	include/balde/fcgi-private.h \
 	include/balde/httpd-private.h \
 	include/balde/resources-private.h \
 	include/balde/routing-private.h \
@@ -145,6 +146,13 @@ libbalde_libbalde_la_SOURCES += \
 	libbalde/http_parser/http_parser.c
 
 endif
+endif
+
+if BUILD_FASTCGI
+
+libbalde_libbalde_la_SOURCES += \
+	libbalde/fcgi.c
+
 endif
 
 

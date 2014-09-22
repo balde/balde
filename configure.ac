@@ -32,11 +32,14 @@ AS_IF([test "x$enable_fastcgi" != "xno"], [
   AC_SEARCH_LIBS([FCGI_Accept], [fcgi], ,
     AC_MSG_ERROR([FCGI_Accept not found. please install the fastcgi developer kit.])
   )
+  build_fastcgi=yes
   AC_DEFINE([ENABLE_FASTCGI], [], [fastcgi support enabled])
   FASTCGI="enabled"
 ], [
+  build_fastcgi=no
   FASTCGI="disabled"
 ])
+AM_CONDITIONAL([BUILD_FASTCGI], [test "x$build_fastcgi" = "xyes"])
 
 AC_ARG_ENABLE([webserver], AS_HELP_STRING([--disable-webserver], [disable embedded webserver]))
 AS_IF([test "x$enable_webserver" != "xno"], [

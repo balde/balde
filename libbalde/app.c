@@ -16,6 +16,7 @@
 #include <balde/app.h>
 #include <balde/app-private.h>
 #include <balde/cgi-private.h>
+#include <balde/fcgi-private.h>
 #include <balde/exceptions.h>
 #include <balde/exceptions-private.h>
 #include <balde/resources-private.h>
@@ -170,6 +171,7 @@ balde_app_url_forv(balde_app_t *app, const gchar *endpoint, va_list params)
 
 #ifdef BUILD_WEBSERVER
 
+static gboolean fastcgi = FALSE;
 static gboolean runserver = FALSE;
 static gchar *host = NULL;
 static gint16 port = 8080;
@@ -177,6 +179,8 @@ static gint max_threads = 10;
 static gboolean version = FALSE;
 static GOptionEntry entries[] =
 {
+    {"fastcgi", 'f', 0, G_OPTION_ARG_NONE, &fastcgi,
+        "Run fastcgi server.", NULL},  // FIXME: temporary!
     {"runserver", 's', 0, G_OPTION_ARG_NONE, &runserver,
         "Run embedded server.", NULL},
     {"host", 't', 0, G_OPTION_ARG_STRING, &host,
@@ -208,6 +212,8 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
     }
     if (version)
         g_printerr("%s\n", PACKAGE_STRING);
+    else if (fastcgi)
+        balde_fcgi_run(app, host, port, max_threads);
     else if (runserver)
         balde_httpd_run(app, host, port, max_threads);
     else {
