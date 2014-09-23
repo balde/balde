@@ -52,6 +52,7 @@ Makefile.in
 /tests/check_app
 /tests/check_exceptions
 /tests/check_datetime
+/tests/check_fcgi
 /tests/check_httpd
 /tests/check_resources
 /tests/check_routing

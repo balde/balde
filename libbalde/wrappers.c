@@ -258,24 +258,33 @@ balde_response_print(GString *response)
 }
 
 
+gchar*
+balde_parse_header_name_from_envvar(const gchar *env_name)
+{
+    if (!g_str_has_prefix(env_name, "HTTP_"))
+        return NULL;
+    gchar *key = g_new(gchar, strlen(env_name) - 4);
+    guint i;
+    for (i = 0; env_name[i+5] != '\0'; i++) {
+        key[i] = env_name[i+5];
+        if (key[i] == '_')
+            key[i] = '-';
+        key[i] = g_ascii_tolower(key[i]);
+    }
+    key[i] = '\0';
+    return key;
+}
+
+
 GHashTable*
 balde_request_headers(void)
 {
     gchar **headers = g_listenv();
     GHashTable *rv = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     for (guint i = 0; headers[i] != NULL; i++) {
-        if (g_str_has_prefix(headers[i], "HTTP_")) {
-            gchar *key = g_new(gchar, strlen(headers[i]) - 4);
-            guint j;
-            for (j = 0; headers[i][j+5] != '\0'; j++) {
-                key[j] = headers[i][j+5];
-                if (key[j] == '_')
-                    key[j] = '-';
-                key[j] = g_ascii_tolower(key[j]);
-            }
-            key[j] = '\0';
+        gchar *key = balde_parse_header_name_from_envvar(headers[i]);
+        if (key != NULL)
             g_hash_table_insert(rv, key, g_strdup(g_getenv(headers[i])));
-        }
     }
     g_strfreev(headers);
     return rv;

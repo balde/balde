@@ -216,7 +216,10 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
         balde_fcgi_run(app, host, port, max_threads);
     else if (runserver)
         balde_httpd_run(app, host, port, max_threads);
-    else {
+    else 
+        balde_fcgi_run(app, host, port, max_threads);
+       /* 
+    {
 
 #endif
 
@@ -232,7 +235,7 @@ END_LOOP
 
 #ifdef BUILD_WEBSERVER
 
-    }
+    }*/
     g_option_context_free(context);
     g_free(host);
 

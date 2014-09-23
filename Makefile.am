@@ -372,6 +372,27 @@ tests_check_httpd_LDADD = \
 
 endif
 
+if BUILD_FASTCGI
+
+check_PROGRAMS += \
+	tests/check_fcgi
+
+tests_check_fcgi_SOURCES = \
+	tests/check_fcgi.c
+
+tests_check_fcgi_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	-I$(top_srcdir)/include
+
+tests_check_fcgi_LDFLAGS = \
+	-no-install
+
+tests_check_fcgi_LDADD = \
+	$(GLIB_LIBS) \
+	libbalde/libbalde.la
+
+endif
+
 tests_check_app_SOURCES = \
 	tests/check_app.c
 

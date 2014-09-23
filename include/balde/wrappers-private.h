@@ -32,6 +32,7 @@ void balde_header_render(const gchar *key, GSList *value, GString *str);
 GString* balde_response_render(balde_response_t *response,
     const gboolean with_body);
 void balde_response_print(GString *response);
+gchar* balde_parse_header_name_from_envvar(const gchar *env_name);
 GHashTable* balde_request_headers(void);
 gchar* balde_urldecode(const gchar* str);
 GHashTable* balde_parse_query_string(const gchar *query_string);
