@@ -88,6 +88,8 @@ balde_resource_free(balde_resource_t *resource)
  * it on the balde source code.
  */
 
+G_LOCK_DEFINE_STATIC(resources);
+
 void
 balde_resources_load(balde_app_t *app, GResource *resources)
 {
@@ -116,7 +118,9 @@ balde_resources_load(balde_app_t *app, GResource *resources)
         resource->hash_name = g_compute_checksum_for_string(G_CHECKSUM_MD5,
             resources_list[i], strlen(resources_list[i]));
         resource->hash_content = g_compute_checksum_for_bytes(G_CHECKSUM_MD5, b);
+        G_LOCK(resources);
         app->static_resources = g_slist_append(app->static_resources, resource);
+        G_UNLOCK(resources);
         g_bytes_unref(b);
     }
     g_strfreev(resources_list);
