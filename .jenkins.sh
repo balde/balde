@@ -31,7 +31,6 @@ pushd "${BALDE_BUILD_DIR}" > /dev/null
 "${BALDE_SRC_DIR}"/configure \
     --enable-examples \
     --enable-webserver \
-    --with-http-parser=internal \
     --with-leg \
     --with-valgrind
 popd > /dev/null
