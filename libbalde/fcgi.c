@@ -97,7 +97,7 @@ balde_fcgi_thread_run(gpointer data)
             break;
 
         balde_request_env_t *env = balde_fcgi_parse_request(app, &request);
-        GString *response = balde_app_main_loop(app, env, balde_cgi_response_render, NULL);
+        GString *response = balde_app_main_loop(app, env, balde_response_render, NULL);
         FCGX_PutStr(response->str, response->len, request.out);
 
         FCGX_Finish_r(&request);

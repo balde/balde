@@ -214,6 +214,42 @@ balde_fix_header_name(gchar *name)
 }
 
 
+void
+balde_header_render(const gchar *key, GSList *value, GString *str)
+{
+    gchar *new_key = g_strdup(key);
+    balde_fix_header_name(new_key);
+    for (GSList *tmp = value; tmp != NULL; tmp = g_slist_next(tmp))
+        g_string_append_printf(str, "%s: %s\r\n", new_key, (gchar*) tmp->data);
+    g_free(new_key);
+}
+
+
+GString*
+balde_response_render(balde_response_t *response, const gboolean with_body)
+{
+    if (response == NULL)
+        return NULL;
+    GString *str = g_string_new("");
+    if (response->status_code != 200) {
+        gchar *n = g_ascii_strup(
+            balde_exception_get_name_from_code(response->status_code), -1);
+        g_string_append_printf(str, "Status: %d %s\r\n", response->status_code, n);
+        g_free(n);
+    }
+    gchar *len = g_strdup_printf("%zu", response->body->len);
+    balde_response_set_header(response, "Content-Length", len);
+    g_free(len);
+    if (g_hash_table_lookup(response->headers, "content-type") == NULL)
+        balde_response_set_header(response, "Content-Type", "text/html; charset=utf-8");
+    g_hash_table_foreach(response->headers, (GHFunc) balde_header_render, str);
+    g_string_append(str, "\r\n");
+    if (with_body)
+        g_string_append_len(str, response->body->str, response->body->len);
+    return str;
+}
+
+
 gchar*
 balde_parse_header_name_from_envvar(const gchar *env_name)
 {
