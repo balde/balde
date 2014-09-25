@@ -42,4 +42,4 @@ cd examples/
 lighttpd -D -f lighttpd.conf
 ```
 
-Got to `http://127.0.0.1:3000/hello`.
+Go to `http://127.0.0.1:3000/hello`.
