@@ -11,18 +11,12 @@
 
 #include <glib.h>
 #include <balde/app.h>
+#include <balde/wrappers-private.h>
 
-#ifdef ENABLE_FASTCGI
-#  include <fcgi_stdio.h>
-#  define BEGIN_LOOP while (FCGI_Accept() >= 0) {
-#  define END_LOOP }
-#else
-#  include <stdio.h>
-#  define BEGIN_LOOP do {
-#  define END_LOOP } while(0);
-#endif
-
-void balde_stderr_handler(const gchar *str);
-gchar* balde_stdin_read(balde_app_t *app);
+guint64 balde_cgi_parse_content_length(const gchar *str);
+gchar* balde_cgi_stdin_read(balde_app_t *app);
+balde_request_env_t* balde_cgi_parse_request(balde_app_t *app);
+void balde_cgi_response_print(GString *response);
+void balde_cgi_run(balde_app_t *app);
 
 #endif /* _BALDE_CGI_PRIVATE_H */

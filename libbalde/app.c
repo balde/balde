@@ -238,11 +238,11 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
     if (version)
         g_printerr("%s\n", PACKAGE_STRING);
     else if (fastcgi)
-        balde_fcgi_run(app, host, port, max_threads);
+        balde_fcgi_run(app, max_threads);
     else if (runserver)
         balde_httpd_run(app, host, port, max_threads);
     else 
-        balde_fcgi_run(app, host, port, max_threads);
+        balde_fcgi_run(app, max_threads);
        /* 
     {
 
@@ -254,7 +254,7 @@ BEGIN_LOOP
 
         GString *response = balde_app_main_loop(app, NULL,
             balde_response_render, NULL);
-        balde_response_print(response);
+        balde_cgi_response_print(response);
 
 END_LOOP
 

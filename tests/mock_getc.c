@@ -11,6 +11,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
+#include <stdio.h>
 #include <string.h>
 #include <balde/cgi-private.h>
 
