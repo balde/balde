@@ -79,7 +79,7 @@ balde_fcgi_thread_run(gpointer data)
 {
     balde_app_t *app = data;
     FCGX_Request request;
-    FCGX_InitRequest(&request, 0, 0);
+    FCGX_InitRequest(&request, 0, FCGI_FAIL_ACCEPT_ON_INTR);
 
     for (;;) {
         G_LOCK_DEFINE_STATIC(request);
@@ -101,6 +101,15 @@ balde_fcgi_thread_run(gpointer data)
 }
 
 
+static void
+balde_fcgi_signal_handler(int signum)
+{
+    FCGX_ShutdownPending();
+    if (signum != SIGINT)
+        kill(getpid(), SIGINT);  // it is dumb, stupid, but works... :/
+}
+
+
 void
 balde_fcgi_run(balde_app_t *app, gint max_threads)
 {
@@ -108,15 +117,17 @@ balde_fcgi_run(balde_app_t *app, gint max_threads)
         balde_cgi_run(app);
         return;
     }
-    GThread *threads[max_threads];
     FCGX_Init();
-    for (guint i = 1; i < max_threads; i++) {
-        gchar *name = g_strdup_printf("balde-%03d", i);
-        threads[i] = g_thread_new(name, balde_fcgi_thread_run, app);
-        g_free(name);
+    if (max_threads > 1) {
+        signal(SIGTERM, balde_fcgi_signal_handler);
+        signal(SIGUSR1, balde_fcgi_signal_handler);
+        GThread *threads[max_threads-1];
+        for (guint i = 1; i < max_threads; i++) {
+            gchar *name = g_strdup_printf("balde-%03d", i);
+            threads[i] = g_thread_new(name, balde_fcgi_thread_run, app);
+            g_free(name);
+        }
     }
     balde_fcgi_thread_run(app);
-    for (guint i = 1; i < max_threads; i++)
-        g_thread_join(threads[i]);
     balde_app_free(app);
 }
