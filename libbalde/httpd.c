@@ -14,6 +14,7 @@
 #include <gio/gio.h>
 
 #include <balde/app-private.h>
+#include <balde/cgi-private.h>
 #include <balde/datetime-private.h>
 #include <balde/exceptions-private.h>
 #include <balde/httpd-private.h>
@@ -113,7 +114,7 @@ balde_httpd_response_render(balde_response_t *response, const gboolean with_body
     g_free(len);
     if (g_hash_table_lookup(response->headers, "content-type") == NULL)
         balde_response_set_header(response, "Content-Type", "text/html; charset=utf-8");
-    g_hash_table_foreach(response->headers, (GHFunc) balde_header_render, str);
+    g_hash_table_foreach(response->headers, (GHFunc) balde_cgi_header_render, str);
     g_string_append(str, "\r\n");
     if (with_body)
         g_string_append_len(str, response->body->str, response->body->len);

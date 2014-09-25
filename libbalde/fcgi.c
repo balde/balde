@@ -14,6 +14,11 @@
 #include <fcgiapp.h>
 #include <string.h>
 
+#if defined(HAVE_SYS_TYPES_H) && defined(HAVE_UNISTD_H)
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
 #include <balde/app.h>
 #include <balde/app-private.h>
 #include <balde/cgi-private.h>
@@ -92,7 +97,7 @@ balde_fcgi_thread_run(gpointer data)
             break;
 
         balde_request_env_t *env = balde_fcgi_parse_request(app, &request);
-        GString *response = balde_app_main_loop(app, env, balde_response_render, NULL);
+        GString *response = balde_app_main_loop(app, env, balde_cgi_response_render, NULL);
         FCGX_PutStr(response->str, response->len, request.out);
 
         FCGX_Finish_r(&request);
@@ -101,6 +106,8 @@ balde_fcgi_thread_run(gpointer data)
 }
 
 
+#if defined(HAVE_SYS_TYPES_H) && defined(HAVE_UNISTD_H)
+
 static void
 balde_fcgi_signal_handler(int signum)
 {
@@ -108,6 +115,8 @@ balde_fcgi_signal_handler(int signum)
     if (signum != SIGINT)
         kill(getpid(), SIGINT);  // it is dumb, stupid, but works... :/
 }
+
+#endif
 
 
 void
@@ -119,8 +128,12 @@ balde_fcgi_run(balde_app_t *app, gint max_threads)
     }
     FCGX_Init();
     if (max_threads > 1) {
+
+#if defined(HAVE_SYS_TYPES_H) && defined(HAVE_UNISTD_H)
         signal(SIGTERM, balde_fcgi_signal_handler);
         signal(SIGUSR1, balde_fcgi_signal_handler);
+#endif
+
         GThread *threads[max_threads-1];
         for (guint i = 1; i < max_threads; i++) {
             gchar *name = g_strdup_printf("balde-%03d", i);
