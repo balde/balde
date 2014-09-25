@@ -16,7 +16,6 @@
 #include <balde/app.h>
 #include <balde/app-private.h>
 #include <balde/cgi-private.h>
-#include <balde/fcgi-private.h>
 #include <balde/exceptions.h>
 #include <balde/exceptions-private.h>
 #include <balde/resources-private.h>
@@ -28,6 +27,12 @@
 #ifdef BUILD_WEBSERVER
 #include <balde/httpd-private.h>
 #endif
+
+#ifdef BUILD_FASTCGI
+#include <fcgiapp.h>
+#include <balde/fcgi-private.h>
+#endif
+
 
 balde_app_t*
 balde_app_init(void)
@@ -194,18 +199,21 @@ balde_app_url_forv(balde_app_t *app, const gchar *endpoint, va_list params)
  * A hello world!
  */
 
-#ifdef BUILD_WEBSERVER
+static gboolean version = FALSE;
 
-static gboolean fastcgi = FALSE;
+#ifdef BUILD_WEBSERVER
 static gboolean runserver = FALSE;
 static gchar *host = NULL;
 static gint16 port = 8080;
 static gint max_threads = 10;
-static gboolean version = FALSE;
+#endif
+
 static GOptionEntry entries[] =
 {
-    {"fastcgi", 'f', 0, G_OPTION_ARG_NONE, &fastcgi,
-        "Run fastcgi server.", NULL},  // FIXME: temporary!
+    {"version", 0, 0, G_OPTION_ARG_NONE, &version,
+        "Show balde's version number and exit.", NULL},
+
+#ifdef BUILD_WEBSERVER
     {"runserver", 's', 0, G_OPTION_ARG_NONE, &runserver,
         "Run embedded server.", NULL},
     {"host", 't', 0, G_OPTION_ARG_STRING, &host,
@@ -214,20 +222,16 @@ static GOptionEntry entries[] =
         "Embedded server port. (default: 8080)", "PORT"},
     {"max-threads", 'm', 0, G_OPTION_ARG_INT, &max_threads,
         "Max number of threads for embedded server. (default: 10)", "THREADS"},
-    {"version", 0, 0, G_OPTION_ARG_NONE, &version,
-        "Show balde's version number and exit.", NULL},
+#endif
+
     {NULL}
 };
 
-#endif
 
 void
 balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 {
     setlocale(LC_ALL, "");
-
-#ifdef BUILD_WEBSERVER
-
     GError *err = NULL;
     GOptionContext *context = g_option_context_new("- a balde application ;-)");
     g_option_context_add_main_entries(context, entries, NULL);
@@ -237,33 +241,33 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
     }
     if (version)
         g_printerr("%s\n", PACKAGE_STRING);
-    else if (fastcgi)
-        balde_fcgi_run(app, max_threads);
-    else if (runserver)
-        balde_httpd_run(app, host, port, max_threads);
-    else 
-        balde_fcgi_run(app, max_threads);
-       /* 
-    {
-
-#endif
-
-        g_set_printerr_handler(balde_stderr_handler);
-
-BEGIN_LOOP
-
-        GString *response = balde_app_main_loop(app, NULL,
-            balde_response_render, NULL);
-        balde_cgi_response_print(response);
-
-END_LOOP
 
 #ifdef BUILD_WEBSERVER
+    else if (runserver)
+        balde_httpd_run(app, host, port, max_threads);
+#endif
 
-    }*/
+#ifdef BUILD_FASTCGI
+    else if (!FCGX_IsCGI()) {
+        const gchar *threads_str = g_getenv("BALDE_FASTCGI_THREADS");
+        guint64 threads = 1;
+        if (threads_str != NULL && threads_str[0] != '\0')
+            threads = g_ascii_strtoull(threads_str, NULL, 10);
+        balde_fcgi_run(app, threads);
+    }
+#endif
+
+    else if (g_getenv("REQUEST_METHOD") != NULL)
+        balde_cgi_run(app);
+    else {
+        gchar *help = g_option_context_get_help(context, FALSE, NULL);
+        g_printerr("%s", help);
+        g_free(help);
+    }
     g_option_context_free(context);
-    g_free(host);
 
+#ifdef BUILD_WEBSERVER
+    g_free(host);
 #endif
 
 }

@@ -122,10 +122,6 @@ balde_fcgi_signal_handler(int signum)
 void
 balde_fcgi_run(balde_app_t *app, gint max_threads)
 {
-    if (FCGX_IsCGI()) {  // fallback to CGI if needed.
-        balde_cgi_run(app);
-        return;
-    }
     FCGX_Init();
     if (max_threads > 1) {
 

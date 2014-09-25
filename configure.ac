@@ -33,7 +33,7 @@ AS_IF([test "x$enable_fastcgi" != "xno"], [
     AC_MSG_ERROR([FCGI_Accept not found. please install the fastcgi developer kit.])
   )
   build_fastcgi=yes
-  AC_DEFINE([ENABLE_FASTCGI], [], [fastcgi support enabled])
+  AC_DEFINE([BUILD_FASTCGI], [], [fastcgi support enabled])
   FASTCGI="enabled"
 ], [
   build_fastcgi=no
