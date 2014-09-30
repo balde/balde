@@ -510,8 +510,7 @@ valgrind: all
 				--tool=memcheck \
 				--leak-check=full \
 				--leak-resolution=high \
-				--num-callers=20 \
-				--show-possibly-lost=no"
+				--num-callers=20"
 
 valgrind-ci: all clean-local
 	$(MAKE) check TESTS_ENVIRONMENT=" \
@@ -525,8 +524,7 @@ valgrind-ci: all clean-local
 				--xml-file=valgrind-%p.xml \
 				--leak-check=full \
 				--leak-resolution=high \
-				--num-callers=20 \
-				--show-possibly-lost=no"
+				--num-callers=20"
 endif
 
 
