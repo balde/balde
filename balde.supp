@@ -1,8 +1,7 @@
 {
-   glib/gobject_init_ctor
+   glib/call_init.part.0
    Memcheck:Leak
    ...
-   fun:gobject_init_ctor
    fun:call_init.part.0
    fun:_dl_init
 }
