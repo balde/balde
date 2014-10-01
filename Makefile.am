@@ -511,7 +511,7 @@ valgrind: all
 				--tool=memcheck \
 				--leak-check=full \
 				--leak-resolution=high \
-				--suppressions=balde.supp \
+				--suppressions=$(top_srcdir)/balde.supp \
 				--num-callers=20"
 
 valgrind-ci: all clean-local
@@ -526,7 +526,7 @@ valgrind-ci: all clean-local
 				--xml-file=valgrind-%p.xml \
 				--leak-check=full \
 				--leak-resolution=high \
-				--suppressions=balde.supp \
+				--suppressions=$(top_srcdir)/balde.supp \
 				--num-callers=20"
 endif
 
