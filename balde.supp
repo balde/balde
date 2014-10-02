@@ -1,7 +1,0 @@
-{
-   glib/call_init.part.0
-   Memcheck:Leak
-   ...
-   fun:call_init.part.0
-   fun:_dl_init
-}

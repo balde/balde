@@ -13,7 +13,6 @@ AM_DISTCHECK_CONFIGURE_FLAGS = \
 EXTRA_DIST = \
 	autogen.sh \
 	.version \
-	balde.supp \
 	build-aux/git-version-gen \
 	README.md \
 	artwork/README.md \
@@ -511,8 +510,8 @@ valgrind: all
 				--tool=memcheck \
 				--leak-check=full \
 				--leak-resolution=high \
-				--suppressions=$(top_srcdir)/balde.supp \
-				--num-callers=20"
+				--num-callers=20 \
+				--show-possibly-lost=no"
 
 valgrind-ci: all clean-local
 	$(MAKE) check TESTS_ENVIRONMENT=" \
@@ -526,8 +525,8 @@ valgrind-ci: all clean-local
 				--xml-file=valgrind-%p.xml \
 				--leak-check=full \
 				--leak-resolution=high \
-				--suppressions=$(top_srcdir)/balde.supp \
-				--num-callers=20"
+				--num-callers=20 \
+				--show-possibly-lost=no"
 endif
 
 
