@@ -240,14 +240,18 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 #endif
 
         g_set_printerr_handler(balde_stderr_handler);
+        balde_app_t *thread_app = balde_app_dup(app);
 
 BEGIN_LOOP
 
-        GString *response = balde_app_main_loop(app, NULL,
+        GString *response = balde_app_main_loop(thread_app, NULL,
             balde_response_render, NULL);
         balde_response_print(response);
 
 END_LOOP
+
+        g_clear_error(&(thread_app->error));
+        g_free(thread_app);
 
 #ifdef BUILD_WEBSERVER
 
@@ -261,10 +265,9 @@ END_LOOP
 
 
 GString*
-balde_app_main_loop(balde_app_t *main_app, balde_request_env_t *env,
+balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
     balde_response_render_t render, balde_http_exception_code_t *status_code)
 {
-    balde_app_t *app = balde_app_dup(main_app);
     balde_request_t *request;
     balde_response_t *response;
     balde_response_t *error_response;
@@ -279,7 +282,7 @@ balde_app_main_loop(balde_app_t *main_app, balde_request_env_t *env,
         if (status_code != NULL)
             *status_code = error_response->status_code;
         balde_response_free(error_response);
-        goto done;
+        return rv;
     }
 
     request = balde_make_request(app, env);
@@ -322,17 +325,13 @@ balde_app_main_loop(balde_app_t *main_app, balde_request_env_t *env,
         if (status_code != NULL)
             *status_code = error_response->status_code;
         balde_response_free(error_response);
-        goto done;
+        return rv;
     }
 
     rv = render(response, with_body);
     if (status_code != NULL)
         *status_code = response->status_code;
     balde_response_free(response);
-
-done:
-    g_clear_error(&(app->error));
-    g_free(app);
 
     return rv;
 }
