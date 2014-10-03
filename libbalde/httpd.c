@@ -146,11 +146,11 @@ balde_incoming_callback(GThreadedSocketService *service,
             break;
     }
     g_object_unref(remote_socket);
-    balde_app_t *app = (balde_app_t*) user_data;
+    balde_app_t *app = balde_app_dup((balde_app_t*) user_data);
     GInputStream *istream = g_io_stream_get_input_stream(G_IO_STREAM(connection));
     balde_httpd_parser_data_t *parser_data = balde_httpd_parse_request(app, istream);
     if (parser_data == NULL)
-        return TRUE;
+        goto point2;
     balde_http_exception_code_t status_code = BALDE_HTTP_INTERNAL_SERVER_ERROR;
     GString *response = balde_app_main_loop(app, parser_data->env,
         balde_httpd_response_render, &status_code);
@@ -177,6 +177,9 @@ point1:
     g_free(parser_data->request_line);
     g_free(parser_data);
     g_free(remote_ip);
+point2:
+    g_clear_error(&app->error);
+    g_free(app);
     return TRUE;
 }
 
