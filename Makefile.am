@@ -37,6 +37,7 @@ EXTRA_DIST = \
 	examples/templates/hello.html \
 	examples/templates/form.html \
 	examples/templates/url_for.html \
+	examples/lighttpd.conf \
 	tests/resources.xml \
 	tests/static/lol.css \
 	tests/static/lol.js \

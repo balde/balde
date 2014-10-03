@@ -25,8 +25,14 @@ balde_httpd_parse_request(balde_app_t *app, GInputStream *istream)
 {
     GDataInputStream *data = g_data_input_stream_new(istream);
     g_data_input_stream_set_newline_type(data, G_DATA_STREAM_NEWLINE_TYPE_ANY);
+    gchar *line = g_data_input_stream_read_line(data, NULL, NULL, NULL);
 
-    gchar *request_line = NULL;
+    if (line == NULL) {
+        g_object_unref(data);
+        return NULL;
+    }
+
+    gchar *request_line = g_strdup(line);
     gchar *request_method = NULL;
     gchar *path_info = NULL;
     gchar *query_string = NULL;
@@ -34,9 +40,6 @@ balde_httpd_parse_request(balde_app_t *app, GInputStream *istream)
     gchar *value = NULL;
     gchar *body = NULL;
     GHashTable *headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-
-    gchar *line = g_data_input_stream_read_line(data, NULL, NULL, NULL);
-    request_line = g_strdup(line);
     gchar **pieces = g_strsplit(line, " ", 3);
     g_free(line);
 
@@ -74,7 +77,7 @@ balde_httpd_parse_request(balde_app_t *app, GInputStream *istream)
         body = g_strndup(body_, content_length);
     }
 
-    g_object_unref (data);
+    g_object_unref(data);
 
     balde_request_env_t *env = g_new(balde_request_env_t, 1);
     env->path_info = path_info;
@@ -146,6 +149,8 @@ balde_incoming_callback(GThreadedSocketService *service,
     balde_app_t *app = (balde_app_t*) user_data;
     GInputStream *istream = g_io_stream_get_input_stream(G_IO_STREAM(connection));
     balde_httpd_parser_data_t *parser_data = balde_httpd_parse_request(app, istream);
+    if (parser_data == NULL)
+        return TRUE;
     balde_http_exception_code_t status_code = BALDE_HTTP_INTERNAL_SERVER_ERROR;
     GString *response = balde_app_main_loop(app, parser_data->env,
         balde_httpd_response_render, &status_code);

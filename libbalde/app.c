@@ -274,10 +274,9 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 
 
 GString*
-balde_app_main_loop(balde_app_t *main_app, balde_request_env_t *env,
+balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
     balde_response_render_t render, balde_http_exception_code_t *status_code)
 {
-    balde_app_t *app = balde_app_dup(main_app);
     balde_request_t *request;
     balde_response_t *response;
     balde_response_t *error_response;
@@ -335,7 +334,6 @@ balde_app_main_loop(balde_app_t *main_app, balde_request_env_t *env,
         if (status_code != NULL)
             *status_code = error_response->status_code;
         balde_response_free(error_response);
-        g_clear_error(&app->error);
         return rv;
     }
 
@@ -343,9 +341,6 @@ balde_app_main_loop(balde_app_t *main_app, balde_request_env_t *env,
     if (status_code != NULL)
         *status_code = response->status_code;
     balde_response_free(response);
-
-    g_clear_error(&(app->error));
-    g_free(app);
 
     return rv;
 }
