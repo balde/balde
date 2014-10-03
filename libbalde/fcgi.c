@@ -82,7 +82,7 @@ balde_fcgi_parse_request(balde_app_t *app, FCGX_Request *request)
 gpointer
 balde_fcgi_thread_run(gpointer data)
 {
-    balde_app_t *app = data;
+    balde_app_t *app = balde_app_dup((balde_app_t*) data);
     FCGX_Request request;
     FCGX_InitRequest(&request, 0, FCGI_FAIL_ACCEPT_ON_INTR);
 
@@ -99,9 +99,12 @@ balde_fcgi_thread_run(gpointer data)
         balde_request_env_t *env = balde_fcgi_parse_request(app, &request);
         GString *response = balde_app_main_loop(app, env, balde_response_render, NULL);
         FCGX_PutStr(response->str, response->len, request.out);
+        g_string_free(response, TRUE);
 
         FCGX_Finish_r(&request);
     }
+    g_clear_error(&app->error);
+    g_free(app);
     return NULL;
 }
 
