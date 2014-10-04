@@ -240,18 +240,14 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 #endif
 
         g_set_printerr_handler(balde_stderr_handler);
-        balde_app_t *thread_app = balde_app_dup(app);
 
 BEGIN_LOOP
 
-        GString *response = balde_app_main_loop(thread_app, NULL,
+        GString *response = balde_app_main_loop(app, NULL,
             balde_response_render, NULL);
         balde_response_print(response);
 
 END_LOOP
-
-        g_clear_error(&(thread_app->error));
-        g_free(thread_app);
 
 #ifdef BUILD_WEBSERVER
 
