@@ -44,22 +44,6 @@ balde_app_init(void)
 }
 
 
-balde_app_t*
-balde_app_dup(balde_app_t *orig)
-{
-    balde_app_t *app = g_new(balde_app_t, 1);
-    app->parent = orig;
-    app->views = app->parent->views;
-    app->static_resources = app->parent->static_resources;
-    app->user_data = app->parent->user_data;
-    app->config = app->parent->config;
-    app->error = NULL;
-    if (app->parent->error != NULL)
-        app->error = g_error_copy(app->parent->error);
-    return app;
-}
-
-
 G_LOCK_DEFINE_STATIC(config);
 
 void

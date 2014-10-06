@@ -23,7 +23,6 @@ typedef struct {
 
 typedef GString* (*balde_response_render_t) (balde_response_t*, const gboolean);
 
-balde_app_t* balde_app_dup(balde_app_t *orig);
 void balde_app_free_views(balde_view_t *view);
 balde_view_t* balde_app_get_view_from_endpoint(balde_app_t *app,
     const gchar *endpoint);
