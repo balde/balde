@@ -59,11 +59,12 @@ Makefile.in
 /tests/check_template
 /tests/check_template_helpers
 /tests/check_wrappers
-/tests/*.log
-/tests/*.trs
-/tests/valgrind-*.xml
 /tests/resources.c
 /tests/resources.h
+/libbalde_utils/tests/check_slist
+/libbalde_utils/tests/check_string_utils
+/libbalde_utils/tests/check_trie
+/valgrind-*.xml
 
 # examples
 /examples/hello

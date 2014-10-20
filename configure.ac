@@ -12,8 +12,15 @@ LIBBALDE_CURRENT=0
 LIBBALDE_AGE=0
 LIBBALDE_REVISION=0
 
+LIBBALDE_UTILS_CURRENT=0
+LIBBALDE_UTILS_AGE=0
+LIBBALDE_UTILS_REVISION=0
+
 LIBBALDE_LT_VERSION_INFO="$LIBBALDE_CURRENT:$LIBBALDE_REVISION:$LIBBALDE_AGE"
 AC_SUBST(LIBBALDE_LT_VERSION_INFO)
+
+LIBBALDE_UTILS_LT_VERSION_INFO="$LIBBALDE_UTILS_CURRENT:$LIBBALDE_UTILS_REVISION:$LIBBALDE_UTILS_AGE"
+AC_SUBST(LIBBALDE_UTILS_LT_VERSION_INFO)
 
 AM_INIT_AUTOMAKE([1.13 foreign dist-bzip2 dist-xz subdir-objects serial-tests])
 AC_CONFIG_HEADERS([config.h])
@@ -29,14 +36,20 @@ AS_IF([test "x$ac_cv_prog_cc_c99" = "xno"], [
 
 AC_ARG_ENABLE([fastcgi], AS_HELP_STRING([--disable-fastcgi], [disable fastcgi support]))
 AS_IF([test "x$enable_fastcgi" != "xno"], [
+  OLD_LIBS="$LIBS"
   AC_SEARCH_LIBS([FCGI_Accept], [fcgi], ,
     AC_MSG_ERROR([FCGI_Accept not found. please install the fastcgi developer kit.])
   )
+  LIBS="$OLD_LIBS"
   AC_DEFINE([ENABLE_FASTCGI], [], [fastcgi support enabled])
+  FASTCGI_LIBS="-lfcgi"
   FASTCGI="enabled"
 ], [
+  FASTCGI_LIBS=
   FASTCGI="disabled"
 ])
+AC_SUBST(FASTCGI_LIBS)
+
 
 AC_ARG_ENABLE([webserver], AS_HELP_STRING([--disable-webserver], [disable embedded webserver]))
 AS_IF([test "x$enable_webserver" != "xno"], [
@@ -122,6 +135,23 @@ AS_IF([test "x$have_leg" = "xyes"], , [
 AM_CONDITIONAL([USE_LEG], [test "x$have_leg" = "xyes"])
 LEG="$ac_cv_path_leg"
 AC_SUBST(LEG)
+
+AC_ARG_WITH([cmocka], AS_HELP_STRING([--without-cmocka],
+            [ignore presence of cmocka. this will disable tests]))
+AS_IF([test "x$with_cmocka" != "xno"], [
+  PKG_PROG_PKG_CONFIG
+  PKG_CHECK_MODULES([CMOCKA], [cmocka], [
+    have_cmocka=yes
+  ], [
+    have_cmocka=no
+  ])
+])
+AS_IF([test "x$have_cmocka" = "xyes"], , [
+  AS_IF([test "x$with_cmocka" = "xyes"], [
+    AC_MSG_ERROR([cmocka requested but not found])
+  ])
+])
+AM_CONDITIONAL([USE_CMOCKA], [test "x$have_cmocka" = "xyes"])
 
 # we need to make sure that shared-mime-info is installed, because we need it
 # for accurate mime-type guess
