@@ -9,5 +9,5 @@ Name: @PACKAGE@
 Description: A microframework for C based on GLib and bad intentions.
 Version: @VERSION@
 Requires: @GLIB_DEP@
-Libs: -L${libdir} -lbalde -lbalde_utils
+Libs: -L${libdir} -lbalde
 Cflags: -I${includedir}

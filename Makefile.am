@@ -15,7 +15,6 @@ EXTRA_DIST = \
 	.version \
 	build-aux/git-version-gen \
 	README.md \
-	COPYING-BSD \
 	artwork/README.md \
 	artwork/balde-logo.ico \
 	artwork/balde-logo.png \
@@ -60,8 +59,7 @@ BUILT_SOURCES = \
 	.version
 
 include_HEADERS = \
-	include/balde.h \
-	include/balde-utils.h
+	include/balde.h
 
 pkginclude_HEADERS = \
 	include/balde/app.h \
@@ -83,15 +81,8 @@ noinst_HEADERS = \
 	include/balde-template/template-private.h \
 	include/balde-template/parser-private.h
 
-utilsincludedir = $(includedir)/balde-utils
-utilsinclude_HEADERS = \
-	include/balde-utils/slist.h \
-	include/balde-utils/string_utils.h \
-	include/balde-utils/trie.h
-
 lib_LTLIBRARIES = \
-	libbalde/libbalde.la \
-	libbalde_utils/libbalde_utils.la
+	libbalde/libbalde.la
 
 noinst_LTLIBRARIES = \
 	libbalde_template/libbalde_template.la
@@ -134,8 +125,7 @@ libbalde_libbalde_la_CFLAGS = \
 	-I$(top_srcdir)/include
 
 libbalde_libbalde_la_LIBADD = \
-	$(GLIB_LIBS) \
-	$(FASTCGI_LIBS)
+	$(GLIB_LIBS)
 
 libbalde_libbalde_la_LDFLAGS = \
 	-version-info $(LIBBALDE_LT_VERSION_INFO)
@@ -144,20 +134,6 @@ if BUILD_WEBSERVER
 libbalde_libbalde_la_SOURCES += \
 	libbalde/httpd.c
 endif
-
-
-## Build rules: libbalde_utils
-
-libbalde_utils_libbalde_utils_la_SOURCES = \
-	libbalde_utils/slist.c \
-	libbalde_utils/string_utils.c \
-	libbalde_utils/trie.c
-
-libbalde_utils_libbalde_utils_la_CFLAGS = \
-	-I$(top_srcdir)/include
-
-libbalde_utils_libbalde_utils_la_LDFLAGS = \
-	-version-info $(LIBBALDE_UTILS_LT_VERSION_INFO)
 
 
 ## Build rules: balde-template-gen
@@ -516,58 +492,6 @@ tests/resources.c: tests/resources.xml $(shell $(GLIB_COMPILE_RESOURCES) --gener
 
 tests/resources.h: tests/resources.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/tests/static $(top_srcdir)/tests/resources.xml)
 	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(top_srcdir)/tests/static --target $@ $<
-
-if USE_CMOCKA
-
-check_PROGRAMS += \
-	libbalde_utils/tests/check_slist \
-	libbalde_utils/tests/check_string_utils \
-	libbalde_utils/tests/check_trie
-
-libbalde_utils_tests_check_string_utils_SOURCES = \
-	libbalde_utils/tests/check_string_utils.c
-
-libbalde_utils_tests_check_string_utils_CFLAGS = \
-	$(CMOCKA_CFLAGS) \
-	-I$(top_srcdir)/include
-
-libbalde_utils_tests_check_string_utils_LDFLAGS = \
-	-no-install
-
-libbalde_utils_tests_check_string_utils_LDADD = \
-	$(CMOCKA_LIBS) \
-	libbalde_utils/libbalde_utils.la
-
-libbalde_utils_tests_check_slist_SOURCES = \
-	libbalde_utils/tests/check_slist.c
-
-libbalde_utils_tests_check_slist_CFLAGS = \
-	$(CMOCKA_CFLAGS) \
-	-I$(top_srcdir)/include
-
-libbalde_utils_tests_check_slist_LDFLAGS = \
-	-no-install
-
-libbalde_utils_tests_check_slist_LDADD = \
-	$(CMOCKA_LIBS) \
-	libbalde_utils/libbalde_utils.la
-
-libbalde_utils_tests_check_trie_SOURCES = \
-	libbalde_utils/tests/check_trie.c
-
-libbalde_utils_tests_check_trie_CFLAGS = \
-	$(CMOCKA_CFLAGS) \
-	-I$(top_srcdir)/include
-
-libbalde_utils_tests_check_trie_LDFLAGS = \
-	-no-install
-
-libbalde_utils_tests_check_trie_LDADD = \
-	$(CMOCKA_LIBS) \
-	libbalde_utils/libbalde_utils.la
-
-endif
-
 
 TESTS = \
 	$(check_PROGRAMS)
