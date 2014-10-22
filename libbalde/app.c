@@ -305,6 +305,7 @@ balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
         if (status_code != NULL)
             *status_code = error_response->status_code;
         balde_response_free(error_response);
+        g_clear_error(&app->error);
         return rv;
     }
 
