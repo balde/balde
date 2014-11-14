@@ -14,3 +14,32 @@ But what about the name?!
 -------------------------
 
 "balde" means "bucket" in Portuguese.
+
+
+Compile
+-------
+
+```
+./autogen.sh
+./configure --enable-examples
+make
+```
+
+Running without install
+-----------------------
+
+Export `libbalde`.
+
+```
+export LD_LIBRARY_PATH=`pwd`/libbalde/.libs/:$LD_LIBRARY_PATH
+export LIBRARY_PATH=`pwd`/libbalde/.libs/:$LIBRARY_PATH
+```
+
+Enter `examples` folder and run `lighttpd`.
+
+```
+cd examples/
+lighttpd -D -f lighttpd.conf
+```
+
+Go to `http://127.0.0.1:3000/hello`.

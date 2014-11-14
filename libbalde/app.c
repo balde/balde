@@ -32,6 +32,7 @@ balde_app_t*
 balde_app_init(void)
 {
     balde_app_t *app = g_new(balde_app_t, 1);
+    app->parent = NULL;
     app->views = NULL;
     app->static_resources = NULL;
     app->user_data = NULL;
@@ -43,10 +44,14 @@ balde_app_init(void)
 }
 
 
+G_LOCK_DEFINE_STATIC(config);
+
 void
 balde_app_set_config(balde_app_t *app, const gchar *name, const gchar *value)
 {
+    G_LOCK(config);
     g_hash_table_replace(app->config, g_utf8_strdown(name, -1), g_strdup(value));
+    G_UNLOCK(config);
 }
 
 
@@ -96,6 +101,8 @@ balde_app_free(balde_app_t *app)
 }
 
 
+G_LOCK_DEFINE_STATIC(views);
+
 void
 balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rule,
     const balde_http_method_t method, balde_view_func_t view_func)
@@ -115,7 +122,9 @@ balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rul
     if (view->url_rule->method & BALDE_HTTP_GET)
         view->url_rule->method |= BALDE_HTTP_HEAD;
     view->view_func = view_func;
+    G_LOCK(views);
     app->views = g_slist_append(app->views, view);
+    G_UNLOCK(views);
 }
 
 
@@ -304,5 +313,6 @@ balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
     if (status_code != NULL)
         *status_code = response->status_code;
     balde_response_free(response);
+
     return rv;
 }

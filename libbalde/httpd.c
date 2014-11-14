@@ -12,7 +12,6 @@
 
 #include <glib.h>
 #include <gio/gio.h>
-#include <string.h>
 
 #include <balde/app-private.h>
 #include <balde/datetime-private.h>
@@ -20,123 +19,79 @@
 #include <balde/httpd-private.h>
 #include <balde/wrappers-private.h>
 
-#ifdef SYSTEM_HTTP_PARSER
-#include <http_parser.h>
-#else
-#include "http_parser/http_parser.h"
-#endif
 
-#ifndef SOCKET_BUFFER_SIZE
-#define SOCKET_BUFFER_SIZE 4096
-#endif
-
-static http_parser_settings settings;
-
-
-static int
-balde_httpd_url_cb(http_parser* parser, const char* chunk, size_t len)
+balde_httpd_parser_data_t*
+balde_httpd_parse_request(balde_app_t *app, GInputStream *istream)
 {
-    balde_httpd_parser_data_t *data = parser->data;
-    struct http_parser_url u;
-    gchar *url = g_strndup(chunk, len);
-    http_parser_parse_url(url, len, 0, &u);
-    if (u.field_set & (1 << UF_PATH))
-        data->request->path_info = g_strndup(url + u.field_data[UF_PATH].off,
-            u.field_data[UF_PATH].len);
-    else
-        data->request->path_info = g_strdup("/");
-    if (u.field_set & (1 << UF_QUERY))
-        data->request->query_string = g_strndup(url + u.field_data[UF_QUERY].off,
-            u.field_data[UF_QUERY].len);
-    else
-        data->request->query_string = g_strdup("");
-    g_free(url);
-    return 0;
-}
+    GDataInputStream *data = g_data_input_stream_new(istream);
+    g_data_input_stream_set_newline_type(data, G_DATA_STREAM_NEWLINE_TYPE_ANY);
+    gchar *line = g_data_input_stream_read_line(data, NULL, NULL, NULL);
 
-
-static int
-balde_httpd_body_cb(http_parser* parser, const char* chunk, size_t len)
-{
-    balde_httpd_parser_data_t *data = parser->data;
-    if (data->body == NULL)
-        data->body = g_string_new("");
-    g_string_append_len(data->body, chunk, len);
-    return 0;
-}
-
-
-static int
-balde_httpd_message_complete_cb(http_parser* parser)
-{
-    balde_httpd_parser_data_t *data = parser->data;
-    data->request->content_length = 0;
-    data->request->body = NULL;
-    if (data->body != NULL) {
-        data->request->content_length = data->body->len;
-        data->request->body = g_string_free(data->body, FALSE);
+    if (line == NULL) {
+        g_object_unref(data);
+        return NULL;
     }
-    return 0;
-}
 
+    gchar *request_line = g_strdup(line);
+    gchar *request_method = NULL;
+    gchar *path_info = NULL;
+    gchar *query_string = NULL;
+    gchar *key = NULL;
+    gchar *value = NULL;
+    gchar *body = NULL;
+    GHashTable *headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    gchar **pieces = g_strsplit(line, " ", 3);
+    g_free(line);
 
-static int
-balde_httpd_header_field_cb(http_parser* parser, const char* chunk, size_t len)
-{
-    balde_httpd_parser_data_t *data = parser->data;
-    data->header_key = g_ascii_strdown(chunk, len);
-    return 0;
-}
+    if (g_strv_length(pieces) == 3 && g_str_has_prefix(pieces[2], "HTTP/1.")) {
+        request_method = g_strdup(pieces[0]);
+        gchar **pieces2 = g_strsplit(pieces[1], "?", 2);
+        path_info = g_strdup(pieces2[0]);
+        query_string = g_strdup(pieces2[1] == NULL ? "" : pieces2[1]);
+        g_strfreev(pieces2);
+    }
+    g_strfreev(pieces);
 
+    line = g_data_input_stream_read_line(data, NULL, NULL, NULL);
+    while (line[0] != '\0') {
+        pieces = g_strsplit(line, ":", 2);
+        g_free(line);
+        if (g_strv_length(pieces) != 2)
+            continue;  // just ignore wrong headers :/
+        key = g_ascii_strdown(g_strstrip(pieces[0]), -1);
+        value = g_strdup(g_strstrip(pieces[1]));
+        g_hash_table_insert(headers, key, value);
+        g_strfreev(pieces);
+        line = g_data_input_stream_read_line(data, NULL, NULL, NULL);
+    }
+    g_free(line);
 
-static int
-balde_httpd_header_value_cb(http_parser* parser, const char* chunk, size_t len)
-{
-    balde_httpd_parser_data_t *data = parser->data;
-    g_hash_table_insert(data->request->headers, data->header_key,
-        g_strndup(chunk, len));
-    data->header_key = NULL;
-    return 0;
-}
+    guint64 content_length = 0;
+    const gchar* clen_str = g_hash_table_lookup(headers, "content-length");
+    if (clen_str != NULL)
+        content_length = g_ascii_strtoull(clen_str, NULL, 10);
 
+    if (content_length > 0) {
+        gchar body_[content_length];
+        g_input_stream_read(G_INPUT_STREAM(data), body_, sizeof(body_), NULL, NULL);
+        body = g_strndup(body_, content_length);
+    }
 
-static int
-balde_httpd_headers_complete_cb(http_parser* parser) {
-    balde_httpd_parser_data_t *data = parser->data;
-    const char* method = http_method_str(parser->method);
-    data->request->request_method = g_strndup(method, strlen(method));
-    return 0;
-}
+    g_object_unref(data);
 
+    balde_request_env_t *env = g_new(balde_request_env_t, 1);
+    env->path_info = path_info;
+    env->request_method = request_method;
+    env->query_string = query_string;
+    env->headers = headers;
+    env->content_length = content_length;
+    env->body = body;
 
-balde_request_env_t*
-balde_httpd_parse_request(GString *request)
-{
-    settings.on_url = balde_httpd_url_cb;
-    settings.on_body = balde_httpd_body_cb;
-    settings.on_header_field = balde_httpd_header_field_cb;
-    settings.on_header_value = balde_httpd_header_value_cb;
-    settings.on_message_complete = balde_httpd_message_complete_cb;
-    settings.on_headers_complete = balde_httpd_headers_complete_cb;
-    balde_httpd_parser_data_t *data = g_new(balde_httpd_parser_data_t, 1);
-    data->body = NULL;
-    data->header_key = NULL;
-    data->request = g_new(balde_request_env_t, 1);
-    data->request->path_info = NULL;
-    data->request->request_method = NULL;
-    data->request->query_string = NULL;
-    data->request->headers = g_hash_table_new_full(g_str_hash, g_str_equal,
-        g_free, g_free);
-    data->request->content_length = 0;
-    data->request->body = NULL;
-    http_parser parser;
-    parser.data = data;
-    http_parser_init(&parser, HTTP_REQUEST);
-    http_parser_execute(&parser, &settings, request->str, request->len);
-    balde_request_env_t *rv = data->request;
-    g_free(data->header_key);
-    g_free(data);
-    return rv;
+    balde_httpd_parser_data_t *parser_data = g_new(balde_httpd_parser_data_t, 1);
+    parser_data->env = env;
+    parser_data->request_line = request_line;
+
+    return parser_data;
 }
 
 
@@ -148,7 +103,7 @@ balde_httpd_response_render(balde_response_t *response, const gboolean with_body
     GString *str = g_string_new("");
     gchar *n = g_ascii_strup(
         balde_exception_get_name_from_code(response->status_code), -1);
-    g_string_append_printf(str, "HTTP/1.1 %d %s\r\n", response->status_code, n);
+    g_string_append_printf(str, "HTTP/1.0 %d %s\r\n", response->status_code, n);
     g_free(n);
     gchar *len = g_strdup_printf("%zu", response->body->len);
     GDateTime *dt = g_date_time_new_now_utc();
@@ -175,7 +130,6 @@ balde_incoming_callback(GThreadedSocketService *service,
 {
     GError *error = NULL;
     gchar *remote_ip = NULL;
-    gchar *request_line = NULL;
     GSocketAddress *remote_socket = g_socket_connection_get_remote_address(
         connection, NULL);
     GInetAddress *remote_addr;
@@ -192,52 +146,36 @@ balde_incoming_callback(GThreadedSocketService *service,
             break;
     }
     g_object_unref(remote_socket);
-    GInputStream * istream = g_io_stream_get_input_stream(G_IO_STREAM(connection));
-    gchar m[SOCKET_BUFFER_SIZE];
-    gssize mlen;
-    GString *content = g_string_new("");
-    while ((mlen = g_input_stream_read(istream, m, sizeof(m), NULL, &error)) > 0) {
-        if (error != NULL) {
-            g_printerr("Failed to read: %s\n", error->message);
-            g_error_free(error);
-            goto point1;
-        }
-        g_string_append_len(content, m, mlen);
-    }
-    for (guint i = 0; i < content->len; i++) {
-        if (content->str[i] == '\r' || content->str[i] == '\n') {
-            request_line = g_strndup(content->str, i);
-            break;
-        }
-    }
-    balde_request_env_t *env = balde_httpd_parse_request(content);
-    g_string_free(content, TRUE);
     balde_app_t *app = (balde_app_t*) user_data;
+    GInputStream *istream = g_io_stream_get_input_stream(G_IO_STREAM(connection));
+    balde_httpd_parser_data_t *parser_data = balde_httpd_parse_request(app, istream);
+    if (parser_data == NULL)
+        return TRUE;
     balde_http_exception_code_t status_code = BALDE_HTTP_INTERNAL_SERVER_ERROR;
-    GString *response = balde_app_main_loop(app, env, balde_httpd_response_render,
-        &status_code);
+    GString *response = balde_app_main_loop(app, parser_data->env,
+        balde_httpd_response_render, &status_code);
     GOutputStream *ostream = g_io_stream_get_output_stream(G_IO_STREAM(connection));
     g_output_stream_write(ostream, response->str, response->len, NULL, &error);
     g_string_free(response, TRUE);
     if (error != NULL) {
         g_printerr("Failed to send: %s\n", error->message);
         g_error_free(error);
-        goto point2;
+        goto point1;
     }
     GDateTime *dt = g_date_time_new_now_local();
     gchar *dt_format = balde_datetime_logging(dt);
     g_date_time_unref(dt);
-    g_printerr("%s - - [%s] \"%s\" %d\n", remote_ip, dt_format, request_line,
-        status_code);
+    g_printerr("%s - - [%s] \"%s\" %d\n", remote_ip, dt_format,
+        parser_data->request_line, status_code);
     g_free(dt_format);
     g_io_stream_close(G_IO_STREAM(connection), NULL, &error);
     if (error != NULL) {
         g_printerr("Failed to close connection: %s\n", error->message);
         g_error_free(error);
     }
-point2:
-    g_free(request_line);
 point1:
+    g_free(parser_data->request_line);
+    g_free(parser_data);
     g_free(remote_ip);
     return TRUE;
 }
@@ -253,7 +191,7 @@ balde_httpd_run(balde_app_t *app, const gchar *host, gint16 port,
     GSocketService *service = g_threaded_socket_service_new(max_threads);
     GInetAddress* addr_host = g_inet_address_new_from_string(final_host);
     GSocketAddress *address = g_inet_socket_address_new(addr_host, port);
-    g_socket_listener_add_address((GSocketListener*) service, address,
+    g_socket_listener_add_address(G_SOCKET_LISTENER(service), address,
         G_SOCKET_TYPE_STREAM, G_SOCKET_PROTOCOL_TCP, NULL, NULL, &error);
     if (error != NULL) {
         g_printerr("Failed to listen: %s\n", error->message);

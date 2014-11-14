@@ -5,7 +5,6 @@ ACLOCAL_AMFLAGS = -I m4
 AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-examples \
 	--enable-webserver \
-	--with-http-parser=internal \
 	--without-leg
 
 
@@ -16,7 +15,6 @@ EXTRA_DIST = \
 	.version \
 	build-aux/git-version-gen \
 	README.md \
-	COPYING-http_parser \
 	artwork/README.md \
 	artwork/balde-logo.ico \
 	artwork/balde-logo.png \
@@ -39,6 +37,7 @@ EXTRA_DIST = \
 	examples/templates/hello.html \
 	examples/templates/form.html \
 	examples/templates/url_for.html \
+	examples/lighttpd.conf \
 	tests/resources.xml \
 	tests/static/lol.css \
 	tests/static/lol.js \
@@ -141,19 +140,8 @@ libbalde_libbalde_la_LDFLAGS = \
 	-version-info $(LIBBALDE_LT_VERSION_INFO)
 
 if BUILD_WEBSERVER
-
 libbalde_libbalde_la_SOURCES += \
 	libbalde/httpd.c
-
-if !USE_SYSTEM_HTTP_PARSER
-
-noinst_HEADERS += \
-	libbalde/http_parser/http_parser.h
-
-libbalde_libbalde_la_SOURCES += \
-	libbalde/http_parser/http_parser.c
-
-endif
 endif
 
 
