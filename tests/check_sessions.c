@@ -13,6 +13,8 @@
 #include <glib.h>
 #include <balde/sessions-private.h>
 
+gboolean valid_timestamp = TRUE;
+
 
 void
 test_session_serialize(void)
@@ -65,8 +67,64 @@ test_session_sign(void)
 {
     gchar *signed_str = balde_session_sign((guchar*) "guda", 4, "bola");
     g_assert_cmpstr(signed_str, ==,
-        "bola.MTAwMDAw.3ef42ac08471c2b19c65d27b82a5542d47d8c145");
+        "bola|MTAwMDAw.4bf2fd5c755f810d27973750c832b0b818250f13");
     g_free(signed_str);
+}
+
+
+void
+test_session_unsign(void)
+{
+    valid_timestamp = TRUE;
+    gsize len;
+    gchar *content;
+    balde_session_unsign_status_t status = balde_session_unsign((guchar*) "guda",
+        4, 40, "bola|MTAwMDAw.4bf2fd5c755f810d27973750c832b0b818250f13", &content);
+    g_assert_cmpint(status, ==, BALDE_SESSION_UNSIGN_OK);
+    g_assert_cmpstr(content, ==, "bola");
+    g_free(content);
+}
+
+
+void
+test_session_unsign_bad_format(void)
+{
+    valid_timestamp = TRUE;
+    gsize len;
+    gchar *content;
+    balde_session_unsign_status_t status = balde_session_unsign((guchar*) "guda",
+        4, 40, "bola|MTAwMDAw4bf2fd5c755f810d27973750c832b0b818250f13", &content);
+    g_assert_cmpint(status, ==, BALDE_SESSION_UNSIGN_BAD_FORMAT);
+    g_assert(content == NULL);
+    status = balde_session_unsign((guchar*) "guda", 4, 40,
+        "bolaMTAwMDAw4bf2fd5c755f810d27973750c832b0b818250f13", &content);
+    g_assert_cmpint(status, ==, BALDE_SESSION_UNSIGN_BAD_FORMAT);
+    g_assert(content == NULL);
+}
+
+
+void
+test_session_unsign_bad_timestamp(void)
+{
+    valid_timestamp = FALSE;
+    gsize len;
+    gchar *content;
+    balde_session_unsign_status_t status = balde_session_unsign((guchar*) "guda",
+        4, 40, "bola|MTAwMDAw.4bf2fd5c755f810d27973750c832b0b818250f13", &content);
+    g_assert_cmpint(status, ==, BALDE_SESSION_UNSIGN_BAD_TIMESTAMP);
+    g_assert(content == NULL);
+}
+
+
+void
+test_session_unsign_bad_sign(void)
+{
+    valid_timestamp = TRUE;
+    gchar *content;
+    balde_session_unsign_status_t status = balde_session_unsign((guchar*) "guda",
+        4, 40, "bola|MTAwMDAw.4bf2fd5c755f810d27973750c832b0b818250f14", &content);
+    g_assert_cmpint(status, ==, BALDE_SESSION_UNSIGN_BAD_SIGN);
+    g_assert(content == NULL);
 }
 
 
@@ -81,5 +139,11 @@ main(int argc, char** argv)
     g_test_add_func("/sessions/unserialize_wrong_type",
         test_session_unserialize_wrong_type);
     g_test_add_func("/sessions/sign", test_session_sign);
+    g_test_add_func("/sessions/unsign", test_session_unsign);
+    g_test_add_func("/sessions/unsign_bad_format",
+        test_session_unsign_bad_format);
+    g_test_add_func("/sessions/unsign_bad_timestamp",
+        test_session_unsign_bad_timestamp);
+    g_test_add_func("/sessions/unsign_bad_sign", test_session_unsign_bad_sign);
     return g_test_run();
 }

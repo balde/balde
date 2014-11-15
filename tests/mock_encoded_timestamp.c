@@ -12,12 +12,22 @@
 
 #include <glib.h>
 
+extern gboolean valid_timestamp;
+
 
 // this is a poor man's mock of balde_encoded_timestamp :)
 gchar*
 balde_encoded_timestamp(void)
 {
     return g_strdup("MTAwMDAw");
+}
+
+
+// this is a poor man's mock of balde_validate_timestamp :)
+gboolean
+balde_validate_timestamp(const gchar* timestamp, gint64 max_delta)
+{
+    return valid_timestamp;
 }
 
 #include "../libbalde/sessions.c"

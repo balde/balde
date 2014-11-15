@@ -11,9 +11,18 @@
 
 #include <glib.h>
 
+typedef enum {
+    BALDE_SESSION_UNSIGN_OK,
+    BALDE_SESSION_UNSIGN_BAD_FORMAT,
+    BALDE_SESSION_UNSIGN_BAD_SIGN,
+    BALDE_SESSION_UNSIGN_BAD_TIMESTAMP,
+} balde_session_unsign_status_t;
+
 gchar* balde_session_serialize(GHashTable *session);
 GHashTable* balde_session_unserialize(const gchar* text);
 gchar* balde_session_sign(const guchar *key, gsize key_len,
     const gchar *content);
+balde_session_unsign_status_t balde_session_unsign(const guchar *key,
+    gsize key_len, guint max_age, const gchar *signed_str, gchar **content);
 
 #endif /* _BALDE_SESSIONS_PRIVATE_H */

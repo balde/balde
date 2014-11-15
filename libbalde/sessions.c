@@ -14,6 +14,8 @@
 #include <string.h>
 #include <json-glib/json-glib.h>
 #include <balde/utils-private.h>
+#include <balde/sessions-private.h>
+#include <balde/sessions.h>
 
 
 static void
@@ -110,11 +112,50 @@ balde_session_sign(const guchar *key, gsize key_len, const gchar *content)
 {
     // content should be nul-terminated.
     // FIXME: key should/could be derived.
-    gchar *sign = g_compute_hmac_for_string(G_CHECKSUM_SHA1, key, key_len,
-        content, strlen(content));
     gchar *timestamp = balde_encoded_timestamp();
-    gchar *rv = g_strdup_printf("%s.%s.%s", content, timestamp, sign);
+    gchar *content_with_ts = g_strdup_printf("%s|%s", content, timestamp);
+    gchar *sign = g_compute_hmac_for_string(G_CHECKSUM_SHA1, key, key_len,
+        content_with_ts, strlen(content_with_ts));
+    gchar *rv = g_strdup_printf("%s.%s", content_with_ts, sign);
     g_free(timestamp);
+    g_free(content_with_ts);
     g_free(sign);
+    return rv;
+}
+
+
+balde_session_unsign_status_t
+balde_session_unsign(const guchar *key, gsize key_len, guint max_age,
+    const gchar *signed_str, gchar **content)
+{
+    *content = NULL;
+    balde_session_unsign_status_t rv = BALDE_SESSION_UNSIGN_OK;
+    gchar **pieces = g_strsplit(signed_str, ".", 2);
+    if (g_strv_length(pieces) != 2) {
+        rv = BALDE_SESSION_UNSIGN_BAD_FORMAT;
+        goto point1;
+    }
+    gchar *sign = g_compute_hmac_for_string(G_CHECKSUM_SHA1, key, key_len,
+        pieces[0], strlen(pieces[0]));
+    if (!balde_constant_time_compare(pieces[1], sign)) {
+        rv = BALDE_SESSION_UNSIGN_BAD_SIGN;
+        goto point2;
+    }
+    gchar **content_pieces = g_strsplit(pieces[0], "|", 2);
+    if (g_strv_length(content_pieces) != 2) {
+        rv = BALDE_SESSION_UNSIGN_BAD_FORMAT;
+        goto point3;
+    }
+    if (!balde_validate_timestamp(content_pieces[1], max_age)) {
+        rv = BALDE_SESSION_UNSIGN_BAD_TIMESTAMP;
+        goto point3;
+    }
+    *content = g_strdup(content_pieces[0]);
+point3:
+    g_strfreev(content_pieces);
+point2:
+    g_free(sign);
+point1:
+    g_strfreev(pieces);
     return rv;
 }
