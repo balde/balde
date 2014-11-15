@@ -11,8 +11,11 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
+#include <stdlib.h>
 #include <string.h>
 #include <json-glib/json-glib.h>
+#include <balde/app.h>
+#include <balde/exceptions.h>
 #include <balde/utils-private.h>
 #include <balde/sessions-private.h>
 #include <balde/sessions.h>
@@ -158,4 +161,72 @@ point2:
 point1:
     g_strfreev(pieces);
     return rv;
+}
+
+
+// TODO: test me!
+balde_session_t*
+balde_session_open(balde_app_t *app, balde_request_t *request)
+{
+    balde_session_t *session = NULL;
+
+    // first of all, verify if we have the cookie
+    const gchar *cookie = balde_request_get_cookie(request, "balde_session");
+    if (cookie == NULL)
+        return session;
+
+    // verify if secret_key is set
+    const gchar *secret_key = balde_app_get_config(app, "SECRET_KEY");
+    if (secret_key == NULL) {
+        balde_abort_set_error_with_description(app, 500,
+            "To be able to use sessions you need to set the SECRET_KEY "
+            "configuration parameter in your application.");
+        return session;
+    }
+
+    // verify if secret_key length is set manually, otherwise defaults to strlen
+    const gchar *secret_key_len_str = balde_app_get_config(app, "SECRET_KEY_LENGTH");
+    gint secret_key_len;
+    if (secret_key_len_str != NULL) {
+        secret_key_len = atoi(secret_key_len_str);
+        if (secret_key_len < 0)
+            secret_key_len = strlen(secret_key);
+    }
+    else {
+        secret_key_len = strlen(secret_key);
+    }
+
+    // verify session lifetime
+    const gchar *session_lifetime_str = balde_app_get_config(app,
+        "PERMANENT_SESSION_LIFETIME");
+    gint64 session_lifetime = 31 * 24 * 60 * 60;  // 31 days
+    if (session_lifetime_str != NULL) {
+        session_lifetime = g_ascii_strtoll(session_lifetime_str, NULL, 10);
+    }
+
+    gchar *signed_cookie;
+    balde_session_unsign_status_t status = balde_session_unsign(
+        (const guchar*) secret_key, secret_key_len, session_lifetime, cookie,
+        &signed_cookie);
+
+    switch (status) {
+        case BALDE_SESSION_UNSIGN_BAD_FORMAT:
+            balde_abort_set_error_with_description(app, 400,
+                "Malformed session cookie!");
+            return session;
+        case BALDE_SESSION_UNSIGN_BAD_SIGN:
+            balde_abort_set_error_with_description(app, 400,
+                "Bad session cookie signature!");
+            return session;
+        case BALDE_SESSION_UNSIGN_BAD_TIMESTAMP:
+            balde_abort_set_error_with_description(app, 400,
+                "Session cookie expired!");
+            return session;
+        case BALDE_SESSION_UNSIGN_OK:
+            break;
+    }
+
+    session = g_new(balde_session_t, 1);
+    session->storage = balde_session_unserialize(signed_cookie);
+    return session;
 }

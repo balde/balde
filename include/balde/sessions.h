@@ -16,5 +16,9 @@
  * \file balde/sessions.h
  */
 
+typedef struct {
+    GHashTable *storage;
+} balde_session_t;
+
 
 #endif /* _BALDE_SESSIONS_H */
