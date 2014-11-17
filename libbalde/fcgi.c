@@ -80,10 +80,9 @@ balde_fcgi_parse_request(balde_app_t *app, FCGX_Request *request)
 
 
 gpointer
-balde_fcgi_thread_run(gpointer data)
+balde_fcgi_thread_run(gpointer user_data)
 {
-    g_printerr("running thread\n");
-    balde_app_t *app = balde_app_copy((balde_app_t*) data);
+    balde_app_t *app = user_data;
     FCGX_Request request;
     FCGX_InitRequest(&request, 0, FCGI_FAIL_ACCEPT_ON_INTR);
 
@@ -104,7 +103,6 @@ balde_fcgi_thread_run(gpointer data)
 
         FCGX_Finish_r(&request);
     }
-    balde_app_free(app);
     return NULL;
 }
 

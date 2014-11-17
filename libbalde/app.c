@@ -40,6 +40,7 @@ balde_app_init(void)
     balde_app_t *app = g_new(balde_app_t, 1);
     app->copy = FALSE;
     app->views = NULL;
+    app->before_requests = NULL;
     app->static_resources = NULL;
     app->user_data = NULL;
     app->config = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
@@ -114,6 +115,7 @@ balde_app_free(balde_app_t *app)
 {
     if (!app->copy) {
         g_slist_free_full(app->views, (GDestroyNotify) balde_app_free_views);
+        g_slist_free(app->before_requests);
         g_slist_free_full(app->static_resources, (GDestroyNotify) balde_resource_free);
         g_hash_table_destroy(app->config);
     }
@@ -147,6 +149,18 @@ balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rul
     G_LOCK(views);
     app->views = g_slist_append(app->views, view);
     G_UNLOCK(views);
+}
+
+
+G_LOCK_DEFINE_STATIC(before_requests);
+
+void
+balde_app_add_before_request(balde_app_t *app, balde_before_request_func_t hook_func)
+{
+    BALDE_APP_READ_ONLY(app);
+    G_LOCK(before_requests);
+    app->before_requests = g_slist_append(app->before_requests, hook_func);
+    G_UNLOCK(before_requests);
 }
 
 
@@ -295,17 +309,25 @@ balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
     }
 
     request = balde_make_request(app, env);
+
+    for (GSList *tmp = app->before_requests; tmp != NULL; tmp = g_slist_next(tmp)) {
+        balde_before_request_func_t hook_func = tmp->data;
+        hook_func(app, request);
+    }
+
+    balde_app_t *app_copy = balde_app_copy(app);
+
     with_body = ! (request->method & BALDE_HTTP_HEAD);
 
     // get the view
-    endpoint = balde_dispatch_from_path(app->views, request->path,
+    endpoint = balde_dispatch_from_path(app_copy->views, request->path,
         &(request->view_args));
     if (endpoint == NULL) {  // no view found! :(
-        balde_abort_set_error(app, 404);
+        balde_abort_set_error(app_copy, 404);
     }
     else {
         // validate http method
-        balde_view_t *view = balde_app_get_view_from_endpoint(app, endpoint);
+        balde_view_t *view = balde_app_get_view_from_endpoint(app_copy, endpoint);
         if (request->method & view->url_rule->method) {
             // answer OPTIONS automatically
             if (request->method == BALDE_HTTP_OPTIONS) {
@@ -316,25 +338,25 @@ balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
             }
             // run the view
             else {
-                response = view->view_func(app, request);
+                response = view->view_func(app_copy, request);
             }
         }
         // method not allowed
         else {
-            balde_abort_set_error(app, 405);
+            balde_abort_set_error(app_copy, 405);
         }
         g_free(endpoint);
     }
 
     balde_request_free(request);
 
-    if (app->error != NULL) {
-        error_response = balde_make_response_from_exception(app->error);
+    if (app_copy->error != NULL) {
+        error_response = balde_make_response_from_exception(app_copy->error);
         rv = render(error_response, with_body);
         if (status_code != NULL)
             *status_code = error_response->status_code;
         balde_response_free(error_response);
-        g_clear_error(&app->error);
+        balde_app_free(app_copy);
         return rv;
     }
 
@@ -342,6 +364,7 @@ balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
     if (status_code != NULL)
         *status_code = response->status_code;
     balde_response_free(response);
+    balde_app_free(app_copy);
 
     return rv;
 }

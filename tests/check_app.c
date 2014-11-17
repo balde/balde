@@ -158,6 +158,30 @@ test_app_add_url_rule(void)
 
 
 void
+arcoiro_hook(balde_app_t *app, balde_request_t *req)
+{
+    i = 1;
+    g_assert(app != NULL);
+}
+
+
+void
+test_app_add_before_request(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_app_add_before_request(app, arcoiro_hook);
+    g_assert(app->before_requests != NULL);
+    g_assert(app->before_requests->next == NULL);
+    i = 0;
+    balde_before_request_func_t hook_func = app->before_requests->data;
+    g_assert(hook_func == arcoiro_hook);
+    hook_func(app, NULL);
+    g_assert(i == 1);
+    balde_app_free(app);
+}
+
+
+void
 test_app_get_view_from_endpoint(void)
 {
     balde_app_t *app = balde_app_init();
@@ -257,6 +281,8 @@ main(int argc, char** argv)
         test_app_set_config_from_envvar_not_found_silent);
     g_test_add_func("/app/get_config", test_app_get_config);
     g_test_add_func("/app/add_url_rule", test_app_add_url_rule);
+    g_test_add_func("/app/add_before_request",
+        test_app_add_before_request);
     g_test_add_func("/app/get_view_from_endpoint",
         test_app_get_view_from_endpoint);
     g_test_add_func("/app/get_view_from_endpoint_not_found",

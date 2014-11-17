@@ -32,6 +32,12 @@ typedef struct {
     GSList *views;
 
     /**
+     * A GLib singly linked list that stores the "before request" hooks. Do
+     * not touch this, use the balde_app_add_before_request() function instead!
+     */
+    GSList *before_requests;
+
+    /**
      * A GLib singly linked list that stores the static resources. Do not touch
      * it!
      */
@@ -64,6 +70,13 @@ typedef struct {
  * and return a response context.
  */
 typedef balde_response_t* (*balde_view_func_t) (balde_app_t*, balde_request_t*);
+
+/** "Before request" hook type definition
+ *
+ * Each hook should accept the application context and the request context.
+ *
+ */
+typedef void (*balde_before_request_func_t) (balde_app_t*, balde_request_t*);
 
 /** Initializes the application context
  *
@@ -111,6 +124,10 @@ void balde_app_free(balde_app_t *app);
 void balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint,
     const gchar *rule, const balde_http_method_t method,
     balde_view_func_t view_func);
+
+/** Adds a "before request" hook to the balde application */
+void balde_app_add_before_request(balde_app_t *app,
+    balde_before_request_func_t hook_func);
 
 /** Helper function to get the URL for a given endpoint.
  *
