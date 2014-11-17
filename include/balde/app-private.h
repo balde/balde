@@ -16,11 +16,11 @@
 #include <balde/wrappers.h>
 #include <balde/wrappers-private.h>
 
-#define BALDE_APP_READ_ONLY(app) \
-    if ((app)->copy) \
-        g_error( \
-            "You called `%s()' from request context. This is unsupported, " \
-            "please review your views.", \
+#define BALDE_APP_READ_ONLY(app)                                            \
+    if ((app)->copy)                                                        \
+        g_error(                                                            \
+            "You called `%s()' from a view. This is unsupported! You may "  \
+            "want to move this code to a \"before request\" hook.",         \
             __FUNCTION__)
 
 typedef struct {
