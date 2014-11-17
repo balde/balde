@@ -16,6 +16,13 @@
 #include <balde/wrappers.h>
 #include <balde/wrappers-private.h>
 
+#define BALDE_APP_READ_ONLY(app) \
+    if ((app)->copy) \
+        g_error( \
+            "You called `%s()' from request context. This is unsupported, " \
+            "please review your views.", \
+            __FUNCTION__)
+
 typedef struct {
     balde_url_rule_t *url_rule;
     balde_view_func_t view_func;

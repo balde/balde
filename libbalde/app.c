@@ -66,6 +66,7 @@ G_LOCK_DEFINE_STATIC(config);
 void
 balde_app_set_config(balde_app_t *app, const gchar *name, const gchar *value)
 {
+    BALDE_APP_READ_ONLY(app);
     G_LOCK(config);
     g_hash_table_replace(app->config, g_utf8_strdown(name, -1), g_strdup(value));
     G_UNLOCK(config);
@@ -76,6 +77,7 @@ void
 balde_app_set_config_from_envvar(balde_app_t *app, const gchar *name,
     const gchar *env_name, gboolean silent)
 {
+    BALDE_APP_READ_ONLY(app);
     const gchar *value = g_getenv(env_name);
     if (value == NULL && !silent) {
         gchar *msg = g_strdup_printf("%s environment variable must be set",
@@ -126,6 +128,7 @@ void
 balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rule,
     const balde_http_method_t method, balde_view_func_t view_func)
 {
+    BALDE_APP_READ_ONLY(app);
     GError *tmp_error = NULL;
     balde_view_t *view = g_new(balde_view_t, 1);
     view->url_rule = g_new(balde_url_rule_t, 1);

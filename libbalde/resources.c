@@ -14,6 +14,7 @@
 #include <glib.h>
 #include <gio/gio.h>
 #include <balde/app.h>
+#include <balde/app-private.h>
 #include <balde/datetime-private.h>
 #include <balde/exceptions.h>
 #include <balde/resources-private.h>
@@ -93,6 +94,7 @@ G_LOCK_DEFINE_STATIC(resources);
 void
 balde_resources_load(balde_app_t *app, GResource *resources)
 {
+    BALDE_APP_READ_ONLY(app);
     g_return_if_fail(app->error == NULL);
     GError *tmp_error = NULL;
     gchar **resources_list = balde_resources_list_files(resources, &tmp_error);

@@ -49,6 +49,11 @@ test_app_copy(void)
     g_assert(app->views == copy->views);
     g_assert(app->config != NULL);
     g_assert(app->config == copy->config);
+    g_assert(app->user_data == NULL);
+    g_assert(copy->user_data == NULL);
+    copy->user_data = GINT_TO_POINTER(10);
+    g_assert_cmpint(GPOINTER_TO_INT(copy->user_data), ==, 10);
+    g_assert_cmpint(GPOINTER_TO_INT(app->user_data), ==, 0);
     balde_app_free(app);
     balde_app_free(copy);
 }
