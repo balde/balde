@@ -13,6 +13,7 @@
 #include <glib.h>
 #include <balde/app.h>
 #include <balde/app-private.h>
+#include <balde/exceptions.h>
 #include <balde/wrappers.h>
 #include <balde/wrappers-private.h>
 
@@ -31,6 +32,25 @@ test_app_init(void)
     g_assert(app->views->next == NULL);
     g_assert(app->error == NULL);
     balde_app_free(app);
+}
+
+
+void
+test_app_copy(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_app_t *copy = balde_app_copy(app);
+    g_assert(!app->copy);
+    g_assert(copy->copy);
+    balde_abort_set_error(app, 404);
+    g_assert(app->error != NULL);
+    g_assert(copy->error == NULL);
+    g_assert(app->views != NULL);
+    g_assert(app->views == copy->views);
+    g_assert(app->config != NULL);
+    g_assert(app->config == copy->config);
+    balde_app_free(app);
+    balde_app_free(copy);
 }
 
 
@@ -222,6 +242,7 @@ main(int argc, char** argv)
 {
     g_test_init(&argc, &argv, NULL);
     g_test_add_func("/app/init", test_app_init);
+    g_test_add_func("/app/copy", test_app_copy);
     g_test_add_func("/app/set_config", test_app_set_config);
     g_test_add_func("/app/set_config_from_envvar",
         test_app_set_config_from_envvar);

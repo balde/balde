@@ -38,7 +38,7 @@ balde_app_t*
 balde_app_init(void)
 {
     balde_app_t *app = g_new(balde_app_t, 1);
-    app->parent = NULL;
+    app->copy = FALSE;
     app->views = NULL;
     app->static_resources = NULL;
     app->user_data = NULL;
@@ -47,6 +47,17 @@ balde_app_init(void)
     balde_app_add_url_rule(app, "static", "/static/<path:file>", BALDE_HTTP_GET,
         balde_resource_view);
     return app;
+}
+
+
+balde_app_t*
+balde_app_copy(balde_app_t *app)
+{
+    balde_app_t *copy = g_new(balde_app_t, 1);
+    *copy = *app;
+    copy->copy = TRUE;
+    copy->error = NULL;
+    return copy;
 }
 
 
@@ -99,9 +110,11 @@ balde_app_free_views(balde_view_t *view)
 void
 balde_app_free(balde_app_t *app)
 {
-    g_slist_free_full(app->views, (GDestroyNotify) balde_app_free_views);
-    g_slist_free_full(app->static_resources, (GDestroyNotify) balde_resource_free);
-    g_hash_table_destroy(app->config);
+    if (!app->copy) {
+        g_slist_free_full(app->views, (GDestroyNotify) balde_app_free_views);
+        g_slist_free_full(app->static_resources, (GDestroyNotify) balde_resource_free);
+        g_hash_table_destroy(app->config);
+    }
     g_clear_error(&app->error);
     g_free(app);
 }

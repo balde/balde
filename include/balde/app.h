@@ -23,7 +23,7 @@
  * loaded in memory during all the application life time, and is reused by all
  * the requests.
  */
-typedef struct _balde_app_t {
+typedef struct {
 
     /**
      * A GLib singly linked list that stores the application views. Do not
@@ -54,7 +54,7 @@ typedef struct _balde_app_t {
      */
     gpointer user_data;
 
-    struct _balde_app_t *parent;
+    gboolean copy;
 
 } balde_app_t;
 
