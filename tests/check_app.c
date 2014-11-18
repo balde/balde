@@ -121,6 +121,26 @@ test_app_get_config(void)
 }
 
 
+void
+test_app_set_user_data(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_app_set_user_data(app, GINT_TO_POINTER(10));
+    g_assert_cmpint(GPOINTER_TO_INT(app->user_data), ==, 10);
+    balde_app_free(app);
+}
+
+
+void
+test_app_get_user_data(void)
+{
+    balde_app_t *app = balde_app_init();
+    app->user_data = GINT_TO_POINTER(10);
+    g_assert_cmpint(GPOINTER_TO_INT(balde_app_get_user_data(app)), ==, 10);
+    balde_app_free(app);
+}
+
+
 balde_response_t*
 arcoiro_view(balde_app_t *app, balde_request_t *req)
 {
@@ -280,6 +300,8 @@ main(int argc, char** argv)
     g_test_add_func("/app/set_config_from_envvar_not_found_silent",
         test_app_set_config_from_envvar_not_found_silent);
     g_test_add_func("/app/get_config", test_app_get_config);
+    g_test_add_func("/app/set_user_data", test_app_set_user_data);
+    g_test_add_func("/app/get_user_data", test_app_get_user_data);
     g_test_add_func("/app/add_url_rule", test_app_add_url_rule);
     g_test_add_func("/app/add_before_request",
         test_app_add_before_request);

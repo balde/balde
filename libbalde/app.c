@@ -102,6 +102,21 @@ balde_app_get_config(balde_app_t *app, const gchar *name)
 
 
 void
+balde_app_set_user_data(balde_app_t *app, void *user_data)
+{
+    BALDE_APP_READ_ONLY(app);
+    app->user_data = user_data;
+}
+
+
+void*
+balde_app_get_user_data(balde_app_t *app)
+{
+    return app->user_data;
+}
+
+
+void
 balde_app_free_views(balde_view_t *view)
 {
     balde_free_url_rule_match(view->url_rule->match);

@@ -55,11 +55,7 @@ typedef struct {
      */
     GError *error;
 
-    /**
-     * User data to be attached to the application context.
-     */
     gpointer user_data;
-
     gboolean copy;
 
 } balde_app_t;
@@ -109,6 +105,18 @@ void balde_app_set_config_from_envvar(balde_app_t *app, const gchar *name,
  * The parameter name is case-insensitive.
  */
 const gchar* balde_app_get_config(balde_app_t *app, const gchar *name);
+
+
+/** Sets user data.
+ *
+ * The memory needed by the user provided data should be allocated previously,
+ * and free'd afterwards.
+ */
+void balde_app_set_user_data(balde_app_t *app, void *user_data);
+
+
+/** Gets user data. */
+void* balde_app_get_user_data(balde_app_t *app);
 
 
 /** Free application context memory.
