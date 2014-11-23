@@ -21,7 +21,7 @@
  *
  * This is an opaque structure that stores everything related to the
  * application context. It should stay loaded in memory during all the
- * application life cycle, and reused by all the requests.
+ * application life cycle, as it will be reused for all the requests.
  */
 typedef struct _balde_app_t balde_app_t;
 
