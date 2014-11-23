@@ -23,6 +23,16 @@
             "want to move this code to a \"before request\" hook.",         \
             __FUNCTION__)
 
+struct _balde_app_t {
+    GSList *views;
+    GSList *before_requests;
+    GSList *static_resources;
+    GHashTable *config;
+    GError *error;
+    gpointer user_data;
+    gboolean copy;
+};
+
 typedef struct {
     balde_url_rule_t *url_rule;
     balde_view_func_t view_func;

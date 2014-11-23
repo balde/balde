@@ -12,6 +12,7 @@
 
 #include <glib.h>
 #include <balde/app.h>
+#include <balde/app-private.h>
 #include <balde/exceptions.h>
 #include <balde/exceptions-private.h>
 #include <balde/wrappers.h>

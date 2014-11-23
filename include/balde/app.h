@@ -19,46 +19,11 @@
 
 /** balde application context
  *
- * This struct stores everything related to the application context. It stays
- * loaded in memory during all the application life time, and is reused by all
- * the requests.
+ * This is an opaque structure that stores everything related to the
+ * application context. It should stay loaded in memory during all the
+ * application life cycle, and reused by all the requests.
  */
-typedef struct {
-
-    /**
-     * A GLib singly linked list that stores the application views. Do not
-     * touch this, use the balde_app_add_url_rule() function instead!
-     */
-    GSList *views;
-
-    /**
-     * A GLib singly linked list that stores the "before request" hooks. Do
-     * not touch this, use the balde_app_add_before_request() function instead!
-     */
-    GSList *before_requests;
-
-    /**
-     * A GLib singly linked list that stores the static resources. Do not touch
-     * it!
-     */
-    GSList *static_resources;
-
-    /**
-     * A GLib hash table that stores the application settings. Do not touch
-     * this, use the balde_app_set_config() and balde_app_get_config()
-     * functions instead!
-     */
-    GHashTable *config;
-
-    /**
-     * A GLib error instance. Do not touch this manually!
-     */
-    GError *error;
-
-    gpointer user_data;
-    gboolean copy;
-
-} balde_app_t;
+typedef struct _balde_app_t balde_app_t;
 
 /** View type definition
  *
@@ -118,6 +83,18 @@ void balde_app_set_user_data(balde_app_t *app, void *user_data);
 /** Gets user data. */
 void* balde_app_get_user_data(balde_app_t *app);
 
+/** Gets current error.
+ *
+ * This function returns the error object of the current context, if any, or
+ * NULL.
+ *
+ * If the function is called from the context of a view, it will return the
+ * error from the request context, otherwise it will return the error from the
+ * application context.
+ *
+ * Errors are usually non-2XX HTTP status codes.
+ */
+const GError* balde_app_get_error(balde_app_t *app);
 
 /** Free application context memory.
  *

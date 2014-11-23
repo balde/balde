@@ -12,6 +12,7 @@
 
 #include <glib.h>
 #include <balde/app.h>
+#include <balde/app-private.h>
 #include <balde/resources.h>
 #include <balde/resources-private.h>
 #include <balde/wrappers-private.h>

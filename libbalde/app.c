@@ -33,7 +33,6 @@
 #include <balde/fcgi-private.h>
 #endif
 
-
 balde_app_t*
 balde_app_init(void)
 {
@@ -113,6 +112,13 @@ void*
 balde_app_get_user_data(balde_app_t *app)
 {
     return app->user_data;
+}
+
+
+const GError*
+balde_app_get_error(balde_app_t *app)
+{
+    return app->error;
 }
 
 

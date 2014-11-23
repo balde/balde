@@ -141,6 +141,16 @@ test_app_get_user_data(void)
 }
 
 
+void
+test_app_get_error(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_abort_set_error(app, 404);
+    g_assert_cmpint(balde_app_get_error(app)->code, ==, 404);
+    balde_app_free(app);
+}
+
+
 balde_response_t*
 arcoiro_view(balde_app_t *app, balde_request_t *req)
 {
@@ -302,6 +312,7 @@ main(int argc, char** argv)
     g_test_add_func("/app/get_config", test_app_get_config);
     g_test_add_func("/app/set_user_data", test_app_set_user_data);
     g_test_add_func("/app/get_user_data", test_app_get_user_data);
+    g_test_add_func("/app/get_error", test_app_get_error);
     g_test_add_func("/app/add_url_rule", test_app_add_url_rule);
     g_test_add_func("/app/add_before_request",
         test_app_add_before_request);
