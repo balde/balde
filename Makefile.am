@@ -79,6 +79,7 @@ noinst_HEADERS = \
 	include/balde/resources-private.h \
 	include/balde/routing-private.h \
 	include/balde/wrappers-private.h \
+	include/balde-quickstart/quickstart-private.h \
 	include/balde-template/template-private.h \
 	include/balde-template/parser-private.h
 
@@ -86,9 +87,11 @@ lib_LTLIBRARIES = \
 	libbalde/libbalde.la
 
 noinst_LTLIBRARIES = \
+	libbalde_quickstart/libbalde_quickstart.la \
 	libbalde_template/libbalde_template.la
 
 bin_PROGRAMS = \
+	bin/balde-quickstart \
 	bin/balde-template-gen
 
 noinst_PROGRAMS =
@@ -142,6 +145,31 @@ libbalde_libbalde_la_SOURCES += \
 	libbalde/fcgi.c
 
 endif
+
+
+## Build rules: balde-quickstart
+
+libbalde_quickstart_libbalde_quickstart_la_SOURCES = \
+	libbalde_quickstart/quickstart.c
+
+libbalde_quickstart_libbalde_quickstart_la_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	-I$(top_srcdir)/include
+
+libbalde_quickstart_libbalde_quickstart_la_LIBADD = \
+	$(GLIB_LIBS)
+
+bin_balde_quickstart_SOURCES = \
+	bin/balde-quickstart.c
+
+bin_balde_quickstart_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	-I$(top_srcdir)/include
+
+bin_balde_quickstart_LDADD = \
+	$(GLIB_LIBS) \
+	libbalde_quickstart/libbalde_quickstart.la
 
 
 ## Build rules: balde-template-gen
