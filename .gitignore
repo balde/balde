@@ -80,7 +80,7 @@ Makefile.in
 /examples/templates/*.h
 
 # leg generated source
-/libbalde_template/parser-grammar.c
+/src/template/parser-grammar.c
 
 # tarballs
 balde-*.tar.*

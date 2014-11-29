@@ -29,7 +29,7 @@ EXTRA_DIST = \
 	doc/15_responses.md \
 	doc/20_template-engine.md \
 	doc/25-static-resources.md \
-	libbalde_template/parser-grammar.leg \
+	src/template/parser-grammar.leg \
 	examples/static-resources.xml \
 	examples/static/foo.js \
 	examples/static/foo.css \
@@ -86,7 +86,7 @@ lib_LTLIBRARIES = \
 	libbalde.la
 
 noinst_LTLIBRARIES = \
-	libbalde_template/libbalde_template.la
+	libbalde_template.la
 
 bin_PROGRAMS = \
 	bin/balde-template-gen
@@ -144,21 +144,21 @@ endif
 
 ## Build rules: balde-template-gen
 
-libbalde_template_libbalde_template_la_SOURCES = \
-	libbalde_template/template.c \
-	libbalde_template/parser.c \
-	libbalde_template/parser-grammar.c
+libbalde_template_la_SOURCES = \
+	src/template/template.c \
+	src/template/parser.c \
+	src/template/parser-grammar.c
 
-libbalde_template_libbalde_template_la_CFLAGS = \
+libbalde_template_la_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	-I$(top_srcdir)/include
 
-libbalde_template_libbalde_template_la_LIBADD = \
+libbalde_template_la_LIBADD = \
 	$(GLIB_LIBS)
 
 if USE_LEG
-libbalde_template/parser-grammar.c: libbalde_template/parser-grammar.leg
+src/template/parser-grammar.c: src/template/parser-grammar.leg
 	$(AM_V_GEN)$(LEG) -o $@ $<
 endif
 
@@ -171,7 +171,7 @@ bin_balde_template_gen_CFLAGS = \
 
 bin_balde_template_gen_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde_template/libbalde_template.la
+	libbalde_template.la
 
 
 ## Build rules: examples
@@ -483,7 +483,7 @@ tests_check_template_LDFLAGS = \
 tests_check_template_LDADD = \
 	$(GLIB_LIBS) \
 	libbalde.la \
-	libbalde_template/libbalde_template.la
+	libbalde_template.la
 
 tests_check_template_helpers_SOURCES = \
 	tests/check_template_helpers.c
