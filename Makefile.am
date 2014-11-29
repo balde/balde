@@ -89,7 +89,7 @@ noinst_LTLIBRARIES = \
 	libbalde_template.la
 
 bin_PROGRAMS = \
-	bin/balde-template-gen
+	balde-template-gen
 
 noinst_PROGRAMS =
 
@@ -162,14 +162,14 @@ src/template/parser-grammar.c: src/template/parser-grammar.leg
 	$(AM_V_GEN)$(LEG) -o $@ $<
 endif
 
-bin_balde_template_gen_SOURCES = \
-	bin/balde-template-gen.c
+balde_template_gen_SOURCES = \
+	src/template/balde-template-gen.c
 
-bin_balde_template_gen_CFLAGS = \
+balde_template_gen_CFLAGS = \
 	$(GLIB_CFLAGS) \
 	-I$(top_srcdir)/include
 
-bin_balde_template_gen_LDADD = \
+balde_template_gen_LDADD = \
 	$(GLIB_LIBS) \
 	libbalde_template.la
 
@@ -327,11 +327,11 @@ examples/%-resources.c: examples/%-resources.xml $(shell $(GLIB_COMPILE_RESOURCE
 examples/%-resources.h: examples/%-resources.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/examples/static $(top_srcdir)/examples/static-resources.xml)
 	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(top_srcdir)/examples/static --target $@ $<
 
-examples/templates/%.c: examples/templates/%.html bin/balde-template-gen
-	$(AM_V_GEN)bin/balde-template-gen $< $@
+examples/templates/%.c: examples/templates/%.html balde-template-gen
+	$(AM_V_GEN)./balde-template-gen $< $@
 
-examples/templates/%.h: examples/templates/%.html bin/balde-template-gen
-	$(AM_V_GEN)bin/balde-template-gen $< $@
+examples/templates/%.h: examples/templates/%.html balde-template-gen
+	$(AM_V_GEN)./balde-template-gen $< $@
 
 
 ## Build rules: tests
