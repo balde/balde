@@ -20,4 +20,4 @@ g_date_time_new_now_utc(void)
     return g_date_time_new_from_unix_utc(1234567890);
 }
 
-#include "../libbalde/httpd.c"
+#include "../src/httpd.c"
