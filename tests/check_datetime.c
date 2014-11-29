@@ -11,6 +11,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
+#include <balde.h>
 #include <balde/datetime-private.h>
 
 

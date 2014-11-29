@@ -10,7 +10,7 @@
 #define _BALDE_EXCEPTIONS_PRIVATE_H
 
 #include <glib.h>
-#include <balde/exceptions.h>
+#include <balde.h>
 
 typedef struct {
     const balde_http_exception_code_t code;

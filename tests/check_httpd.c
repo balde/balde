@@ -12,8 +12,8 @@
 
 #include <glib.h>
 #include <string.h>
+#include <balde.h>
 #include <balde/app-private.h>
-#include <balde/exceptions.h>
 #include <balde/httpd-private.h>
 
 

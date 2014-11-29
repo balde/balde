@@ -13,6 +13,7 @@
 #include <glib.h>
 #include <gio/gio.h>
 
+#include <balde.h>
 #include <balde/app-private.h>
 #include <balde/datetime-private.h>
 #include <balde/exceptions-private.h>

@@ -10,10 +10,8 @@
 #define _BALDE_APP_PRIVATE_H
 
 #include <glib.h>
-#include <balde/app.h>
-#include <balde/exceptions.h>
+#include <balde.h>
 #include <balde/routing-private.h>
-#include <balde/wrappers.h>
 #include <balde/wrappers-private.h>
 
 #define BALDE_APP_READ_ONLY(app)                                            \

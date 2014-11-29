@@ -10,9 +10,7 @@
 #define _BALDE_WRAPPERS_PRIVATE_H
 
 #include <glib.h>
-#include <balde/app.h>
-#include <balde/routing.h>
-#include <balde/wrappers.h>
+#include <balde.h>
 
 typedef struct {
     gchar *request_method;

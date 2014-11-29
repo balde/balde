@@ -10,7 +10,7 @@
 #define _BALDE_ROUTING_PRIVATE_H
 
 #include <glib.h>
-#include <balde/routing.h>
+#include <balde.h>
 
 typedef struct {
     GRegex *regex;

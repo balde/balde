@@ -12,10 +12,9 @@
 
 #include <glib.h>
 #include <stdio.h>
-#include <balde/app.h>
+#include <balde.h>
 #include <balde/app-private.h>
 #include <balde/cgi-private.h>
-#include <balde/exceptions.h>
 
 
 guint64

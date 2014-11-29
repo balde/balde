@@ -10,7 +10,7 @@
 #define _BALDE_CGI_PRIVATE_H
 
 #include <glib.h>
-#include <balde/app.h>
+#include <balde.h>
 #include <balde/wrappers-private.h>
 
 guint64 balde_cgi_parse_content_length(const gchar *str);

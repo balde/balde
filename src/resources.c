@@ -13,10 +13,9 @@
 #include <string.h>
 #include <glib.h>
 #include <gio/gio.h>
-#include <balde/app.h>
+#include <balde.h>
 #include <balde/app-private.h>
 #include <balde/datetime-private.h>
-#include <balde/exceptions.h>
 #include <balde/resources-private.h>
 #include <balde/wrappers-private.h>
 

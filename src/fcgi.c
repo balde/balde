@@ -19,7 +19,7 @@
 #include <unistd.h>
 #endif
 
-#include <balde/app.h>
+#include <balde.h>
 #include <balde/app-private.h>
 #include <balde/cgi-private.h>
 #include <balde/fcgi-private.h>

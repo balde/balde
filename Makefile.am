@@ -61,14 +61,6 @@ BUILT_SOURCES = \
 include_HEADERS = \
 	include/balde.h
 
-pkginclude_HEADERS = \
-	include/balde/app.h \
-	include/balde/exceptions.h \
-	include/balde/resources.h \
-	include/balde/routing.h \
-	include/balde/template-helpers.h \
-	include/balde/wrappers.h
-
 noinst_HEADERS = \
 	include/balde/app-private.h \
 	include/balde/cgi-private.h \

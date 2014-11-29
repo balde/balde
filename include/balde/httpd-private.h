@@ -11,7 +11,7 @@
 
 #include <glib.h>
 #include <gio/gio.h>
-#include <balde/app.h>
+#include <balde.h>
 #include <balde/wrappers-private.h>
 
 typedef struct {

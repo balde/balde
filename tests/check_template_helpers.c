@@ -11,7 +11,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include <balde/template-helpers.h>
+#include <balde.h>
 
 
 balde_response_t*
