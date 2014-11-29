@@ -343,7 +343,7 @@ check_PROGRAMS += \
 
 tests_check_httpd_SOURCES = \
 	tests/check_httpd.c \
-	tests/mock_datetime2.c
+	tests/mock_httpd.c
 
 tests_check_httpd_CFLAGS = \
 	$(GLIB_CFLAGS) \
@@ -457,7 +457,7 @@ tests_check_routing_LDADD = \
 
 tests_check_stdin_SOURCES = \
 	tests/check_stdin.c \
-	tests/mock_getc.c
+	tests/mock_stdin.c
 
 tests_check_stdin_CFLAGS = \
 	$(GLIB_CFLAGS) \
@@ -501,7 +501,7 @@ tests_check_template_helpers_LDADD = \
 
 tests_check_wrappers_SOURCES = \
 	tests/check_wrappers.c \
-	tests/mock_datetime.c
+	tests/mock_wrappers.c
 
 tests_check_wrappers_CFLAGS = \
 	$(GLIB_CFLAGS) \
