@@ -27,7 +27,7 @@
  * files when you change template.html.
  */
 
-#include <balde-template/template-private.h>
+#include "template.h"
 
 
 int

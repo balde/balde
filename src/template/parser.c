@@ -11,7 +11,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include <balde-template/parser-private.h>
+#include "parser.h"
 
 
 void

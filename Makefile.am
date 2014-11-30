@@ -71,8 +71,8 @@ noinst_HEADERS = \
 	include/balde/resources-private.h \
 	include/balde/routing-private.h \
 	include/balde/wrappers-private.h \
-	include/balde-template/template-private.h \
-	include/balde-template/parser-private.h
+	src/template/template.h \
+	src/template/parser.h
 
 lib_LTLIBRARIES = \
 	libbalde.la
@@ -143,8 +143,7 @@ libbalde_template_la_SOURCES = \
 
 libbalde_template_la_CFLAGS = \
 	$(AM_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(GLIB_CFLAGS)
 
 libbalde_template_la_LIBADD = \
 	$(GLIB_LIBS)
@@ -158,8 +157,7 @@ balde_template_gen_SOURCES = \
 	src/template/balde-template-gen.c
 
 balde_template_gen_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(GLIB_CFLAGS)
 
 balde_template_gen_LDADD = \
 	$(GLIB_LIBS) \
@@ -466,8 +464,7 @@ tests_check_template_SOURCES = \
 	tests/check_template.c
 
 tests_check_template_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(GLIB_CFLAGS)
 
 tests_check_template_LDFLAGS = \
 	-no-install
