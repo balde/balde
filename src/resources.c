@@ -120,7 +120,7 @@ balde_resources_load(balde_app_t *app, GResource *resources)
             resources_list[i], strlen(resources_list[i]));
         resource->hash_content = g_compute_checksum_for_bytes(G_CHECKSUM_MD5, b);
         G_LOCK(resources);
-        app->static_resources = g_slist_append(app->static_resources, resource);
+        app->priv->static_resources = g_slist_append(app->priv->static_resources, resource);
         G_UNLOCK(resources);
         g_bytes_unref(b);
     }
@@ -132,9 +132,9 @@ balde_response_t*
 balde_make_response_from_static_resource(balde_app_t *app, balde_request_t *request,
     const gchar *name)
 {
-    if (app->static_resources == NULL)
+    if (app->priv->static_resources == NULL)
         return balde_abort(app, 404);
-    for (GSList *tmp = app->static_resources; tmp != NULL; tmp = g_slist_next(tmp)) {
+    for (GSList *tmp = app->priv->static_resources; tmp != NULL; tmp = g_slist_next(tmp)) {
         balde_resource_t *resource = tmp->data;
         if (0 == g_strcmp0(name, resource->name)) {
             balde_response_t *response = balde_make_response("");

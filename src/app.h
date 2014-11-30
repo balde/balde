@@ -15,18 +15,17 @@
 #include "wrappers.h"
 
 #define BALDE_APP_READ_ONLY(app)                                            \
-    if ((app)->copy)                                                        \
+    if ((app)->priv->copy)                                                  \
         g_error(                                                            \
             "You called `%s()' from a view. This is unsupported! You may "  \
             "want to move this code to a \"before request\" hook.",         \
             __FUNCTION__)
 
-struct _balde_app_t {
+struct _balde_app_private_t {
     GSList *views;
     GSList *before_requests;
     GSList *static_resources;
     GHashTable *config;
-    GError *error;
     gpointer user_data;
     gboolean copy;
 };

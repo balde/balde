@@ -92,7 +92,15 @@ typedef enum {
  * application context. It should stay loaded in memory during all the
  * application life cycle, as it will be reused for all the requests.
  */
-typedef struct _balde_app_t balde_app_t;
+typedef struct {
+
+    /** Application error context. */
+    GError *error;
+
+    /** Private structure. Shouldn't be touched by users. **/
+    struct _balde_app_private_t *priv;
+
+} balde_app_t;
 
 /**
  * \example hello-with-auth.c
