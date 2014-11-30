@@ -12,14 +12,22 @@
 #include <glib.h>
 #include <gio/gio.h>
 
-/** Balde public API.
+
+/** balde public API.
+ *
+ * This document describes the public API exposed by balde, to be used by
+ * applications.
  *
  * \file balde.h
  */
 
+
 /** Supported HTTP methods.
  *
- * BALDE_HTTP_NONE method is internal and shouldn't be used manually.
+ * \c BALDE_HTTP_NONE and \c BALDE_HTTP_ANY are special methods, that will
+ * set the view to do not accept any request method or to accept any request
+ * method, respectively.
+ *
  */
 typedef enum {
     BALDE_HTTP_NONE    = 0,
@@ -33,41 +41,48 @@ typedef enum {
     BALDE_HTTP_ANY     = 0xFF,
 } balde_http_method_t;
 
-/** Supported HTTP status codes */
+
+/** Supported HTTP status codes.
+ *
+ * These are the HTTP status codes that are supported by the \c balde_abort_*
+ * functions. To support any other methods, they must be added to the source
+ * code.
+ *
+ */
 typedef enum {
-    BALDE_HTTP_OK = 200,
-    BALDE_HTTP_MULTIPLE_CHOICES = 300,
-    BALDE_HTTP_MOVED_PERMANENTLY = 301,
-    BALDE_HTTP_FOUND = 302,
-    BALDE_HTTP_SEE_OTHER = 303,
-    BALDE_HTTP_NOT_MODIFIED = 304,
-    BALDE_HTTP_USE_PROXY = 305,
-    BALDE_HTTP_TEMPORARY_REDIRECT = 307,
-    BALDE_HTTP_BAD_REQUEST = 400,
-    BALDE_HTTP_UNAUTHORIZED = 401,
-    BALDE_HTTP_FORBIDDEN = 403,
-    BALDE_HTTP_NOT_FOUND = 404,
-    BALDE_HTTP_METHOD_NOT_ALLOWED = 405,
-    BALDE_HTTP_NOT_ACCEPTABLE = 406,
-    BALDE_HTTP_REQUEST_TIMEOUT = 408,
-    BALDE_HTTP_CONFLICT = 409,
-    BALDE_HTTP_GONE = 410,
-    BALDE_HTTP_LENGTH_REQUIRED = 411,
-    BALDE_HTTP_PRECONDITION_FAILED = 412,
-    BALDE_HTTP_REQUEST_ENTITY_TOO_LARGE = 413,
-    BALDE_HTTP_REQUEST_URI_TOO_LONG = 414,
-    BALDE_HTTP_UNSUPPORTED_MEDIA_TYPE = 415,
+    BALDE_HTTP_OK                              = 200,
+    BALDE_HTTP_MULTIPLE_CHOICES                = 300,
+    BALDE_HTTP_MOVED_PERMANENTLY               = 301,
+    BALDE_HTTP_FOUND                           = 302,
+    BALDE_HTTP_SEE_OTHER                       = 303,
+    BALDE_HTTP_NOT_MODIFIED                    = 304,
+    BALDE_HTTP_USE_PROXY                       = 305,
+    BALDE_HTTP_TEMPORARY_REDIRECT              = 307,
+    BALDE_HTTP_BAD_REQUEST                     = 400,
+    BALDE_HTTP_UNAUTHORIZED                    = 401,
+    BALDE_HTTP_FORBIDDEN                       = 403,
+    BALDE_HTTP_NOT_FOUND                       = 404,
+    BALDE_HTTP_METHOD_NOT_ALLOWED              = 405,
+    BALDE_HTTP_NOT_ACCEPTABLE                  = 406,
+    BALDE_HTTP_REQUEST_TIMEOUT                 = 408,
+    BALDE_HTTP_CONFLICT                        = 409,
+    BALDE_HTTP_GONE                            = 410,
+    BALDE_HTTP_LENGTH_REQUIRED                 = 411,
+    BALDE_HTTP_PRECONDITION_FAILED             = 412,
+    BALDE_HTTP_REQUEST_ENTITY_TOO_LARGE        = 413,
+    BALDE_HTTP_REQUEST_URI_TOO_LONG            = 414,
+    BALDE_HTTP_UNSUPPORTED_MEDIA_TYPE          = 415,
     BALDE_HTTP_REQUESTED_RANGE_NOT_SATISFIABLE = 416,
-    BALDE_HTTP_EXPECTATION_FAILED = 417,
-    BALDE_HTTP_I_M_A_TEAPOT = 418,
-    BALDE_HTTP_UNPROCESSABLE_ENTITY = 422,
-    BALDE_HTTP_PRECONDITION_REQUIRED = 428,
-    BALDE_HTTP_TOO_MANY_REQUESTS = 429,
+    BALDE_HTTP_EXPECTATION_FAILED              = 417,
+    BALDE_HTTP_I_M_A_TEAPOT                    = 418,
+    BALDE_HTTP_UNPROCESSABLE_ENTITY            = 422,
+    BALDE_HTTP_PRECONDITION_REQUIRED           = 428,
+    BALDE_HTTP_TOO_MANY_REQUESTS               = 429,
     BALDE_HTTP_REQUEST_HEADER_FIELDS_TOO_LARGE = 431,
-    BALDE_HTTP_INTERNAL_SERVER_ERROR = 500,
-    BALDE_HTTP_NOT_IMPLEMENTED = 501,
-    BALDE_HTTP_BAD_GATEWAY = 502,
-    BALDE_HTTP_SERVICE_UNAVAILABLE = 503
+    BALDE_HTTP_INTERNAL_SERVER_ERROR           = 500,
+    BALDE_HTTP_NOT_IMPLEMENTED                 = 501,
+    BALDE_HTTP_BAD_GATEWAY                     = 502,
+    BALDE_HTTP_SERVICE_UNAVAILABLE             = 503,
 } balde_http_exception_code_t;
 
 
