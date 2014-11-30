@@ -12,9 +12,9 @@
 
 #include <glib.h>
 #include <stdio.h>
-#include <balde.h>
-#include <balde/app-private.h>
-#include <balde/cgi-private.h>
+#include "balde.h"
+#include "app.h"
+#include "cgi.h"
 
 
 guint64

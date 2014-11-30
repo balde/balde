@@ -12,13 +12,13 @@
 
 #include <glib.h>
 #include <string.h>
-#include <balde.h>
-#include <balde/cgi-private.h>
-#include <balde/datetime-private.h>
-#include <balde/exceptions-private.h>
-#include <balde/resources-private.h>
-#include <balde/routing-private.h>
-#include <balde/wrappers-private.h>
+#include "balde.h"
+#include "cgi.h"
+#include "datetime.h"
+#include "exceptions.h"
+#include "resources.h"
+#include "routing.h"
+#include "wrappers.h"
 
 
 void

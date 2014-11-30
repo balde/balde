@@ -11,9 +11,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include <balde.h>
-#include <balde/app-private.h>
-#include <balde/wrappers-private.h>
+#include "../src/balde.h"
+#include "../src/app.h"
+#include "../src/wrappers.h"
 
 
 static guint i = 0;

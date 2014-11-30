@@ -13,21 +13,21 @@
 #include <glib.h>
 #include <locale.h>
 #include <stdlib.h>
-#include <balde.h>
-#include <balde/app-private.h>
-#include <balde/cgi-private.h>
-#include <balde/exceptions-private.h>
-#include <balde/resources-private.h>
-#include <balde/routing-private.h>
-#include <balde/wrappers-private.h>
+#include "balde.h"
+#include "app.h"
+#include "cgi.h"
+#include "exceptions.h"
+#include "resources.h"
+#include "routing.h"
+#include "wrappers.h"
 
 #ifdef BUILD_WEBSERVER
-#include <balde/httpd-private.h>
+#include "httpd.h"
 #endif
 
 #ifdef BUILD_FASTCGI
 #include <fcgiapp.h>
-#include <balde/fcgi-private.h>
+#include "fcgi.h"
 #endif
 
 balde_app_t*

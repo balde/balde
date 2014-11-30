@@ -19,11 +19,11 @@
 #include <unistd.h>
 #endif
 
-#include <balde.h>
-#include <balde/app-private.h>
-#include <balde/cgi-private.h>
-#include <balde/fcgi-private.h>
-#include <balde/wrappers-private.h>
+#include "balde.h"
+#include "app.h"
+#include "cgi.h"
+#include "fcgi.h"
+#include "wrappers.h"
 
 
 GHashTable*

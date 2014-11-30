@@ -11,9 +11,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include <balde.h>
-#include <balde/app-private.h>
-#include <balde/routing-private.h>
+#include "../src/balde.h"
+#include "../src/app.h"
+#include "../src/routing.h"
 
 static balde_url_rule_t rules[] = {
     {"home", "/", NULL, BALDE_HTTP_GET},

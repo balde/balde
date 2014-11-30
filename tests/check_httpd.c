@@ -12,9 +12,9 @@
 
 #include <glib.h>
 #include <string.h>
-#include <balde.h>
-#include <balde/app-private.h>
-#include <balde/httpd-private.h>
+#include "../src/balde.h"
+#include "../src/app.h"
+#include "../src/httpd.h"
 
 
 void

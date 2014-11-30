@@ -13,12 +13,12 @@
 #include <glib.h>
 #include <gio/gio.h>
 
-#include <balde.h>
-#include <balde/app-private.h>
-#include <balde/datetime-private.h>
-#include <balde/exceptions-private.h>
-#include <balde/httpd-private.h>
-#include <balde/wrappers-private.h>
+#include "balde.h"
+#include "app.h"
+#include "datetime.h"
+#include "exceptions.h"
+#include "httpd.h"
+#include "wrappers.h"
 
 
 balde_httpd_parser_data_t*

@@ -11,7 +11,7 @@
 
 #include <glib.h>
 #include <fcgiapp.h>
-#include <balde.h>
+#include "balde.h"
 
 GHashTable* balde_fcgi_request_headers(const gchar **envp);
 void balde_fcgi_run(balde_app_t *app, gint max_threads);

@@ -11,9 +11,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include <balde.h>
-#include <balde/app-private.h>
-#include <balde/routing-private.h>
+#include "balde.h"
+#include "app.h"
+#include "routing.h"
 
 
 const gboolean

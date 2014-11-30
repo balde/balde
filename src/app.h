@@ -10,9 +10,9 @@
 #define _BALDE_APP_PRIVATE_H
 
 #include <glib.h>
-#include <balde.h>
-#include <balde/routing-private.h>
-#include <balde/wrappers-private.h>
+#include "balde.h"
+#include "routing.h"
+#include "wrappers.h"
 
 #define BALDE_APP_READ_ONLY(app)                                            \
     if ((app)->copy)                                                        \

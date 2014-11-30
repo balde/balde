@@ -12,9 +12,9 @@
 
 #include <glib.h>
 #include <string.h>
-#include <balde.h>
-#include <balde/cgi-private.h>
-#include <balde/wrappers-private.h>
+#include "../src/balde.h"
+#include "../src/cgi.h"
+#include "../src/wrappers.h"
 
 const gchar *query_string = "guda=bola&moises=arcoiro";
 

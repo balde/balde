@@ -13,11 +13,11 @@
 #include <string.h>
 #include <glib.h>
 #include <gio/gio.h>
-#include <balde.h>
-#include <balde/app-private.h>
-#include <balde/datetime-private.h>
-#include <balde/resources-private.h>
-#include <balde/wrappers-private.h>
+#include "balde.h"
+#include "app.h"
+#include "datetime.h"
+#include "resources.h"
+#include "wrappers.h"
 
 
 static void

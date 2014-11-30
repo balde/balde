@@ -12,7 +12,8 @@
 
 #include <glib.h>
 #include <string.h>
-#include <balde/datetime-private.h>
+#include "balde.h"
+#include "datetime.h"
 
 // these functions are needed because we want locale-independent date formats.
 

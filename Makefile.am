@@ -59,18 +59,18 @@ BUILT_SOURCES = \
 	.version
 
 include_HEADERS = \
-	include/balde.h
+	src/balde.h
 
 noinst_HEADERS = \
-	include/balde/app-private.h \
-	include/balde/cgi-private.h \
-	include/balde/datetime-private.h \
-	include/balde/exceptions-private.h \
-	include/balde/fcgi-private.h \
-	include/balde/httpd-private.h \
-	include/balde/resources-private.h \
-	include/balde/routing-private.h \
-	include/balde/wrappers-private.h \
+	src/app.h \
+	src/cgi.h \
+	src/datetime.h \
+	src/exceptions.h \
+	src/fcgi.h \
+	src/httpd.h \
+	src/resources.h \
+	src/routing.h \
+	src/wrappers.h \
 	src/template/template.h \
 	src/template/parser.h
 
@@ -114,8 +114,7 @@ libbalde_la_SOURCES = \
 
 libbalde_la_CFLAGS = \
 	$(AM_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(GLIB_CFLAGS)
 
 libbalde_la_LIBADD = \
 	$(GLIB_LIBS)
@@ -182,7 +181,7 @@ examples_hello_SOURCES = \
 
 examples_hello_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/src
 
 examples_hello_LDFLAGS = \
 	-no-install
@@ -196,7 +195,7 @@ examples_hello_with_cookies_SOURCES = \
 
 examples_hello_with_cookies_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/src
 
 examples_hello_with_cookies_LDFLAGS = \
 	-no-install
@@ -219,7 +218,7 @@ examples/examples_hello_with_form-hello-with-form.$(OBJEXT): \
 
 examples_hello_with_form_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src \
 	-I$(top_builddir)/examples
 
 examples_hello_with_form_LDFLAGS = \
@@ -241,7 +240,7 @@ examples/examples_hello_with_template-hello-with-template.$(OBJEXT): \
 
 examples_hello_with_template_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src \
 	-I$(top_builddir)/examples
 
 examples_hello_with_template_LDFLAGS = \
@@ -263,7 +262,7 @@ examples/examples_hello_with_static-hello-with-static.$(OBJEXT): \
 
 examples_hello_with_static_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src \
 	-I$(top_builddir)/examples
 
 examples_hello_with_static_LDFLAGS = \
@@ -285,7 +284,7 @@ examples/examples_hello_with_url_for-hello-with-url_for.$(OBJEXT): \
 
 examples_hello_with_url_for_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include \
+	-I$(top_srcdir)/src \
 	-I$(top_builddir)/examples
 
 examples_hello_with_url_for_LDFLAGS = \
@@ -300,7 +299,7 @@ examples_hello_with_auth_SOURCES = \
 
 examples_hello_with_auth_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/src
 
 examples_hello_with_auth_LDFLAGS = \
 	-no-install
@@ -336,8 +335,7 @@ tests_check_httpd_SOURCES = \
 	tests/mock_httpd.c
 
 tests_check_httpd_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(GLIB_CFLAGS)
 
 tests_check_httpd_LDFLAGS = \
 	-no-install
@@ -357,8 +355,7 @@ tests_check_fcgi_SOURCES = \
 	tests/check_fcgi.c
 
 tests_check_fcgi_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(GLIB_CFLAGS)
 
 tests_check_fcgi_LDFLAGS = \
 	-no-install
@@ -373,8 +370,7 @@ tests_check_app_SOURCES = \
 	tests/check_app.c
 
 tests_check_app_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(GLIB_CFLAGS)
 
 tests_check_app_LDFLAGS = \
 	-no-install
@@ -387,8 +383,7 @@ tests_check_datetime_SOURCES = \
 	tests/check_datetime.c
 
 tests_check_datetime_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(GLIB_CFLAGS)
 
 tests_check_datetime_LDFLAGS = \
 	-no-install
@@ -401,8 +396,7 @@ tests_check_exceptions_SOURCES = \
 	tests/check_exceptions.c
 
 tests_check_exceptions_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(GLIB_CFLAGS)
 
 tests_check_exceptions_LDFLAGS = \
 	-no-install
@@ -421,7 +415,6 @@ tests/tests_check_resources-check_resources.$(OBJEXT): tests/resources.c tests/r
 
 tests_check_resources_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include \
 	-I$(top_builddir)/tests
 
 tests_check_resources_LDFLAGS = \
@@ -435,8 +428,7 @@ tests_check_routing_SOURCES = \
 	tests/check_routing.c
 
 tests_check_routing_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(GLIB_CFLAGS)
 
 tests_check_routing_LDFLAGS = \
 	-no-install
@@ -450,8 +442,7 @@ tests_check_stdin_SOURCES = \
 	tests/mock_stdin.c
 
 tests_check_stdin_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(GLIB_CFLAGS)
 
 tests_check_stdin_LDFLAGS = \
 	-no-install
@@ -478,8 +469,7 @@ tests_check_template_helpers_SOURCES = \
 	tests/check_template_helpers.c
 
 tests_check_template_helpers_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(GLIB_CFLAGS)
 
 tests_check_template_helpers_LDFLAGS = \
 	-no-install
@@ -493,8 +483,7 @@ tests_check_wrappers_SOURCES = \
 	tests/mock_wrappers.c
 
 tests_check_wrappers_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(GLIB_CFLAGS)
 
 tests_check_wrappers_LDFLAGS = \
 	-no-install

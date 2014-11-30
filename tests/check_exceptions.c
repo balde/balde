@@ -11,10 +11,10 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include <balde.h>
-#include <balde/app-private.h>
-#include <balde/exceptions-private.h>
-#include <balde/wrappers-private.h>
+#include "../src/balde.h"
+#include "../src/app.h"
+#include "../src/exceptions.h"
+#include "../src/wrappers.h"
 
 
 void

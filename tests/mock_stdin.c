@@ -13,7 +13,7 @@
 #include <glib.h>
 #include <stdio.h>
 #include <string.h>
-#include <balde/cgi-private.h>
+#include "../src/cgi.h"
 
 // this thing isn't thread safe, bla, bla, bla, but this is just a test :)
 extern const gchar *query_string;

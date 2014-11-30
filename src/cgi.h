@@ -10,8 +10,8 @@
 #define _BALDE_CGI_PRIVATE_H
 
 #include <glib.h>
-#include <balde.h>
-#include <balde/wrappers-private.h>
+#include "balde.h"
+#include "wrappers.h"
 
 guint64 balde_cgi_parse_content_length(const gchar *str);
 gchar* balde_cgi_stdin_read(balde_app_t *app);
