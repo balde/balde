@@ -27,11 +27,11 @@ balde_response_set_header(balde_response_t *response, const gchar *name,
 {
     // http header name is ascii
     gchar *new_name = g_ascii_strdown(name, -1);
-    GSList *values = g_hash_table_lookup(response->headers, new_name);
+    GSList *values = g_hash_table_lookup(response->priv->headers, new_name);
     GSList *tmp = values;
     values = g_slist_append(values, g_strdup(value));
     if (tmp == NULL)
-        g_hash_table_insert(response->headers, new_name, values);
+        g_hash_table_insert(response->priv->headers, new_name, values);
     else
         g_free(new_name);
 }
@@ -40,7 +40,7 @@ balde_response_set_header(balde_response_t *response, const gchar *name,
 void
 balde_response_append_body(balde_response_t *response, const gchar *content)
 {
-    g_string_append(response->body, content);
+    g_string_append(response->priv->body, content);
 }
 
 
@@ -48,7 +48,7 @@ void
 balde_response_append_body_len(balde_response_t *response, const gchar *content,
     const gssize len)
 {
-    g_string_append_len(response->body, content, len);
+    g_string_append_len(response->priv->body, content, len);
 }
 
 
@@ -63,11 +63,13 @@ balde_response_t*
 balde_make_response_from_gstring(GString *content)
 {
     balde_response_t *response = g_new(balde_response_t, 1);
+    response->priv = g_new(struct _balde_response_private_t, 1);
     response->status_code = 200;
-    response->headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
+    response->priv->headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
         balde_response_headers_free);
-    response->template_ctx = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    response->body = content;
+    response->priv->template_ctx = g_hash_table_new_full(g_str_hash, g_str_equal,
+        g_free, g_free);
+    response->priv->body = content;
     return response;
 }
 
@@ -90,7 +92,7 @@ void
 balde_response_set_tmpl_var(balde_response_t *response, const gchar *name,
     const gchar *value)
 {
-    g_hash_table_replace(response->template_ctx, g_strdup(name), g_strdup(value));
+    g_hash_table_replace(response->priv->template_ctx, g_strdup(name), g_strdup(value));
 }
 
 
@@ -104,7 +106,7 @@ balde_response_set_tmpl_var(balde_response_t *response, const gchar *name,
 const gchar*
 balde_response_get_tmpl_var(balde_response_t *response, const gchar *name)
 {
-    return g_hash_table_lookup(response->template_ctx, name);
+    return g_hash_table_lookup(response->priv->template_ctx, name);
 }
 
 
@@ -168,9 +170,10 @@ balde_response_free(balde_response_t *response)
 {
     if (response == NULL)
         return;
-    g_hash_table_destroy(response->headers);
-    g_hash_table_destroy(response->template_ctx);
-    g_string_free(response->body, TRUE);
+    g_hash_table_destroy(response->priv->headers);
+    g_hash_table_destroy(response->priv->template_ctx);
+    g_string_free(response->priv->body, TRUE);
+    g_free(response->priv);
     g_free(response);
 }
 
@@ -235,15 +238,16 @@ balde_response_render(balde_response_t *response, const gboolean with_body)
         g_string_append_printf(str, "Status: %d %s\r\n", response->status_code, n);
         g_free(n);
     }
-    gchar *len = g_strdup_printf("%zu", response->body->len);
+    gchar *len = g_strdup_printf("%zu", response->priv->body->len);
     balde_response_set_header(response, "Content-Length", len);
     g_free(len);
-    if (g_hash_table_lookup(response->headers, "content-type") == NULL)
+    if (g_hash_table_lookup(response->priv->headers, "content-type") == NULL)
         balde_response_set_header(response, "Content-Type", "text/html; charset=utf-8");
-    g_hash_table_foreach(response->headers, (GHFunc) balde_header_render, str);
+    g_hash_table_foreach(response->priv->headers, (GHFunc) balde_header_render, str);
     g_string_append(str, "\r\n");
     if (with_body)
-        g_string_append_len(str, response->body->str, response->body->len);
+        g_string_append_len(str, response->priv->body->str,
+            response->priv->body->len);
     return str;
 }
 

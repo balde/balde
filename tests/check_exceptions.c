@@ -86,11 +86,11 @@ test_abort(void)
     g_assert(app != NULL);
     balde_response_t *res = balde_abort(app, 404);
     g_assert(res->status_code == 404);
-    g_assert_cmpstr(res->body->str, ==,
+    g_assert_cmpstr(res->priv->body->str, ==,
         "404 Not Found\n\n"
         "The requested URL was not found on the server. If you entered the URL "
         "manually please check your spelling and try again.\n");
-    GSList *tmp = g_hash_table_lookup(res->headers, "content-type");
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "content-type");
     g_assert_cmpstr(tmp->data, ==, "text/plain; charset=utf-8");
     balde_response_free(res);
     balde_app_free(app);
@@ -104,11 +104,11 @@ test_abort_with_description(void)
     g_assert(app != NULL);
     balde_response_t *res = balde_abort_with_description(app, 404, "bola");
     g_assert(res->status_code == 404);
-    g_assert_cmpstr(res->body->str, ==,
+    g_assert_cmpstr(res->priv->body->str, ==,
         "404 Not Found\n\n"
         "The requested URL was not found on the server. If you entered the URL "
         "manually please check your spelling and try again.\n\nbola\n");
-    GSList *tmp = g_hash_table_lookup(res->headers, "content-type");
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "content-type");
     g_assert_cmpstr(tmp->data, ==, "text/plain; charset=utf-8");
     balde_response_free(res);
     balde_app_free(app);

@@ -96,17 +96,17 @@ test_make_response_from_static_resource(void)
         request, "/static/lol.css");
     g_assert(response != NULL);
     g_assert_cmpint(response->status_code, ==, 200);
-    g_assert_cmpint(g_hash_table_size(response->headers), ==, 4);
-    GSList *tmp = g_hash_table_lookup(response->headers, "cache-control");
+    g_assert_cmpint(g_hash_table_size(response->priv->headers), ==, 4);
+    GSList *tmp = g_hash_table_lookup(response->priv->headers, "cache-control");
     g_assert_cmpstr(tmp->data, ==, "public, max-age=43200");
-    tmp = g_hash_table_lookup(response->headers, "expires");
+    tmp = g_hash_table_lookup(response->priv->headers, "expires");
     g_assert(g_str_has_suffix(tmp->data, " GMT"));
-    tmp = g_hash_table_lookup(response->headers, "etag");
+    tmp = g_hash_table_lookup(response->priv->headers, "etag");
     g_assert_cmpstr(tmp->data, ==,
         "\"balde-daab60b9178fd56656840a7fb9fc491c-48536785a0d37e65c9ebc6d7ee25119a\"");
-    tmp = g_hash_table_lookup(response->headers, "content-type");
+    tmp = g_hash_table_lookup(response->priv->headers, "content-type");
     g_assert_cmpstr(tmp->data, ==, "text/css");
-    g_assert_cmpstr(response->body->str, ==,
+    g_assert_cmpstr(response->priv->body->str, ==,
         "body {\n"
         "    background-color: #CCC;\n"
         "}\n");
@@ -129,17 +129,17 @@ test_make_response_from_static_resource_304(void)
         request, "/static/lol.css");
     g_assert(response != NULL);
     g_assert_cmpint(response->status_code, ==, 304);
-    g_assert_cmpint(g_hash_table_size(response->headers), ==, 4);
-    GSList *tmp = g_hash_table_lookup(response->headers, "cache-control");
+    g_assert_cmpint(g_hash_table_size(response->priv->headers), ==, 4);
+    GSList *tmp = g_hash_table_lookup(response->priv->headers, "cache-control");
     g_assert_cmpstr(tmp->data, ==, "public, max-age=43200");
-    tmp = g_hash_table_lookup(response->headers, "expires");
+    tmp = g_hash_table_lookup(response->priv->headers, "expires");
     g_assert(g_str_has_suffix(tmp->data, " GMT"));
-    tmp = g_hash_table_lookup(response->headers, "etag");
+    tmp = g_hash_table_lookup(response->priv->headers, "etag");
     g_assert_cmpstr(tmp->data, ==,
         "\"balde-daab60b9178fd56656840a7fb9fc491c-48536785a0d37e65c9ebc6d7ee25119a\"");
-    tmp = g_hash_table_lookup(response->headers, "content-type");
+    tmp = g_hash_table_lookup(response->priv->headers, "content-type");
     g_assert_cmpstr(tmp->data, ==, "text/css");
-    g_assert_cmpstr(response->body->str, ==, "");
+    g_assert_cmpstr(response->priv->body->str, ==, "");
     balde_response_free(response);
     balde_request_free(request);
     balde_app_free(app);

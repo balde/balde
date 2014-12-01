@@ -106,7 +106,7 @@ balde_httpd_response_render(balde_response_t *response, const gboolean with_body
         balde_exception_get_name_from_code(response->status_code), -1);
     g_string_append_printf(str, "HTTP/1.0 %d %s\r\n", response->status_code, n);
     g_free(n);
-    gchar *len = g_strdup_printf("%zu", response->body->len);
+    gchar *len = g_strdup_printf("%zu", response->priv->body->len);
     GDateTime *dt = g_date_time_new_now_utc();
     gchar *date = balde_datetime_rfc5322(dt);
     g_date_time_unref(dt);
@@ -115,12 +115,13 @@ balde_httpd_response_render(balde_response_t *response, const gboolean with_body
     balde_response_set_header(response, "Content-Length", len);
     g_free(date);
     g_free(len);
-    if (g_hash_table_lookup(response->headers, "content-type") == NULL)
+    if (g_hash_table_lookup(response->priv->headers, "content-type") == NULL)
         balde_response_set_header(response, "Content-Type", "text/html; charset=utf-8");
-    g_hash_table_foreach(response->headers, (GHFunc) balde_header_render, str);
+    g_hash_table_foreach(response->priv->headers, (GHFunc) balde_header_render, str);
     g_string_append(str, "\r\n");
     if (with_body)
-        g_string_append_len(str, response->body->str, response->body->len);
+        g_string_append_len(str, response->priv->body->str,
+            response->priv->body->len);
     return str;
 }
 

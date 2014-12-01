@@ -174,26 +174,10 @@ typedef struct {
     /**
      * HTTP response status code.
      */
-    guint status_code;
+    balde_http_exception_code_t status_code;
 
-    /**
-     * A GLib hash table that stores the response headers. Do not touch
-     * it manually, use the balde_response_set_header() function instead.
-     */
-    GHashTable *headers;
-
-    /**
-     * A GLib hash table that stores the template variables. Do not touch
-     * it manually, use the balde_response_set_tmpl_var() and
-     * balde_response_get_tmpl_var() functions instead.
-     */
-    GHashTable *template_ctx;
-
-    /**
-     * A GLib string that stores the response body. Do not touch it
-     * manually, use the balde_response_append_body() function instead.
-     */
-    GString *body;
+    /** Private structure. Shouldn't be touched by users. **/
+    struct _balde_response_private_t *priv;
 
 } balde_response_t;
 

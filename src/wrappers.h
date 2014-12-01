@@ -29,6 +29,12 @@ struct _balde_request_private_t {
     GHashTable *cookies;
 };
 
+struct _balde_response_private_t {
+    GHashTable *headers;
+    GHashTable *template_ctx;
+    GString *body;
+};
+
 void balde_response_headers_free(gpointer l);
 void balde_response_free(balde_response_t *response);
 balde_response_t* balde_make_response_from_gstring(GString *content);
