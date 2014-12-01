@@ -27,6 +27,7 @@ struct _balde_request_private_t {
     GHashTable *view_args;
     GHashTable *headers;
     GHashTable *cookies;
+    GString *body;
 };
 
 struct _balde_response_private_t {

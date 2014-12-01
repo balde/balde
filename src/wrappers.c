@@ -407,7 +407,7 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
     balde_request_t *request = g_new(balde_request_t, 1);
     request->priv = g_new(struct _balde_request_private_t, 1);
     request->priv->view_args = NULL;
-    request->stream = NULL;
+    request->priv->body = NULL;
     request->priv->form = NULL;
     balde_request_env_t *env = request_env;
     if (request_env == NULL)
@@ -421,9 +421,10 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
     request->authorization = balde_parse_authorization(
         balde_request_get_header(request, "authorization"));
     if (request->method & (BALDE_HTTP_POST | BALDE_HTTP_PUT | BALDE_HTTP_PATCH)) {
-        request->stream = env->body;
-        request->priv->form = balde_parse_query_string(request->stream);
+        request->priv->body = g_string_new_len(env->body, env->content_length);
+        request->priv->form = balde_parse_query_string(request->priv->body->str);
     }
+    g_free(env->body);
     g_free(env->query_string);
     g_free(env->request_method);
     g_free(env);
@@ -488,6 +489,13 @@ balde_request_get_cookie(balde_request_t *request, const gchar *name)
 }
 
 
+const GString*
+balde_request_get_body(balde_request_t *request)
+{
+    return request->priv->body;
+}
+
+
 void
 balde_request_free(balde_request_t *request)
 {
@@ -498,7 +506,8 @@ balde_request_free(balde_request_t *request)
     g_hash_table_destroy(request->priv->args);
     if (request->priv->view_args != NULL)
         g_hash_table_destroy(request->priv->view_args);
-    g_free((gchar*) request->stream);
+    if (request->priv->body != NULL)
+        g_string_free(request->priv->body, TRUE);
     if (request->priv->form != NULL)
         g_hash_table_destroy(request->priv->form);
     if (request->priv->cookies != NULL)

@@ -538,7 +538,7 @@ test_request_get_form(void)
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, NULL);
-    g_assert(request->stream == NULL);
+    g_assert(request->priv->body == NULL);
     g_assert(request->priv->form == NULL);
     g_assert(balde_request_get_form(request, "lol") == NULL);
     balde_request_free(request);
@@ -554,7 +554,8 @@ test_request_get_form_with_empty_body(void)
     balde_app_t *app = balde_app_init();
     // ommited CONTENT_LENGTH
     balde_request_t *request = balde_make_request(app, NULL);
-    g_assert(request->stream == NULL);
+    g_assert_cmpstr(request->priv->body->str, ==, "");
+    g_assert(request->priv->body->len == 0);
     g_assert(g_hash_table_size(request->priv->form) == 0);
     g_assert(balde_request_get_form(request, "lol") == NULL);
     balde_request_free(request);
@@ -584,6 +585,35 @@ test_request_get_cookie(void)
     g_hash_table_replace(request->priv->cookies, g_strdup("foo"), g_strdup("bar"));
     g_assert_cmpstr(balde_request_get_cookie(request, "foo"), == , "bar");
     g_assert(balde_request_get_cookie(request, "xd") == NULL);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
+test_request_get_body(void)
+{
+    g_setenv("REQUEST_METHOD", "GET", TRUE);
+    // FIXME: this thing is too weak :(
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    g_assert(balde_request_get_body(request) == NULL);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
+test_request_get_body_with_empty_body(void)
+{
+    g_setenv("REQUEST_METHOD", "POST", TRUE);
+    // FIXME: this thing is too weak :(
+    balde_app_t *app = balde_app_init();
+    // ommited CONTENT_LENGTH
+    balde_request_t *request = balde_make_request(app, NULL);
+    const GString *str = balde_request_get_body(request);
+    g_assert_cmpstr(str->str, ==, "");
+    g_assert(str->len == 0);
     balde_request_free(request);
     balde_app_free(app);
 }
@@ -657,5 +687,8 @@ main(int argc, char** argv)
         test_request_get_form_with_empty_body);
     g_test_add_func("/wrappers/request_get_view_arg", test_request_get_view_arg);
     g_test_add_func("/wrappers/request_get_cookie", test_request_get_cookie);
+    g_test_add_func("/wrappers/request_get_body", test_request_get_body);
+    g_test_add_func("/wrappers/request_get_body_with_empty_body",
+        test_request_get_body_with_empty_body);
     return g_test_run();
 }

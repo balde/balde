@@ -154,13 +154,6 @@ typedef struct {
 typedef struct {
 
     /**
-     * Raw request body, if provided by client. You can use it, but not change
-     * its value.
-     *
-     */
-    const gchar *stream;
-
-    /**
      * A structure that stores the authorization data received from the client.
      *
      */
@@ -499,6 +492,15 @@ const gchar* balde_request_get_view_arg(balde_request_t *request,
  *
  */
 const gchar* balde_request_get_cookie(balde_request_t *request, const gchar *name);
+
+
+/**
+ * Gets the request body.
+ *
+ * It returns \c NULL if no body was processed, and a \c GString otherwise.
+ *
+ */
+const GString* balde_request_get_body(balde_request_t *request);
 
 
 /**
