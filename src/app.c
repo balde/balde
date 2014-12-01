@@ -335,7 +335,7 @@ balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
 
     // get the view
     endpoint = balde_dispatch_from_path(app_copy->priv->views, request->path,
-        &(request->view_args));
+        &(request->priv->view_args));
     if (endpoint == NULL) {  // no view found! :(
         balde_abort_set_error(app_copy, 404);
     }

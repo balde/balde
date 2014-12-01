@@ -88,7 +88,7 @@ typedef enum {
 
 /** balde application context
  *
- * This is an opaque structure that stores everything related to the
+ * This is an structure that stores everything related to the
  * application context. It should stay loaded in memory during all the
  * application life cycle, as it will be reused for all the requests.
  */
@@ -102,11 +102,6 @@ typedef struct {
 
 } balde_app_t;
 
-/**
- * \example hello-with-auth.c
- *
- * An example with Basic HTTP authentication.
- */
 
 /** balde HTTP authorization context.
  *
@@ -131,6 +126,7 @@ typedef struct {
 
 } balde_authorization_t;
 
+
 /** balde request context
  *
  * This struct stores everything related to the request context. It stays
@@ -140,42 +136,10 @@ typedef struct {
 typedef struct {
 
     /**
-     * A GLib hash table that stores the query string parameters. Do not
-     * touch it manually, use the balde_request_get_arg() function instead.
-     */
-    GHashTable *args;
-
-    /**
-     * A GLib hash table that stores the parsed form data. Do not touch it
-     * manually, use the balde_request_get_form() function instead.
-     */
-    GHashTable *form;
-
-    /**
      * Raw request body, if provided by client. You can use it, but not change
      * its value.
      */
     const gchar *stream;
-
-    /**
-     * A GLib hash table that stores the arguments parsed from the request
-     * path. Do not touch it manually, use the balde_request_get_view_arg()
-     * function instead.
-     */
-    GHashTable *view_args;
-
-    /**
-     * A GLib hash table that stores the request headers. Do not touch
-     * it manually, use the balde_request_get_header() function instead.
-     */
-    GHashTable *headers;
-
-    /**
-     * A GLib hash table that stores the cookies received from the client.
-     * Do not touch it manually, use the balde_request_get_cookie() function
-     * instead.
-     */
-    GHashTable *cookies;
 
     /**
      * A structure that stores the authorization data received from the client.
@@ -193,7 +157,11 @@ typedef struct {
      */
     balde_http_method_t method;
 
+    /** Private structure. Shouldn't be touched by users. **/
+    struct _balde_request_private_t *priv;
+
 } balde_request_t;
+
 
 /** balde response context
  *

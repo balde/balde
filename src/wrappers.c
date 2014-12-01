@@ -401,23 +401,24 @@ balde_request_t*
 balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
 {
     balde_request_t *request = g_new(balde_request_t, 1);
-    request->view_args = NULL;
+    request->priv = g_new(struct _balde_request_private_t, 1);
+    request->priv->view_args = NULL;
     request->stream = NULL;
-    request->form = NULL;
+    request->priv->form = NULL;
     balde_request_env_t *env = request_env;
     if (request_env == NULL)
         env = balde_cgi_parse_request(app);
     request->path = env->path_info;
     request->method = balde_http_method_str2enum(env->request_method);
-    request->headers = env->headers;
-    request->args = balde_parse_query_string(env->query_string);
-    request->cookies = balde_parse_cookies(
+    request->priv->headers = env->headers;
+    request->priv->args = balde_parse_query_string(env->query_string);
+    request->priv->cookies = balde_parse_cookies(
         balde_request_get_header(request, "cookie"));
     request->authorization = balde_parse_authorization(
         balde_request_get_header(request, "authorization"));
     if (request->method & (BALDE_HTTP_POST | BALDE_HTTP_PUT | BALDE_HTTP_PATCH)) {
         request->stream = env->body;
-        request->form = balde_parse_query_string(request->stream);
+        request->priv->form = balde_parse_query_string(request->stream);
     }
     g_free(env->query_string);
     g_free(env->request_method);
@@ -430,7 +431,7 @@ const gchar*
 balde_request_get_header(balde_request_t *request, const gchar *name)
 {
     gchar *l_name = g_ascii_strdown(name, -1);
-    gchar *value = g_hash_table_lookup(request->headers, l_name);
+    gchar *value = g_hash_table_lookup(request->priv->headers, l_name);
     g_free(l_name);
     return value;
 }
@@ -439,7 +440,7 @@ balde_request_get_header(balde_request_t *request, const gchar *name)
 const gchar*
 balde_request_get_arg(balde_request_t *request, const gchar *name)
 {
-    return g_hash_table_lookup(request->args, name);
+    return g_hash_table_lookup(request->priv->args, name);
 }
 
 
@@ -453,18 +454,18 @@ balde_request_get_arg(balde_request_t *request, const gchar *name)
 const gchar*
 balde_request_get_form(balde_request_t *request, const gchar *name)
 {
-    if (request->form == NULL)
+    if (request->priv->form == NULL)
         return NULL;
-    return g_hash_table_lookup(request->form, name);
+    return g_hash_table_lookup(request->priv->form, name);
 }
 
 
 const gchar*
 balde_request_get_view_arg(balde_request_t *request, const gchar *name)
 {
-    if (request->view_args == NULL)
+    if (request->priv->view_args == NULL)
         return NULL;
-    return g_hash_table_lookup(request->view_args, name);
+    return g_hash_table_lookup(request->priv->view_args, name);
 }
 
 
@@ -477,9 +478,9 @@ balde_request_get_view_arg(balde_request_t *request, const gchar *name)
 const gchar*
 balde_request_get_cookie(balde_request_t *request, const gchar *name)
 {
-    if (request->cookies == NULL)
+    if (request->priv->cookies == NULL)
         return NULL;
-    return g_hash_table_lookup(request->cookies, name);
+    return g_hash_table_lookup(request->priv->cookies, name);
 }
 
 
@@ -489,16 +490,17 @@ balde_request_free(balde_request_t *request)
     if (request == NULL)
         return;
     g_free((gchar*) request->path);
-    g_hash_table_destroy(request->headers);
-    g_hash_table_destroy(request->args);
-    if (request->view_args != NULL)
-        g_hash_table_destroy(request->view_args);
+    g_hash_table_destroy(request->priv->headers);
+    g_hash_table_destroy(request->priv->args);
+    if (request->priv->view_args != NULL)
+        g_hash_table_destroy(request->priv->view_args);
     g_free((gchar*) request->stream);
-    if (request->form != NULL)
-        g_hash_table_destroy(request->form);
-    if (request->cookies != NULL)
-        g_hash_table_destroy(request->cookies);
+    if (request->priv->form != NULL)
+        g_hash_table_destroy(request->priv->form);
+    if (request->priv->cookies != NULL)
+        g_hash_table_destroy(request->priv->cookies);
     balde_authorization_free(request->authorization);
+    g_free(request->priv);
     g_free(request);
 }
 

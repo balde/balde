@@ -21,6 +21,14 @@ typedef struct {
     gchar *body;
 } balde_request_env_t;
 
+struct _balde_request_private_t {
+    GHashTable *args;
+    GHashTable *form;
+    GHashTable *view_args;
+    GHashTable *headers;
+    GHashTable *cookies;
+};
+
 void balde_response_headers_free(gpointer l);
 void balde_response_free(balde_response_t *response);
 balde_response_t* balde_make_response_from_gstring(GString *content);

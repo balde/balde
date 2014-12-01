@@ -456,13 +456,13 @@ test_make_request(void)
     balde_request_t *request = balde_make_request(app, NULL);
     g_assert_cmpstr(request->path, ==, "/");
     g_assert(request->method == BALDE_HTTP_GET);
-    g_assert(g_hash_table_size(request->headers) == 4);
-    g_assert(g_hash_table_size(request->args) == 2);
-    g_assert(g_hash_table_size(request->cookies) == 2);
+    g_assert(g_hash_table_size(request->priv->headers) == 4);
+    g_assert(g_hash_table_size(request->priv->args) == 2);
+    g_assert(g_hash_table_size(request->priv->cookies) == 2);
     g_assert(request->authorization != NULL);
     g_assert_cmpstr(request->authorization->username, ==, "bola");
     g_assert_cmpstr(request->authorization->password, ==, "guda:lol");
-    g_assert(request->view_args == NULL);
+    g_assert(request->priv->view_args == NULL);
     balde_request_free(request);
     balde_app_free(app);
 }
@@ -489,13 +489,13 @@ test_make_request_with_env(void)
     balde_request_t *request = balde_make_request(app, env);
     g_assert_cmpstr(request->path, ==, "/");
     g_assert(request->method == BALDE_HTTP_GET);
-    g_assert(g_hash_table_size(request->headers) == 4);
-    g_assert(g_hash_table_size(request->args) == 2);
-    g_assert(g_hash_table_size(request->cookies) == 2);
+    g_assert(g_hash_table_size(request->priv->headers) == 4);
+    g_assert(g_hash_table_size(request->priv->args) == 2);
+    g_assert(g_hash_table_size(request->priv->cookies) == 2);
     g_assert(request->authorization != NULL);
     g_assert_cmpstr(request->authorization->username, ==, "bola");
     g_assert_cmpstr(request->authorization->password, ==, "guda:lol");
-    g_assert(request->view_args == NULL);
+    g_assert(request->priv->view_args == NULL);
     balde_request_free(request);
     balde_app_free(app);
 }
@@ -539,7 +539,7 @@ test_request_get_form(void)
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, NULL);
     g_assert(request->stream == NULL);
-    g_assert(request->form == NULL);
+    g_assert(request->priv->form == NULL);
     g_assert(balde_request_get_form(request, "lol") == NULL);
     balde_request_free(request);
     balde_app_free(app);
@@ -555,7 +555,7 @@ test_request_get_form_with_empty_body(void)
     // ommited CONTENT_LENGTH
     balde_request_t *request = balde_make_request(app, NULL);
     g_assert(request->stream == NULL);
-    g_assert(g_hash_table_size(request->form) == 0);
+    g_assert(g_hash_table_size(request->priv->form) == 0);
     g_assert(balde_request_get_form(request, "lol") == NULL);
     balde_request_free(request);
     balde_app_free(app);
@@ -567,8 +567,8 @@ test_request_get_view_arg(void)
 {
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, NULL);
-    request->view_args = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    g_hash_table_replace(request->view_args, g_strdup("foo"), g_strdup("bar"));
+    request->priv->view_args = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    g_hash_table_replace(request->priv->view_args, g_strdup("foo"), g_strdup("bar"));
     g_assert_cmpstr(balde_request_get_view_arg(request, "foo"), == , "bar");
     g_assert(balde_request_get_view_arg(request, "xd") == NULL);
     balde_request_free(request);
@@ -581,7 +581,7 @@ test_request_get_cookie(void)
 {
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, NULL);
-    g_hash_table_replace(request->cookies, g_strdup("foo"), g_strdup("bar"));
+    g_hash_table_replace(request->priv->cookies, g_strdup("foo"), g_strdup("bar"));
     g_assert_cmpstr(balde_request_get_cookie(request, "foo"), == , "bar");
     g_assert(balde_request_get_cookie(request, "xd") == NULL);
     balde_request_free(request);
