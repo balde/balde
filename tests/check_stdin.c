@@ -41,11 +41,12 @@ test_read(void) {
 
 
 void
-test_stream(void) {
+test_body(void) {
     set_headers();
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, NULL);
     g_assert_cmpstr(request->priv->body->str, ==, "guda=bola&moises=arcoiro");
+    g_assert_cmpint(request->priv->body->len, ==, 24);
     balde_request_free(request);
     balde_app_free(app);
 }
@@ -70,7 +71,7 @@ main(int argc, char** argv)
 {
     g_test_init(&argc, &argv, NULL);
     g_test_add_func("/stdin/read", test_read);
-    g_test_add_func("/stdin/stream", test_stream);
+    g_test_add_func("/stdin/body", test_body);
     g_test_add_func("/stdin/form", test_form);
     return g_test_run();
 }

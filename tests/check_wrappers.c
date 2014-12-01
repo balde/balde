@@ -555,7 +555,7 @@ test_request_get_form_with_empty_body(void)
     // ommited CONTENT_LENGTH
     balde_request_t *request = balde_make_request(app, NULL);
     g_assert_cmpstr(request->priv->body->str, ==, "");
-    g_assert(request->priv->body->len == 0);
+    g_assert_cmpint(request->priv->body->len, ==, 0);
     g_assert(g_hash_table_size(request->priv->form) == 0);
     g_assert(balde_request_get_form(request, "lol") == NULL);
     balde_request_free(request);
