@@ -93,9 +93,9 @@ typedef enum {
 /**
  * balde application context
  *
- * This is an structure that stores everything related to the application
- * context. It should stay loaded in memory during all the pplication life
- * cycle, as it will be reused for all the requests.
+ * This structure that stores everything related to the application context.
+ * It should stay loaded in memory during all the pplication life cycle, as it
+ * will be reused for all the requests.
  *
  */
 typedef struct {
