@@ -274,17 +274,41 @@ const gchar* balde_app_get_config(balde_app_t *app, const gchar *name);
  * Sets user data.
  *
  * The memory needed by the user provided data should be allocated previously,
- * and free'd afterwards.
+ * and free'd afterwards, unless you provide a destroy function with
+ * balde_app_set_user_data_destroy_func(). If you do not provides a destroy
+ * function and call this function twice, it will probably results in a memory
+ * leak.
  *
  */
-void balde_app_set_user_data(balde_app_t *app, void *user_data);
+void balde_app_set_user_data(balde_app_t *app, gpointer user_data);
 
 
 /**
  * Gets user data.
  *
  */
-void* balde_app_get_user_data(balde_app_t *app);
+gpointer balde_app_get_user_data(balde_app_t *app);
+
+
+/**
+ * Sets user data destroy function.
+ *
+ * This function sets the destroy function that will be used by balde to free
+ * memory allocated for user data when freeing/setting new values for it.
+ *
+ */
+void balde_app_set_user_data_destroy_func(balde_app_t *app,
+    GDestroyNotify destroy_func);
+
+
+/**
+ * Free memory allocated for user data.
+ *
+ * This function depends on a destroy function being provided through
+ * balde_app_set_user_data_destroy_func() function.
+ *
+ */
+void balde_app_free_user_data(balde_app_t *app);
 
 
 /**

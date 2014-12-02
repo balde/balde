@@ -40,6 +40,7 @@ balde_app_init(void)
     app->priv->before_requests = NULL;
     app->priv->static_resources = NULL;
     app->priv->user_data = NULL;
+    app->priv->user_data_destroy_func = NULL;
     app->priv->config = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     app->error = NULL;
     balde_app_add_url_rule(app, "static", "/static/<path:file>", BALDE_HTTP_GET,
@@ -100,17 +101,39 @@ balde_app_get_config(balde_app_t *app, const gchar *name)
 
 
 void
-balde_app_set_user_data(balde_app_t *app, void *user_data)
+balde_app_set_user_data(balde_app_t *app, gpointer user_data)
 {
     BALDE_APP_READ_ONLY(app);
+
+    // when setting, if we have a destroy function, try to use it.
+    balde_app_free_user_data(app);
+
     app->priv->user_data = user_data;
 }
 
 
-void*
+gpointer
 balde_app_get_user_data(balde_app_t *app)
 {
     return app->priv->user_data;
+}
+
+
+void
+balde_app_set_user_data_destroy_func(balde_app_t *app, GDestroyNotify destroy_func)
+{
+    BALDE_APP_READ_ONLY(app);
+    app->priv->user_data_destroy_func = destroy_func;
+}
+
+
+void
+balde_app_free_user_data(balde_app_t *app)
+{
+    if (app->priv->user_data_destroy_func != NULL && app->priv->user_data != NULL) {
+        app->priv->user_data_destroy_func(app->priv->user_data);
+        app->priv->user_data = NULL;
+    }
 }
 
 

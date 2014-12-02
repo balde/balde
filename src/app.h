@@ -27,6 +27,7 @@ struct _balde_app_private_t {
     GSList *static_resources;
     GHashTable *config;
     gpointer user_data;
+    GDestroyNotify user_data_destroy_func;
     gboolean copy;
 };
 

@@ -136,9 +136,36 @@ test_app_get_user_data(void)
     balde_app_t *app = balde_app_init();
     app->priv->user_data = GINT_TO_POINTER(10);
     g_assert_cmpint(GPOINTER_TO_INT(balde_app_get_user_data(app)), ==, 10);
-    void* foo = balde_app_get_user_data(app);
+    gpointer foo = balde_app_get_user_data(app);
     foo = GINT_TO_POINTER(20);
     g_assert_cmpint(GPOINTER_TO_INT(balde_app_get_user_data(app)), ==, 10);
+    balde_app_free(app);
+}
+
+
+void
+test_app_set_user_data_with_destroyer(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_app_set_user_data_destroy_func(app, g_free);
+    balde_app_set_user_data(app, g_strdup("bola"));
+    g_assert_cmpstr(balde_app_get_user_data(app), ==, "bola");
+    balde_app_set_user_data(app, g_strdup("chunda"));
+    g_assert_cmpstr(balde_app_get_user_data(app), ==, "chunda");
+    balde_app_free_user_data(app);
+    balde_app_free(app);
+}
+
+
+void
+test_app_free_user_data(void)
+{
+    balde_app_t *app = balde_app_init();
+    balde_app_set_user_data_destroy_func(app, g_free);
+    balde_app_set_user_data(app, g_strdup("bola"));
+    g_assert_cmpstr(balde_app_get_user_data(app), ==, "bola");
+    balde_app_free_user_data(app);
+    g_assert(balde_app_get_user_data(app) == NULL);
     balde_app_free(app);
 }
 
@@ -318,6 +345,9 @@ main(int argc, char** argv)
     g_test_add_func("/app/get_config", test_app_get_config);
     g_test_add_func("/app/set_user_data", test_app_set_user_data);
     g_test_add_func("/app/get_user_data", test_app_get_user_data);
+    g_test_add_func("/app/set_user_data_with_destroyer",
+        test_app_set_user_data_with_destroyer);
+    g_test_add_func("/app/free_user_data", test_app_free_user_data);
     g_test_add_func("/app/add_url_rule", test_app_add_url_rule);
     g_test_add_func("/app/add_before_request",
         test_app_add_before_request);
