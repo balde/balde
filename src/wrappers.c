@@ -413,6 +413,7 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
     if (request_env == NULL)
         env = balde_cgi_parse_request(app);
     request->path = env->path_info;
+    request->script_name = env->script_name;
     request->method = balde_http_method_str2enum(env->request_method);
     request->priv->headers = env->headers;
     request->priv->args = balde_parse_query_string(env->query_string);
@@ -502,6 +503,7 @@ balde_request_free(balde_request_t *request)
     if (request == NULL)
         return;
     g_free((gchar*) request->path);
+    g_free((gchar*) request->script_name);
     g_hash_table_destroy(request->priv->headers);
     g_hash_table_destroy(request->priv->args);
     if (request->priv->view_args != NULL)

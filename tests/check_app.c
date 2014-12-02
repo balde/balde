@@ -244,47 +244,61 @@ test_app_get_view_from_endpoint_not_found(void)
 void
 test_app_url_for(void)
 {
+    g_setenv("PATH_INFO", "/", TRUE);
+    g_setenv("REQUEST_METHOD", "GET", TRUE);
+    // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
     balde_app_add_url_rule(app, "arcoiro", "/arcoiro/<bola>/<guda>/",
         BALDE_HTTP_GET, arcoiro_view);
     balde_app_add_url_rule(app, "arcoiro2", "/arco/<iro>", BALDE_HTTP_GET,
         arcoiro_view);
-    gchar *url = balde_app_url_for(app, "arcoiro", FALSE, "chunda", "guto");
+    gchar *url = balde_app_url_for(app, request, "arcoiro", FALSE, "chunda", "guto");
     g_assert_cmpstr(url, ==, "/arcoiro/chunda/guto/");
     g_free(url);
-    url = balde_app_url_for(app, "arcoiro2", FALSE, "bola");
+    url = balde_app_url_for(app, request, "arcoiro2", FALSE, "bola");
     g_assert_cmpstr(url, ==, "/arco/bola");
     g_free(url);
-    url = balde_app_url_for(app, "arcoiro2", FALSE, "bo\"la");
+    url = balde_app_url_for(app, request, "arcoiro2", FALSE, "bo\"la");
     g_assert_cmpstr(url, ==, "/arco/bo%22la");
     g_free(url);
-    url = balde_app_url_for(app, "static", FALSE, "foo/jquery-min.js");
+    url = balde_app_url_for(app, request, "static", FALSE, "foo/jquery-min.js");
     g_assert_cmpstr(url, ==, "/static/foo/jquery-min.js");
     g_free(url);
+    balde_request_free(request);
     balde_app_free(app);
+    g_unsetenv("REQUEST_METHOD");
+    g_unsetenv("PATH_INFO");
 }
 
 
 void
 test_app_url_for_with_script_name(void)
 {
+    g_setenv("PATH_INFO", "/", TRUE);
+    g_setenv("REQUEST_METHOD", "GET", TRUE);
     g_setenv("SCRIPT_NAME", "/foo/bar", TRUE);
+    // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
     balde_app_add_url_rule(app, "arcoiro", "/arcoiro/<bola>/<guda>/",
         BALDE_HTTP_GET, arcoiro_view);
     balde_app_add_url_rule(app, "arcoiro2", "/arco/<iro>", BALDE_HTTP_GET,
         arcoiro_view);
-    gchar *url = balde_app_url_for(app, "arcoiro", FALSE, "chunda", "guto");
+    gchar *url = balde_app_url_for(app, request, "arcoiro", FALSE, "chunda", "guto");
     g_assert_cmpstr(url, ==, "/foo/bar/arcoiro/chunda/guto/");
     g_free(url);
-    url = balde_app_url_for(app, "arcoiro2", FALSE, "bola");
+    url = balde_app_url_for(app, request, "arcoiro2", FALSE, "bola");
     g_assert_cmpstr(url, ==, "/foo/bar/arco/bola");
     g_free(url);
-    url = balde_app_url_for(app, "static", FALSE, "foo/jquery-min.js");
+    url = balde_app_url_for(app, request, "static", FALSE, "foo/jquery-min.js");
     g_assert_cmpstr(url, ==, "/foo/bar/static/foo/jquery-min.js");
     g_free(url);
+    balde_request_free(request);
     balde_app_free(app);
     g_unsetenv("SCRIPT_NAME");
+    g_unsetenv("REQUEST_METHOD");
+    g_unsetenv("PATH_INFO");
 }
 
 

@@ -50,6 +50,7 @@ balde_request_env_t*
 balde_cgi_parse_request(balde_app_t *app)
 {
     balde_request_env_t *rv = g_new(balde_request_env_t, 1);
+    rv->script_name = g_strdup(g_getenv("SCRIPT_NAME"));
     rv->path_info = g_strdup(g_getenv("PATH_INFO"));
     rv->request_method = g_strdup(g_getenv("REQUEST_METHOD"));
     rv->query_string = g_strdup(g_getenv("QUERY_STRING"));

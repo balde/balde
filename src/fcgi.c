@@ -69,6 +69,7 @@ balde_request_env_t*
 balde_fcgi_parse_request(balde_app_t *app, FCGX_Request *request)
 {
     balde_request_env_t *rv = g_new(balde_request_env_t, 1);
+    rv->script_name = g_strdup(FCGX_GetParam("SCRIPT_NAME", request->envp));
     rv->path_info = g_strdup(FCGX_GetParam("PATH_INFO", request->envp));
     rv->request_method = g_strdup(FCGX_GetParam("REQUEST_METHOD", request->envp));
     rv->query_string = g_strdup(FCGX_GetParam("QUERY_STRING", request->envp));

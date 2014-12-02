@@ -160,6 +160,12 @@ typedef struct {
     balde_authorization_t *authorization;
 
     /**
+     * Request script name.
+     *
+     */
+    const gchar *script_name;
+
+    /**
      * Request path.
      *
      */
@@ -335,8 +341,8 @@ void balde_app_add_before_request(balde_app_t *app,
  * If set to TRUE, the function will return an absolute URL.
  *
  */
-gchar* balde_app_url_for(balde_app_t *app, const gchar *endpoint, gboolean external,
-    ...);
+gchar* balde_app_url_for(balde_app_t *app, balde_request_t *request,
+    const gchar *endpoint, gboolean external, ...);
 
 
 /**

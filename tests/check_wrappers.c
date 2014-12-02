@@ -472,6 +472,7 @@ void
 test_make_request_with_env(void)
 {
     balde_request_env_t *env = g_new(balde_request_env_t, 1);
+    env->script_name = NULL;
     env->path_info = g_strdup("/");
     env->request_method = g_strdup("GET");
     env->query_string = g_strdup("asd=lol&xd=hehe");

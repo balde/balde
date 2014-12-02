@@ -81,6 +81,7 @@ balde_httpd_parse_request(balde_app_t *app, GInputStream *istream)
     g_object_unref(data);
 
     balde_request_env_t *env = g_new(balde_request_env_t, 1);
+    env->script_name = NULL;
     env->path_info = path_info;
     env->request_method = request_method;
     env->query_string = query_string;

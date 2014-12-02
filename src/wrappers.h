@@ -14,6 +14,7 @@
 
 typedef struct {
     gchar *request_method;
+    gchar *script_name;
     gchar *path_info;
     gchar *query_string;
     GHashTable *headers;

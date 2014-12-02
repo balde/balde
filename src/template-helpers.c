@@ -28,7 +28,7 @@ balde_tmpl_url_for(balde_app_t *app, balde_request_t *request,
 {
     va_list params;
     va_start(params, external);
-    gchar *rv = balde_app_url_forv(app, endpoint, params);
+    gchar *rv = balde_app_url_forv(app, request, endpoint, params);
     va_end(params);
     return rv;
 }

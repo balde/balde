@@ -191,18 +191,20 @@ balde_app_get_view_from_endpoint(balde_app_t *app, const gchar *endpoint)
 
 
 gchar*
-balde_app_url_for(balde_app_t *app, const gchar *endpoint, gboolean external, ...)
+balde_app_url_for(balde_app_t *app, balde_request_t *request,
+    const gchar *endpoint, gboolean external, ...)
 {
     va_list params;
     va_start(params, external);
-    gchar *rv = balde_app_url_forv(app, endpoint, params);
+    gchar *rv = balde_app_url_forv(app, request, endpoint, params);
     va_end(params);
     return rv;
 }
 
 
 gchar*
-balde_app_url_forv(balde_app_t *app, const gchar *endpoint, va_list params)
+balde_app_url_forv(balde_app_t *app, balde_request_t *request,
+    const gchar *endpoint, va_list params)
 {
     balde_view_t *view = balde_app_get_view_from_endpoint(app, endpoint);
     if (view == NULL)
