@@ -372,20 +372,6 @@ test_response_render_exception_without_body(void)
 
 
 void
-test_request_headers(void)
-{
-    g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
-    g_setenv("HTTP_XD_KKK", "asdf", TRUE);
-    // FIXME: this thing is too weak :(
-    GHashTable *headers = balde_request_headers();
-    g_assert(g_hash_table_size(headers) == 2);
-    g_assert_cmpstr(g_hash_table_lookup(headers, "lol-hehe"), ==, "12345");
-    g_assert_cmpstr(g_hash_table_lookup(headers, "xd-kkk"), ==, "asdf");
-    g_hash_table_destroy(headers);
-}
-
-
-void
 test_urldecode(void)
 {
     gchar *rv = balde_urldecode("saf%3Dgfd+123");
@@ -674,7 +660,6 @@ main(int argc, char** argv)
         test_response_render_exception);
     g_test_add_func("/wrappers/response_render_exception_without_body",
         test_response_render_exception_without_body);
-    g_test_add_func("/wrappers/request_headers", test_request_headers);
     g_test_add_func("/wrappers/urldecode", test_urldecode);
     g_test_add_func("/wrappers/parse_query_string", test_parse_query_string);
     g_test_add_func("/wrappers/parse_cookies", test_parse_cookies);

@@ -87,6 +87,7 @@ noinst_PROGRAMS =
 
 check_PROGRAMS = \
 	tests/check_app \
+	tests/check_cgi \
 	tests/check_datetime \
 	tests/check_exceptions \
 	tests/check_resources \
@@ -377,6 +378,19 @@ tests_check_app_LDFLAGS = \
 	-no-install
 
 tests_check_app_LDADD = \
+	$(GLIB_LIBS) \
+	libbalde.la
+
+tests_check_cgi_SOURCES = \
+	tests/check_cgi.c
+
+tests_check_cgi_CFLAGS = \
+	$(GLIB_CFLAGS)
+
+tests_check_cgi_LDFLAGS = \
+	-no-install
+
+tests_check_cgi_LDADD = \
 	$(GLIB_LIBS) \
 	libbalde.la
 

@@ -270,21 +270,6 @@ balde_parse_header_name_from_envvar(const gchar *env_name)
 }
 
 
-GHashTable*
-balde_request_headers(void)
-{
-    gchar **headers = g_listenv();
-    GHashTable *rv = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    for (guint i = 0; headers[i] != NULL; i++) {
-        gchar *key = balde_parse_header_name_from_envvar(headers[i]);
-        if (key != NULL)
-            g_hash_table_insert(rv, key, g_strdup(g_getenv(headers[i])));
-    }
-    g_strfreev(headers);
-    return rv;
-}
-
-
 gchar*
 balde_urldecode(const gchar* str)
 {

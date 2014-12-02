@@ -15,6 +15,7 @@
 
 guint64 balde_cgi_parse_content_length(const gchar *str);
 gchar* balde_cgi_stdin_read(balde_app_t *app);
+GHashTable* balde_cgi_request_headers(void);
 balde_request_env_t* balde_cgi_parse_request(balde_app_t *app);
 void balde_cgi_response_print(GString *response);
 void balde_cgi_run(balde_app_t *app);
