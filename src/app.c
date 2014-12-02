@@ -209,7 +209,7 @@ balde_app_url_forv(balde_app_t *app, balde_request_t *request,
     balde_view_t *view = balde_app_get_view_from_endpoint(app, endpoint);
     if (view == NULL)
         return NULL;
-    const gchar *script_name = g_getenv("SCRIPT_NAME");
+    const gchar *script_name = request->script_name;
     GString *p = g_string_new(script_name == NULL ? "" : script_name);
     for (guint i = 0; view->url_rule->match->pieces[i] != NULL; i++) {
         g_string_append(p, view->url_rule->match->pieces[i]);
