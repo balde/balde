@@ -154,8 +154,8 @@ balde_app_free(balde_app_t *app)
         g_slist_free(app->priv->before_requests);
         g_slist_free_full(app->priv->static_resources, (GDestroyNotify) balde_resource_free);
         g_hash_table_destroy(app->priv->config);
+        balde_app_free_user_data(app);
     }
-    balde_app_free_user_data(app);
     g_clear_error(&app->error);
     g_free(app->priv);
     g_free(app);
