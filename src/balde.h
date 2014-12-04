@@ -112,6 +112,12 @@ typedef struct {
      */
     struct _balde_app_private_t *priv;
 
+    /**
+     * Private field. Shouldn't be touched by users.
+     *
+     */
+    gboolean copy;
+
 } balde_app_t;
 
 

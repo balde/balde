@@ -39,8 +39,8 @@ test_app_copy(void)
 {
     balde_app_t *app = balde_app_init();
     balde_app_t *copy = balde_app_copy(app);
-    g_assert(!app->priv->copy);
-    g_assert(copy->priv->copy);
+    g_assert(!app->copy);
+    g_assert(copy->copy);
     balde_abort_set_error(app, 404);
     g_assert(app->error != NULL);
     g_assert(copy->error == NULL);
@@ -52,7 +52,7 @@ test_app_copy(void)
     g_assert(copy->priv->user_data == NULL);
     copy->priv->user_data = GINT_TO_POINTER(10);
     g_assert_cmpint(GPOINTER_TO_INT(copy->priv->user_data), ==, 10);
-    g_assert_cmpint(GPOINTER_TO_INT(app->priv->user_data), ==, 0);
+    g_assert_cmpint(GPOINTER_TO_INT(app->priv->user_data), ==, 10);
     balde_app_free(app);
     balde_app_free(copy);
 }

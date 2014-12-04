@@ -15,7 +15,7 @@
 #include "wrappers.h"
 
 #define BALDE_APP_READ_ONLY(app)                                            \
-    if ((app)->priv->copy)                                                  \
+    if ((app)->copy)                                                        \
         g_error(                                                            \
             "You called `%s()' from a view. This is unsupported! You may "  \
             "want to move this code to a \"before request\" hook.",         \
@@ -28,7 +28,6 @@ struct _balde_app_private_t {
     GHashTable *config;
     gpointer user_data;
     GDestroyNotify user_data_destroy_func;
-    gboolean copy;
 };
 
 typedef struct {
