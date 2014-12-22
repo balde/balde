@@ -63,19 +63,19 @@ Here is a simple example:
 @include templates/url_for.html
 
 
-Include headers
+Import headers
 ---------------
 
-To be able to run arbitrary functions, the users need to include the header to the template, using the following syntax:
+To be able to run arbitrary functions, the users need to import the header to the template, using the following syntax:
 
 @code
-{% include "foo.h" %}
+{% import "foo.h" %}
 @endcode
 
-or (since ``0.2``)
+or
 
 @code
-{% include 'foo.h' %}
+{% import 'foo.h' %}
 @endcode
 
 that will be translated to:
@@ -84,7 +84,9 @@ that will be translated to:
 #include "foo.h"
 @endcode
 
-This will include all the declarations available on the header to the template.
+This will add all the declarations available on the header to the template.
+
+@warning this call was renamed from ``include`` to ``import`` since version 0.2.
 
 
 How to build templates

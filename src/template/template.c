@@ -30,6 +30,7 @@ balde_template_generate_source(const gchar *template_name,
     guint decl_count = 1;
     GString *parsed = g_string_new("");
     balde_template_block_t *node;
+    balde_template_import_block_t *imblock;
     balde_template_include_block_t *iblock;
     balde_template_content_block_t *cblock;
     balde_template_print_var_block_t *vblock;
@@ -39,9 +40,13 @@ balde_template_generate_source(const gchar *template_name,
     for (GSList *tmp = blocks; tmp != NULL; tmp = g_slist_next(tmp)) {
         node = tmp->data;
         switch (node->type) {
+            case BALDE_TEMPLATE_IMPORT_BLOCK:
+                imblock = node->block;
+                g_string_append_printf(includes, "#include <%s>\n", imblock->import);
             case BALDE_TEMPLATE_INCLUDE_BLOCK:
                 iblock = node->block;
-                g_string_append_printf(includes, "#include <%s>\n", iblock->include);
+                // FIXME: do something with iblock->include. {% include ... %} is a
+                // no-op right now.
                 break;
             case BALDE_TEMPLATE_CONTENT_BLOCK:
                 cblock = node->block;

@@ -24,6 +24,18 @@ static balde_template_fn_arg_type_t fn_arg_type;
 static const gchar *charbuf = NULL;
 
 static void
+balde_template_import_block(const gchar *import)
+{
+    balde_template_import_block_t *block = g_new(balde_template_import_block_t, 1);
+    block->import = g_strdup(import);
+    balde_unescape_single_quoted_strings(&(block->import));
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = block;
+    node->type = BALDE_TEMPLATE_IMPORT_BLOCK;
+    nodes = g_slist_append(nodes, node);
+}
+
+static void
 balde_template_include_block(const gchar *include)
 {
     balde_template_include_block_t *block = g_new(balde_template_include_block_t, 1);
@@ -95,7 +107,7 @@ balde_template_print_block(void)
 
 %}
 
-page = include | print_call | content | anything
+page = import | include | print_call | content | anything
     { g_printerr("Syntax error near: %s\n", yytext); }
 
 
@@ -114,6 +126,12 @@ bool = 'TRUE' | 'FALSE'
 null = 'NULL'
 
 anything = < ( !eol . )* > eol
+
+# Imports
+import_open = '{%' -
+import_close = - '%}'
+import = import_open 'import' ' '+ str import_close
+    { balde_template_import_block(yytext); }
 
 # Includes
 include_open = '{%' -
@@ -144,7 +162,7 @@ print_fn = print_fn_id - '(' print_fn_args ')'
 print_call = print_open ( print_fn | print_var ) print_close
 
 # Generic content
-content = < ( !eof !include_open !include_close !print_open !print_close . )+ >
+content = < ( !eof !import_open !import_close !include_open !include_close !print_open !print_close . )+ >
     { balde_template_content_block(yytext); }
 
 %%
