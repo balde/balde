@@ -233,39 +233,3 @@ balde_template_get_name(const gchar *template_basename)
     }
     return template_name;
 }
-
-
-int
-balde_template_main(int argc, char **argv)
-{
-    int rv = EXIT_SUCCESS;
-    if (argc != 3) {
-        g_printerr("Usage: $ balde-template-gen template.html template.[ch]\n");
-        rv = EXIT_FAILURE;
-        goto point1;
-    }
-    gchar *template_name = balde_template_get_name(argv[2]);
-    gchar *source = NULL;
-    if (g_str_has_suffix(argv[2], ".c")) {
-        source = balde_template_generate_source(template_name, argv[1]);
-    }
-    else if (g_str_has_suffix(argv[2], ".h")) {
-        source = balde_template_generate_header(template_name);
-    }
-    else {
-        g_printerr("Invalid filename: %s\n", argv[2]);
-        rv = EXIT_FAILURE;
-        goto point3;
-    }
-    if (!g_file_set_contents(argv[2], source, -1, NULL)) {
-        g_printerr("Failed to write file: %s\n", argv[2]);
-        rv = EXIT_FAILURE;
-        goto point3;  // duh!
-    }
-point3:
-    g_free(source);
-point2:
-    g_free(template_name);
-point1:
-    return rv;
-}

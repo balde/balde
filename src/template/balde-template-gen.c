@@ -10,28 +10,67 @@
 #include <config.h>
 #endif /* HAVE_CONFIG_H */
 
-
-/*
- * balde-template-gen is a damn simple code generator, that converts an HTML
- * template to C source, that should be compiled and linked to the balde app.
- *
- * This isn't easy to use but is really fast, and this is what matters! :P
- *
- * Usage: $ balde-template-gen template.html template.[ch]
- *
- * This will generate template.c or template.h. You should add both files to
- * the foo_SOURCES variable in your Makefile.am file, and include template.h
- * in your app source.
- *
- * Also, you may want to add a rule to rebuild your template.c and template.h
- * files when you change template.html.
- */
-
+#include <glib.h>
+#include <locale.h>
+#include <stdlib.h>
 #include "template.h"
+
+static gboolean version = FALSE;
+static GOptionEntry entries[] =
+{
+    {"version", 0, 0, G_OPTION_ARG_NONE, &version,
+        "Show balde's version number and exit.", NULL},
+    {NULL}
+};
 
 
 int
 main(int argc, char **argv)
 {
-    return balde_template_main(argc, argv);
+    setlocale(LC_ALL, "");
+    int rv = EXIT_SUCCESS;
+    GError *err = NULL;
+    GOptionContext *context = g_option_context_new(
+        "TEMPLATE GENERATED-FILE - balde template source code generator");
+    g_option_context_add_main_entries(context, entries, NULL);
+    if (!g_option_context_parse(context, &argc, &argv, &err)) {
+        g_printerr("Option parsing failed: %s\n", err->message);
+        g_clear_error(&err);
+        rv = EXIT_FAILURE;
+        goto point1;
+    }
+    if (version) {
+        g_printerr("%s\n", PACKAGE_STRING);
+        goto point1;
+    }
+    if (argc != 3) {
+        gchar *help = g_option_context_get_help(context, FALSE, NULL);
+        g_printerr("%s", help);
+        g_free(help);
+        rv = EXIT_FAILURE;
+        goto point1;
+    }
+    gchar *template_name = balde_template_get_name(argv[2]);
+    gchar *source = NULL;
+    if (g_str_has_suffix(argv[2], ".c")) {
+        source = balde_template_generate_source(template_name, argv[1]);
+    }
+    else if (g_str_has_suffix(argv[2], ".h")) {
+        source = balde_template_generate_header(template_name);
+    }
+    else {
+        g_printerr("Invalid filename: %s\n", argv[2]);
+        rv = EXIT_FAILURE;
+        goto point2;
+    }
+    if (!g_file_set_contents(argv[2], source, -1, NULL)) {
+        g_printerr("Failed to write file: %s\n", argv[2]);
+        rv = EXIT_FAILURE;
+        goto point2;  // duh!
+    }
+point2:
+    g_free(source);
+    g_free(template_name);
+point1:
+    return rv;
 }

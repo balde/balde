@@ -25,6 +25,5 @@ void balde_template_free_state(balde_template_state_t *state);
 gchar* balde_template_generate_source(const gchar *template_name, const gchar *file_name);
 gchar* balde_template_generate_header(const gchar *template_name);
 gchar* balde_template_get_name(const gchar *template_basename);
-int balde_template_main(int argc, char **argv);
 
 #endif /* _BALDE_TEMPLATE_TEMPLATE_H */
