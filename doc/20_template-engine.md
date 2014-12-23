@@ -89,6 +89,26 @@ This will add all the declarations available on the header to the template.
 @warning this call was renamed from ``include`` to ``import`` since version 0.2.
 
 
+Include other templates
+-----------------------
+
+Other templates can be included in current template, using the following syntax:
+
+@code
+{% include "foo.html" %}
+@endcode
+
+or
+
+@code
+{% include 'foo.html' %}
+@endcode
+
+The file path is relative to the current template's directory.
+
+@warning this feature was added in version 0.2. The ``include`` call was used to import headers in previous versions of the framework.
+
+
 How to build templates
 ----------------------
 

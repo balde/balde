@@ -141,6 +141,7 @@ AC_CONFIG_FILES([
     Makefile
     balde.pc
     Doxyfile
+    tests/utils.c
 ])
 AC_OUTPUT
 

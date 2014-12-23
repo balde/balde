@@ -17,143 +17,183 @@
 #include "parser.h"
 
 
-gchar*
-balde_template_generate_source(const gchar *template_name,
-    const gchar *template_source)
+void
+balde_template_build_state(const gchar *filename, balde_template_state_t **state)
 {
+    if (*state == NULL) {
+        *state = g_new(balde_template_state_t, 1);
+        (*state)->includes = NULL;
+        (*state)->decls = NULL;
+        (*state)->free_decls = NULL;
+        (*state)->args = NULL;
+        (*state)->format = g_string_new("");
+        (*state)->decl_count = 1;
+    }
+
     GRegex *re_percent = g_regex_new("%", 0, 0, NULL);
+    gchar *dirname = g_path_get_dirname(filename);
+    gchar *template_source;
+    if (!g_file_get_contents(filename, &template_source, NULL, NULL))
+        g_critical("Failed to read source file: %s\n", filename);
     GSList *blocks = balde_template_parse(template_source);
-    GSList *printf_args = NULL;
-    GString *includes = g_string_new("");
-    GString *decls = g_string_new("");
-    GString *frees = g_string_new("");
-    guint decl_count = 1;
-    GString *parsed = g_string_new("");
-    balde_template_block_t *node;
-    balde_template_import_block_t *imblock;
-    balde_template_include_block_t *iblock;
-    balde_template_content_block_t *cblock;
-    balde_template_print_var_block_t *vblock;
-    balde_template_print_fn_call_block_t *fblock;
-    balde_template_fn_arg_t *arg;
-    gchar *escaped_content;
+    g_free(template_source);
+
+    gchar *tmp_str;
+    GString *tmp_string;
+
     for (GSList *tmp = blocks; tmp != NULL; tmp = g_slist_next(tmp)) {
-        node = tmp->data;
+        balde_template_block_t *node = tmp->data;
         switch (node->type) {
             case BALDE_TEMPLATE_IMPORT_BLOCK:
-                imblock = node->block;
-                g_string_append_printf(includes, "#include <%s>\n", imblock->import);
+                (*state)->includes = g_slist_append((*state)->includes,
+                    g_strdup(((balde_template_import_block_t*) node->block)->import));
+                break;
             case BALDE_TEMPLATE_INCLUDE_BLOCK:
-                iblock = node->block;
-                // FIXME: do something with iblock->include. {% include ... %} is a
-                // no-op right now.
+                tmp_str = g_build_filename(dirname,
+                    ((balde_template_include_block_t*) node->block)->include,
+                    NULL);
+                balde_template_build_state(tmp_str, state);
+                g_free(tmp_str);
                 break;
             case BALDE_TEMPLATE_CONTENT_BLOCK:
-                cblock = node->block;
-                escaped_content = g_regex_replace_literal(re_percent, cblock->content,
+                tmp_str = g_regex_replace_literal(re_percent,
+                    ((balde_template_content_block_t*) node->block)->content,
                     -1, 0, "%%", 0, NULL);
-                g_string_append(parsed, escaped_content);
-                g_free(escaped_content);
+                g_string_append((*state)->format, tmp_str);
+                g_free(tmp_str);
                 break;
             case BALDE_TEMPLATE_PRINT_VAR_BLOCK:
-                vblock = node->block;
-                g_string_append(parsed, "%s");
-                printf_args = g_slist_append(printf_args, g_strdup_printf(
-                    "        balde_response_get_tmpl_var(response, \"%s\")",
-                    vblock->variable));
+                g_string_append((*state)->format, "%s");
+                (*state)->args = g_slist_append((*state)->args,
+                    g_strdup_printf(
+                        "balde_response_get_tmpl_var(response, \"%s\")",
+                        ((balde_template_print_var_block_t*) node->block)->variable));
                 break;
             case BALDE_TEMPLATE_PRINT_FN_CALL_BLOCK:
-                fblock = node->block;
-                g_string_append(parsed, "%s");
-                g_string_append_printf(decls, "    gchar *a%d = balde_tmpl_%s(app, request",
-                    decl_count, fblock->name);
-                if (fblock->args != NULL)
-                    g_string_append(decls, ",\n");
+                g_string_append((*state)->format, "%s");
+                (*state)->args = g_slist_append((*state)->args,
+                    g_strdup_printf("a%d", (*state)->decl_count));
+                (*state)->free_decls = g_slist_prepend((*state)->free_decls,
+                    g_strdup_printf("a%d", (*state)->decl_count));
+                tmp_string = g_string_new("");
+                g_string_append_printf(tmp_string,
+                    "gchar *a%d = balde_tmpl_%s(app, request", (*state)->decl_count++,
+                    ((balde_template_print_fn_call_block_t*) node->block)->name);
+                if (((balde_template_print_fn_call_block_t*) node->block)->args != NULL)
+                    g_string_append(tmp_string, ", ");
                 else
-                    g_string_append(decls, ");\n");
-                for (GSList *tmp2 = fblock->args; tmp2 != NULL; tmp2 = g_slist_next(tmp2)) {
-                    arg = tmp2->data;
-                    switch (arg->type) {
+                    g_string_append(tmp_string, ")");
+                for (GSList *tmp2 = ((balde_template_print_fn_call_block_t*) node->block)->args;
+                        tmp2 != NULL; tmp2 = g_slist_next(tmp2)) {
+                    switch (((balde_template_fn_arg_t*) tmp2->data)->type) {
                         case BALDE_TEMPLATE_FN_ARG_STRING:
                         case BALDE_TEMPLATE_FN_ARG_INT:
                         case BALDE_TEMPLATE_FN_ARG_FLOAT:
                         case BALDE_TEMPLATE_FN_ARG_BOOL:
                         case BALDE_TEMPLATE_FN_ARG_NULL:
-                            g_string_append_printf(decls, "        %s", arg->content);
+                            g_string_append(tmp_string,
+                                ((balde_template_fn_arg_t*) tmp2->data)->content);
                             break;
                         case BALDE_TEMPLATE_FN_ARG_VAR:
-                            g_string_append_printf(decls,
-                                "        balde_response_get_tmpl_var(response, \"%s\")",
-                                arg->content);
+                            g_string_append_printf(tmp_string,
+                                "balde_response_get_tmpl_var(response, \"%s\")",
+                                ((balde_template_fn_arg_t*) tmp2->data)->content);
                             break;
                     }
                     if (g_slist_next(tmp2) == NULL)
-                        g_string_append(decls, ");\n");
+                        g_string_append(tmp_string, ")");
                     else
-                        g_string_append(decls, ",\n");
-
+                        g_string_append(tmp_string, ", ");
                 }
-                printf_args = g_slist_append(printf_args, g_strdup_printf("        a%d",
-                    decl_count));
-                g_string_append_printf(frees, "    g_free(a%d);\n", decl_count++);
+                (*state)->decls = g_slist_append((*state)->decls,
+                    g_string_free(tmp_string, FALSE));
                 break;
         }
     }
 
-    g_regex_unref(re_percent);
     balde_template_free_blocks(blocks);
+    g_free(dirname);
+    g_regex_unref(re_percent);
+}
 
-    // escape newlines.
-    gchar *parsed_tmp = g_string_free(parsed, FALSE);
-    gchar *escaped = g_strescape(parsed_tmp, "");
-    g_free(parsed_tmp);
 
-    gchar *tmp_includes = g_string_free(includes, FALSE);
-    gchar *tmp_decls = g_string_free(decls, FALSE);
+void
+balde_template_free_state(balde_template_state_t *state)
+{
+    if (state == NULL)
+        return;
+    g_slist_free_full(state->includes, g_free);
+    g_slist_free_full(state->decls, g_free);
+    g_slist_free_full(state->free_decls, g_free);
+    g_slist_free_full(state->args, g_free);
+    g_string_free(state->format, TRUE);
+    g_free(state);
+}
 
-    GString *rv = g_string_new("");
-    g_string_append_printf(rv,
+
+gchar*
+balde_template_generate_source(const gchar *template_name, const gchar *file_name)
+{
+    balde_template_state_t *state = NULL;
+    balde_template_build_state(file_name, &state);
+
+    GString *rv = g_string_new(
         "// WARNING: this file was generated automatically by balde-template-gen\n"
         "\n"
         "#include <balde.h>\n"
-        "#include <glib.h>\n"
-        "%s\n"
+        "#include <glib.h>\n");
+
+    for (GSList *tmp = state->includes; tmp != NULL; tmp = g_slist_next(tmp))
+        g_string_append_printf(rv, "#include <%s>\n", (gchar*) tmp->data);
+
+    gchar *escaped = g_strescape(state->format->str, "");
+
+    g_string_append_printf(rv,
+        "\n"
         "static const gchar *balde_template_%s_format = \"%s\";\n"
         "extern void balde_template_%s(balde_app_t *app, balde_request_t *request, "
         "balde_response_t *response);\n"
         "\n"
         "void\n"
-        "balde_template_%s(balde_app_t *app, balde_request_t *request, balde_response_t *response)\n"
-        "{\n%s",
-        tmp_includes, template_name, escaped, template_name, template_name, tmp_decls);
-    g_free(tmp_includes);
-    g_free(tmp_decls);
+        "balde_template_%s(balde_app_t *app, balde_request_t *request, "
+        "balde_response_t *response)\n"
+        "{\n",
+        template_name, escaped, template_name, template_name);
 
-    if (printf_args == NULL) {
+    for (GSList *tmp = state->decls; tmp != NULL; tmp = g_slist_next(tmp))
+        g_string_append_printf(rv, "    %s;\n", (gchar*) tmp->data);
+
+    if (state->args == NULL) {
         g_string_append_printf(rv,
             "    gchar *rv = g_strdup(balde_template_%s_format);\n",
             template_name);
     }
     else {
         g_string_append_printf(rv,
-            "    gchar *rv = g_strdup_printf(balde_template_%s_format,\n",
+            "    gchar *rv = g_strdup_printf(balde_template_%s_format, ",
             template_name);
     }
-    for (GSList *tmp = printf_args; tmp != NULL; tmp = tmp->next) {
+
+    for (GSList *tmp = state->args; tmp != NULL; tmp = g_slist_next(tmp)) {
         g_string_append(rv, (gchar*) tmp->data);
         if (tmp->next != NULL)
-            g_string_append(rv, ",\n");
+            g_string_append(rv, ", ");
         else
             g_string_append(rv, ");\n");
     }
-    g_slist_free_full(printf_args, g_free);
-    gchar *tmp_frees = g_string_free(frees, FALSE);
-    g_string_append_printf(rv,
-        "    balde_response_append_body(response, rv);\n%s"
-        "    g_free(rv);\n"
-        "}\n", tmp_frees);
-    g_free(tmp_frees);
+
+    g_string_append(rv,
+        "    balde_response_append_body(response, rv);\n"
+        "    g_free(rv);\n");
+
+    for (GSList *tmp = state->free_decls; tmp != NULL; tmp = g_slist_next(tmp))
+        g_string_append_printf(rv, "    g_free(%s);\n", (gchar*) tmp->data);
+
+    g_string_append(rv, "}\n");
+
     g_free(escaped);
+    balde_template_free_state(state);
+
     return g_string_free(rv, FALSE);
 }
 
@@ -205,15 +245,9 @@ balde_template_main(int argc, char **argv)
         goto point1;
     }
     gchar *template_name = balde_template_get_name(argv[2]);
-    gchar *template_source = NULL;
     gchar *source = NULL;
     if (g_str_has_suffix(argv[2], ".c")) {
-        if (!g_file_get_contents(argv[1], &template_source, NULL, NULL)) {
-            g_printerr("Failed to read source file: %s\n", argv[1]);
-            rv = EXIT_FAILURE;
-            goto point2;
-        }
-        source = balde_template_generate_source(template_name, template_source);
+        source = balde_template_generate_source(template_name, argv[1]);
     }
     else if (g_str_has_suffix(argv[2], ".h")) {
         source = balde_template_generate_header(template_name);
@@ -230,7 +264,6 @@ balde_template_main(int argc, char **argv)
     }
 point3:
     g_free(source);
-    g_free(template_source);
 point2:
     g_free(template_name);
 point1:

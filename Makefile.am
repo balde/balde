@@ -41,7 +41,21 @@ EXTRA_DIST = \
 	tests/resources.xml \
 	tests/static/lol.css \
 	tests/static/lol.js \
-	tests/static/zz.sh
+	tests/static/zz.sh \
+	tests/templates/base.html \
+	tests/templates/base2.html \
+	tests/templates/body.html \
+	tests/templates/body2.html \
+	tests/templates/foo.html \
+	tests/templates/foo2.html \
+	tests/templates/foo3.html \
+	tests/templates/foo4.html \
+	tests/templates/foo5.html \
+	tests/templates/foo6.html \
+	tests/templates/foo7.html \
+	tests/templates/foo8.html \
+	tests/templates/foo9.html
+
 
 CLEANFILES = \
 	examples/static-resources.c \
@@ -53,7 +67,8 @@ CLEANFILES = \
 	examples/templates/url_for.c \
 	examples/templates/url_for.h \
 	tests/resources.c \
-	tests/resources.h
+	tests/resources.h \
+	tests/utils.c
 
 BUILT_SOURCES = \
 	.version
@@ -72,7 +87,8 @@ noinst_HEADERS = \
 	src/routing.h \
 	src/wrappers.h \
 	src/template/template.h \
-	src/template/parser.h
+	src/template/parser.h \
+	tests/utils.h
 
 lib_LTLIBRARIES = \
 	libbalde.la
@@ -467,10 +483,12 @@ tests_check_stdin_LDADD = \
 	libbalde.la
 
 tests_check_template_SOURCES = \
-	tests/check_template.c
+	tests/check_template.c \
+	tests/utils.c
 
 tests_check_template_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	-I$(top_srcdir)/tests
 
 tests_check_template_LDFLAGS = \
 	-no-install
@@ -557,6 +575,7 @@ endif
 
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
+	rm -f $(distdir)/tests/utils.c
 
 
 # Helpers: Cleanup of helper files

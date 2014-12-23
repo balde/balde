@@ -66,6 +66,7 @@ Makefile.in
 /tests/valgrind-*.xml
 /tests/resources.c
 /tests/resources.h
+/tests/utils.c
 
 # examples
 /examples/hello
