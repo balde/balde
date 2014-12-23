@@ -15,7 +15,7 @@
 
 
 gchar*
-get_template(const gchar *fixture)
+get_template(const gchar *filename)
 {
-    return g_build_filename("@abs_top_srcdir@", "tests", "templates", fixture, NULL);
+    return g_build_filename("@abs_top_srcdir@", "tests", "templates", filename, NULL);
 }

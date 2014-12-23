@@ -9,6 +9,6 @@
 #ifndef _BALDE_TESTS_UTILS_H
 #define _BALDE_TESTS_UTILS_H
 
-gchar* get_template(const gchar *fixture);
+gchar* get_template(const gchar *filename);
 
 #endif
