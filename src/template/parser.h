@@ -20,6 +20,11 @@ typedef struct {
 } balde_template_include_block_t;
 
 typedef struct {
+    gchar *item;
+    gchar *items;
+} balde_template_for_block_t;
+
+typedef struct {
     gchar *content;
 } balde_template_content_block_t;
 
@@ -49,6 +54,8 @@ typedef struct {
 typedef enum {
     BALDE_TEMPLATE_IMPORT_BLOCK,
     BALDE_TEMPLATE_INCLUDE_BLOCK,
+    BALDE_TEMPLATE_FOR_BLOCK,
+    BALDE_TEMPLATE_FOR_END_BLOCK,
     BALDE_TEMPLATE_CONTENT_BLOCK,
     BALDE_TEMPLATE_PRINT_VAR_BLOCK,
     BALDE_TEMPLATE_PRINT_FN_CALL_BLOCK,

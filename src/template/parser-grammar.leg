@@ -21,6 +21,9 @@ static GSList *nodes = NULL;
 static gchar *fn_name = NULL;
 static GSList *fn_args = NULL;
 static balde_template_fn_arg_type_t fn_arg_type;
+static gchar *for_item = NULL;
+static gchar *for_items = NULL;
+static gboolean for_open = FALSE;
 static const gchar *charbuf = NULL;
 
 static void
@@ -45,6 +48,47 @@ balde_template_include_block(const gchar *include)
     node->block = block;
     node->type = BALDE_TEMPLATE_INCLUDE_BLOCK;
     nodes = g_slist_append(nodes, node);
+}
+
+static void
+balde_template_for_item_block(const gchar *item)
+{
+    if (for_open)
+        g_critical("More than one level of looping is unsupported.");
+    for_open = TRUE;
+    for_item = g_strdup(item);
+}
+
+static void
+balde_template_for_items_block(const gchar *items)
+{
+    for_items = g_strdup(items);
+}
+
+static void
+balde_template_for_end_block(void)
+{
+    if (!for_open)
+        g_critical("{{ endfor }} call in wrong place!");
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = NULL;
+    node->type = BALDE_TEMPLATE_FOR_END_BLOCK;
+    nodes = g_slist_append(nodes, node);
+    for_open = FALSE;
+}
+
+static void
+balde_template_for_block(void)
+{
+    balde_template_for_block_t *block = g_new(balde_template_for_block_t, 1);
+    block->item = for_item;
+    block->items = for_items;
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = block;
+    node->type = BALDE_TEMPLATE_FOR_BLOCK;
+    nodes = g_slist_append(nodes, node);
+    for_item = NULL;
+    for_items = NULL;
 }
 
 static void
@@ -107,8 +151,8 @@ balde_template_print_block(void)
 
 %}
 
-page = import | include | print_call | content | anything
-    { g_printerr("Syntax error near: %s\n", yytext); }
+page = import | include | print_call | for | for_end | content | anything
+    { g_critical("Syntax error near: %s\n", yytext); }
 
 
 # Useful rules
@@ -139,6 +183,18 @@ include_close = - '%}'
 include = include_open 'include' ' '+ str include_close
     { balde_template_include_block(yytext); }
 
+# For loops
+for_open = '{%' -
+for_close = - '%}'
+for1 = for_open 'for' ' '+ < id >  ' '+
+    { balde_template_for_item_block(yytext); }
+for2 = 'in' ' '+ < id > for_close
+    { balde_template_for_items_block(yytext); }
+for = for1 for2
+    { balde_template_for_block(); }
+for_end = for_open 'endfor' for_close
+    { balde_template_for_end_block(); }
+
 # Print calls
 print_open = '{{' -
 print_close = - '}}'
@@ -162,7 +218,7 @@ print_fn = print_fn_id - '(' print_fn_args ')'
 print_call = print_open ( print_fn | print_var ) print_close
 
 # Generic content
-content = < ( !eof !import_open !import_close !include_open !include_close !print_open !print_close . )+ >
+content = < ( !eof !import_open !import_close !include_open !include_close !for_open !for_close !print_open !print_close . )+ >
     { balde_template_content_block(yytext); }
 
 %%

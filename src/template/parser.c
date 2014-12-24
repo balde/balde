@@ -32,6 +32,7 @@ balde_template_free_blocks(GSList *blocks)
     balde_template_block_t *block;
     balde_template_import_block_t *imblock;
     balde_template_include_block_t *iblock;
+    balde_template_for_block_t *forblock;
     balde_template_content_block_t *cblock;
     balde_template_print_var_block_t *vblock;
     balde_template_print_fn_call_block_t *fblock;
@@ -46,6 +47,13 @@ balde_template_free_blocks(GSList *blocks)
             case BALDE_TEMPLATE_INCLUDE_BLOCK:
                 iblock = block->block;
                 g_free(iblock->include);
+                break;
+            case BALDE_TEMPLATE_FOR_BLOCK:
+                forblock = block->block;
+                g_free(forblock->item);
+                g_free(forblock->items);
+                break;
+            case BALDE_TEMPLATE_FOR_END_BLOCK:
                 break;
             case BALDE_TEMPLATE_CONTENT_BLOCK:
                 cblock = block->block;
