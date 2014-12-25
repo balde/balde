@@ -56,7 +56,6 @@ EXTRA_DIST = \
 	tests/templates/foo8.html \
 	tests/templates/foo9.html
 
-
 CLEANFILES = \
 	examples/static-resources.c \
 	examples/static-resources.h \
@@ -497,6 +496,21 @@ tests_check_template_LDADD = \
 	$(GLIB_LIBS) \
 	libbalde.la \
 	libbalde_template.la
+
+tests/tests_check_template-check_template.$(OBJEXT): \
+	tests/templates/base.html \
+	tests/templates/base2.html \
+	tests/templates/body.html \
+	tests/templates/body2.html \
+	tests/templates/foo.html \
+	tests/templates/foo2.html \
+	tests/templates/foo3.html \
+	tests/templates/foo4.html \
+	tests/templates/foo5.html \
+	tests/templates/foo6.html \
+	tests/templates/foo7.html \
+	tests/templates/foo8.html \
+	tests/templates/foo9.html
 
 tests_check_template_helpers_SOURCES = \
 	tests/check_template_helpers.c
