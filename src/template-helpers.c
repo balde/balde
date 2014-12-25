@@ -12,6 +12,7 @@
 
 #include <glib.h>
 #include "balde.h"
+#include "balde-private.h"
 #include "app.h"
 
 
@@ -22,7 +23,7 @@
  * it on the balde source code.
  */
 
-gchar*
+BALDE_API gchar*
 balde_tmpl_url_for(balde_app_t *app, balde_request_t *request,
     const gchar *endpoint, gboolean external, ...)
 {

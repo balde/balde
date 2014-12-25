@@ -318,22 +318,6 @@ void balde_app_free_user_data(balde_app_t *app);
 
 
 /**
- * Gets current error.
- *
- * This function returns the error object of the current context, if any, or
- * NULL.
- *
- * If the function is called from the context of a view, it will return the
- * error from the request context, otherwise it will return the error from the
- * application context.
- *
- * Errors are usually non-2XX HTTP status codes.
- *
- */
-const GError* balde_app_get_error(balde_app_t *app);
-
-
-/**
  * Free application context memory.
  *
  * This function will clean and free all memory used by the application context.

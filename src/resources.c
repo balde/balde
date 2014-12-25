@@ -14,6 +14,7 @@
 #include <glib.h>
 #include <gio/gio.h>
 #include "balde.h"
+#include "balde-private.h"
 #include "app.h"
 #include "datetime.h"
 #include "resources.h"
@@ -90,7 +91,7 @@ balde_resource_free(balde_resource_t *resource)
 
 G_LOCK_DEFINE_STATIC(resources);
 
-void
+BALDE_API void
 balde_resources_load(balde_app_t *app, GResource *resources)
 {
     BALDE_APP_READ_ONLY(app);

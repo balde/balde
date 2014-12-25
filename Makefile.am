@@ -76,6 +76,7 @@ include_HEADERS = \
 	src/balde.h
 
 noinst_HEADERS = \
+	src/balde-private.h \
 	src/app.h \
 	src/cgi.h \
 	src/datetime.h \
@@ -129,6 +130,7 @@ libbalde_la_SOURCES = \
 	src/wrappers.c
 
 libbalde_la_CFLAGS = \
+	-fvisibility=hidden \
 	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS)
 
@@ -355,6 +357,7 @@ tests_check_httpd_CFLAGS = \
 	$(GLIB_CFLAGS)
 
 tests_check_httpd_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_httpd_LDADD = \
@@ -375,6 +378,7 @@ tests_check_fcgi_CFLAGS = \
 	$(GLIB_CFLAGS)
 
 tests_check_fcgi_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_fcgi_LDADD = \
@@ -390,6 +394,7 @@ tests_check_app_CFLAGS = \
 	$(GLIB_CFLAGS)
 
 tests_check_app_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_app_LDADD = \
@@ -403,6 +408,7 @@ tests_check_cgi_CFLAGS = \
 	$(GLIB_CFLAGS)
 
 tests_check_cgi_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_cgi_LDADD = \
@@ -416,6 +422,7 @@ tests_check_datetime_CFLAGS = \
 	$(GLIB_CFLAGS)
 
 tests_check_datetime_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_datetime_LDADD = \
@@ -429,6 +436,7 @@ tests_check_exceptions_CFLAGS = \
 	$(GLIB_CFLAGS)
 
 tests_check_exceptions_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_exceptions_LDADD = \
@@ -448,6 +456,7 @@ tests_check_resources_CFLAGS = \
 	-I$(top_builddir)/tests
 
 tests_check_resources_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_resources_LDADD = \
@@ -461,6 +470,7 @@ tests_check_routing_CFLAGS = \
 	$(GLIB_CFLAGS)
 
 tests_check_routing_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_routing_LDADD = \
@@ -475,6 +485,7 @@ tests_check_stdin_CFLAGS = \
 	$(GLIB_CFLAGS)
 
 tests_check_stdin_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_stdin_LDADD = \
@@ -490,6 +501,7 @@ tests_check_template_CFLAGS = \
 	-I$(top_srcdir)/tests
 
 tests_check_template_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_template_LDADD = \
@@ -519,6 +531,7 @@ tests_check_template_helpers_CFLAGS = \
 	$(GLIB_CFLAGS)
 
 tests_check_template_helpers_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_template_helpers_LDADD = \
@@ -533,6 +546,7 @@ tests_check_wrappers_CFLAGS = \
 	$(GLIB_CFLAGS)
 
 tests_check_wrappers_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_wrappers_LDADD = \

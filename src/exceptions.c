@@ -12,6 +12,7 @@
 
 #include <glib.h>
 #include "balde.h"
+#include "balde-private.h"
 #include "app.h"
 #include "exceptions.h"
 #include "wrappers.h"
@@ -256,7 +257,7 @@ balde_exception_get_description_from_code(const balde_http_exception_code_t code
 }
 
 
-void
+BALDE_API void
 balde_abort_set_error(balde_app_t *app, const balde_http_exception_code_t code)
 {
     g_propagate_error(&(app->error),
@@ -265,7 +266,7 @@ balde_abort_set_error(balde_app_t *app, const balde_http_exception_code_t code)
 }
 
 
-void
+BALDE_API void
 balde_abort_set_error_with_description(balde_app_t *app,
     const balde_http_exception_code_t code, const gchar* description)
 {
@@ -276,7 +277,7 @@ balde_abort_set_error_with_description(balde_app_t *app,
 }
 
 
-balde_response_t*
+BALDE_API balde_response_t*
 balde_abort(balde_app_t *app, const balde_http_exception_code_t code)
 {
     balde_abort_set_error(app, code);
@@ -290,7 +291,7 @@ balde_abort(balde_app_t *app, const balde_http_exception_code_t code)
 }
 
 
-balde_response_t*
+BALDE_API balde_response_t*
 balde_abort_with_description(balde_app_t *app,
     const balde_http_exception_code_t code, const gchar *description)
 {

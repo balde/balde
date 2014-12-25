@@ -14,6 +14,7 @@
 #include <locale.h>
 #include <stdlib.h>
 #include "balde.h"
+#include "balde-private.h"
 #include "app.h"
 #include "cgi.h"
 #include "exceptions.h"
@@ -30,7 +31,7 @@
 #include "fcgi.h"
 #endif
 
-balde_app_t*
+BALDE_API balde_app_t*
 balde_app_init(void)
 {
     balde_app_t *app = g_new(balde_app_t, 1);
@@ -62,7 +63,7 @@ balde_app_copy(balde_app_t *app)
 
 G_LOCK_DEFINE_STATIC(config);
 
-void
+BALDE_API void
 balde_app_set_config(balde_app_t *app, const gchar *name, const gchar *value)
 {
     BALDE_APP_READ_ONLY(app);
@@ -72,7 +73,7 @@ balde_app_set_config(balde_app_t *app, const gchar *name, const gchar *value)
 }
 
 
-void
+BALDE_API void
 balde_app_set_config_from_envvar(balde_app_t *app, const gchar *name,
     const gchar *env_name, gboolean silent)
 {
@@ -89,7 +90,7 @@ balde_app_set_config_from_envvar(balde_app_t *app, const gchar *name,
 }
 
 
-const gchar*
+BALDE_API const gchar*
 balde_app_get_config(balde_app_t *app, const gchar *name)
 {
     gchar *tmp = g_utf8_strdown(name, -1);
@@ -99,7 +100,7 @@ balde_app_get_config(balde_app_t *app, const gchar *name)
 }
 
 
-void
+BALDE_API void
 balde_app_set_user_data(balde_app_t *app, gpointer user_data)
 {
     BALDE_APP_READ_ONLY(app);
@@ -111,14 +112,14 @@ balde_app_set_user_data(balde_app_t *app, gpointer user_data)
 }
 
 
-gpointer
+BALDE_API gpointer
 balde_app_get_user_data(balde_app_t *app)
 {
     return app->priv->user_data;
 }
 
 
-void
+BALDE_API void
 balde_app_set_user_data_destroy_func(balde_app_t *app, GDestroyNotify destroy_func)
 {
     BALDE_APP_READ_ONLY(app);
@@ -126,7 +127,7 @@ balde_app_set_user_data_destroy_func(balde_app_t *app, GDestroyNotify destroy_fu
 }
 
 
-void
+BALDE_API void
 balde_app_free_user_data(balde_app_t *app)
 {
     if (app->priv->user_data_destroy_func != NULL && app->priv->user_data != NULL) {
@@ -145,7 +146,7 @@ balde_app_free_views(balde_view_t *view)
 }
 
 
-void
+BALDE_API void
 balde_app_free(balde_app_t *app)
 {
     if (!app->copy) {
@@ -163,7 +164,7 @@ balde_app_free(balde_app_t *app)
 
 G_LOCK_DEFINE_STATIC(views);
 
-void
+BALDE_API void
 balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rule,
     const balde_http_method_t method, balde_view_func_t view_func)
 {
@@ -191,7 +192,7 @@ balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rul
 
 G_LOCK_DEFINE_STATIC(before_requests);
 
-void
+BALDE_API void
 balde_app_add_before_request(balde_app_t *app, balde_before_request_func_t hook_func)
 {
     BALDE_APP_READ_ONLY(app);
@@ -213,7 +214,7 @@ balde_app_get_view_from_endpoint(balde_app_t *app, const gchar *endpoint)
 }
 
 
-gchar*
+BALDE_API gchar*
 balde_app_url_for(balde_app_t *app, balde_request_t *request,
     const gchar *endpoint, gboolean external, ...)
 {
@@ -281,7 +282,7 @@ static GOptionEntry entries[] =
 };
 
 
-void
+BALDE_API void
 balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 {
     setlocale(LC_ALL, "");

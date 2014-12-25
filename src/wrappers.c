@@ -13,6 +13,7 @@
 #include <glib.h>
 #include <string.h>
 #include "balde.h"
+#include "balde-private.h"
 #include "cgi.h"
 #include "datetime.h"
 #include "exceptions.h"
@@ -21,7 +22,7 @@
 #include "wrappers.h"
 
 
-void
+BALDE_API void
 balde_response_set_header(balde_response_t *response, const gchar *name,
     const gchar *value)
 {
@@ -37,14 +38,14 @@ balde_response_set_header(balde_response_t *response, const gchar *name,
 }
 
 
-void
+BALDE_API void
 balde_response_append_body(balde_response_t *response, const gchar *content)
 {
     g_string_append(response->priv->body, content);
 }
 
 
-void
+BALDE_API void
 balde_response_append_body_len(balde_response_t *response, const gchar *content,
     const gssize len)
 {
@@ -74,21 +75,21 @@ balde_make_response_from_gstring(GString *content)
 }
 
 
-balde_response_t*
+BALDE_API balde_response_t*
 balde_make_response(const gchar *content)
 {
     return balde_make_response_from_gstring(g_string_new(content));
 }
 
 
-balde_response_t*
+BALDE_API balde_response_t*
 balde_make_response_len(const gchar *content, const gssize len)
 {
     return balde_make_response_from_gstring(g_string_new_len(content, len));
 }
 
 
-void
+BALDE_API void
 balde_response_set_tmpl_var(balde_response_t *response, const gchar *name,
     const gchar *value)
 {
@@ -103,14 +104,14 @@ balde_response_set_tmpl_var(balde_response_t *response, const gchar *name,
  * it on the balde source code.
  */
 
-const gchar*
+BALDE_API const gchar*
 balde_response_get_tmpl_var(balde_response_t *response, const gchar *name)
 {
     return g_hash_table_lookup(response->priv->template_ctx, name);
 }
 
 
-void
+BALDE_API void
 balde_response_set_cookie(balde_response_t *response, const gchar *name,
     const gchar *value, const gint max_age, const gint64 expires,
     const gchar *path, const gchar *domain, const gboolean secure,
@@ -157,7 +158,7 @@ balde_response_set_cookie(balde_response_t *response, const gchar *name,
 }
 
 
-void
+BALDE_API void
 balde_response_delete_cookie(balde_response_t *response, const gchar *name,
     const gchar *path, const gchar *domain)
 {
@@ -418,7 +419,7 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
 }
 
 
-const gchar*
+BALDE_API const gchar*
 balde_request_get_header(balde_request_t *request, const gchar *name)
 {
     gchar *l_name = g_ascii_strdown(name, -1);
@@ -428,7 +429,7 @@ balde_request_get_header(balde_request_t *request, const gchar *name)
 }
 
 
-const gchar*
+BALDE_API const gchar*
 balde_request_get_arg(balde_request_t *request, const gchar *name)
 {
     return g_hash_table_lookup(request->priv->args, name);
@@ -442,7 +443,7 @@ balde_request_get_arg(balde_request_t *request, const gchar *name)
  * it on the balde source code.
  */
 
-const gchar*
+BALDE_API const gchar*
 balde_request_get_form(balde_request_t *request, const gchar *name)
 {
     if (request->priv->form == NULL)
@@ -451,7 +452,7 @@ balde_request_get_form(balde_request_t *request, const gchar *name)
 }
 
 
-const gchar*
+BALDE_API const gchar*
 balde_request_get_view_arg(balde_request_t *request, const gchar *name)
 {
     if (request->priv->view_args == NULL)
@@ -466,7 +467,7 @@ balde_request_get_view_arg(balde_request_t *request, const gchar *name)
  * An example with HTTP cookies.
  */
 
-const gchar*
+BALDE_API const gchar*
 balde_request_get_cookie(balde_request_t *request, const gchar *name)
 {
     if (request->priv->cookies == NULL)
@@ -475,7 +476,7 @@ balde_request_get_cookie(balde_request_t *request, const gchar *name)
 }
 
 
-const GString*
+BALDE_API const GString*
 balde_request_get_body(balde_request_t *request)
 {
     return request->priv->body;
