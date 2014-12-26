@@ -27,6 +27,17 @@ AS_IF([test "x$ac_cv_prog_cc_c99" = "xno"], [
   AC_MSG_ERROR([no C99 compiler found, balde requires a C99 compiler.])
 ])
 
+bkp_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -fvisibility=hidden"
+AC_MSG_CHECKING([if ${CC} supports -fvisibility=hidden])
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([char guda;])], [
+  AC_MSG_RESULT([yes])
+], [
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([no -fvisibility=hidden support found in ${CC}, balde requires -fvisibility=hidden])
+])
+CFLAGS="$bkp_CFLAGS"
+
 AC_ARG_ENABLE([fastcgi], AS_HELP_STRING([--disable-fastcgi], [disable fastcgi support]))
 AS_IF([test "x$enable_fastcgi" != "xno"], [
   AC_SEARCH_LIBS([FCGI_Accept], [fcgi], ,
