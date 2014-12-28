@@ -428,12 +428,27 @@ void balde_response_set_tmpl_var(balde_response_t *response, const gchar* name,
 
 
 /**
+ * Sets a template variable as a reference for a pointer.
+ *
+ * This is useful to pass an arbitrary variable to a template helper. The
+ * reference should point to a valid memory space when the template helpers
+ * are called. This functionality makes it possible to implement iterators
+ * in template helpers.
+ *
+ * The template variable name *IS* case-sensitive.
+ *
+ */
+void balde_response_set_tmpl_ref(balde_response_t *response, const gchar* name,
+    gconstpointer pointer);
+
+
+/**
  * Gets a template variable.
  *
  * The template variable name *IS* case-sensitive.
  *
  */
-const gchar* balde_response_get_tmpl_var(balde_response_t *response,
+gconstpointer balde_response_get_tmpl_var(balde_response_t *response,
     const gchar* name);
 
 

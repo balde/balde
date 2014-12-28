@@ -22,6 +22,17 @@ typedef struct {
     gchar *body;
 } balde_request_env_t;
 
+typedef enum {
+    BALDE_TMPL_VAR_STRING,
+    BALDE_TMPL_VAR_REF,
+} balde_tmpl_var_type_t;
+
+typedef struct {
+    gpointer value;
+    balde_tmpl_var_type_t type;
+} balde_tmpl_var_t;
+
+
 struct _balde_request_private_t {
     GHashTable *args;
     GHashTable *form;
@@ -39,6 +50,7 @@ struct _balde_response_private_t {
 
 void balde_response_headers_free(gpointer l);
 void balde_response_free(balde_response_t *response);
+void balde_response_free_template_ctx(balde_tmpl_var_t *var);
 balde_response_t* balde_make_response_from_gstring(GString *content);
 balde_response_t* balde_make_response_from_exception(GError *error);
 void balde_fix_header_name(gchar *name);
