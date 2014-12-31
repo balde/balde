@@ -69,7 +69,7 @@ balde_make_response_from_gstring(GString *content)
     response->priv->headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
         balde_response_headers_free);
     response->priv->template_ctx = g_hash_table_new_full(g_str_hash, g_str_equal,
-        g_free, (GDestroyNotify) balde_response_free_template_ctx);
+        g_free, g_free);
     response->priv->body = content;
     return response;
 }
@@ -93,21 +93,7 @@ BALDE_API void
 balde_response_set_tmpl_var(balde_response_t *response, const gchar *name,
     const gchar *value)
 {
-    balde_tmpl_var_t *var = g_new(balde_tmpl_var_t, 1);
-    var->type = BALDE_TMPL_VAR_STRING;
-    var->value = g_strdup(value);
-    g_hash_table_replace(response->priv->template_ctx, g_strdup(name), var);
-}
-
-
-BALDE_API void
-balde_response_set_tmpl_ref(balde_response_t *response, const gchar *name,
-    gconstpointer pointer)
-{
-    balde_tmpl_var_t *var = g_new(balde_tmpl_var_t, 1);
-    var->type = BALDE_TMPL_VAR_REF;
-    var->value = (gpointer) pointer;
-    g_hash_table_replace(response->priv->template_ctx, g_strdup(name), var);
+    g_hash_table_replace(response->priv->template_ctx, g_strdup(name), g_strdup(value));
 }
 
 
@@ -118,11 +104,10 @@ balde_response_set_tmpl_ref(balde_response_t *response, const gchar *name,
  * it on the balde source code.
  */
 
-BALDE_API gconstpointer
+BALDE_API const gchar*
 balde_response_get_tmpl_var(balde_response_t *response, const gchar *name)
 {
-    balde_tmpl_var_t *var = g_hash_table_lookup(response->priv->template_ctx, name);
-    return var->value;
+    return g_hash_table_lookup(response->priv->template_ctx, name);
 }
 
 
@@ -178,22 +163,6 @@ balde_response_delete_cookie(balde_response_t *response, const gchar *name,
     const gchar *path, const gchar *domain)
 {
     balde_response_set_cookie(response, name, "", 0, 0, path, domain, FALSE, FALSE);
-}
-
-
-void
-balde_response_free_template_ctx(balde_tmpl_var_t *var)
-{
-    if (var == NULL)
-        return;
-    switch(var->type) {
-        case BALDE_TMPL_VAR_STRING:
-            g_free(var->value);
-            break;
-        case BALDE_TMPL_VAR_REF:
-            break;
-    }
-    g_free(var);
 }
 
 

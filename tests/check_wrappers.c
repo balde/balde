@@ -135,22 +135,7 @@ test_response_set_tmpl_var(void)
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_tmpl_var(res, "bola", "guda");
     g_assert(g_hash_table_size(res->priv->template_ctx) == 1);
-    balde_tmpl_var_t *var = g_hash_table_lookup(res->priv->template_ctx, "bola");
-    g_assert_cmpint(var->type, ==, BALDE_TMPL_VAR_STRING);
-    g_assert_cmpstr(var->value, ==, "guda");
-    balde_response_free(res);
-}
-
-
-void
-test_response_set_tmpl_ref(void)
-{
-    balde_response_t *res = balde_make_response("lol");
-    balde_response_set_tmpl_ref(res, "bola", GINT_TO_POINTER(10));
-    g_assert(g_hash_table_size(res->priv->template_ctx) == 1);
-    balde_tmpl_var_t *var = g_hash_table_lookup(res->priv->template_ctx, "bola");
-    g_assert_cmpint(var->type, ==, BALDE_TMPL_VAR_REF);
-    g_assert_cmpint(GPOINTER_TO_INT(var->value), ==, 10);
+    g_assert_cmpstr(g_hash_table_lookup(res->priv->template_ctx, "bola"), ==, "guda");
     balde_response_free(res);
 }
 
@@ -159,25 +144,8 @@ void
 test_response_get_tmpl_var(void)
 {
     balde_response_t *res = balde_make_response("lol");
-    balde_tmpl_var_t *var = g_new(balde_tmpl_var_t, 1);
-    var->type = BALDE_TMPL_VAR_STRING;
-    var->value = g_strdup("guda");
-    g_hash_table_insert(res->priv->template_ctx, g_strdup("bola"), var);
+    g_hash_table_insert(res->priv->template_ctx, g_strdup("bola"), g_strdup("guda"));
     g_assert_cmpstr(balde_response_get_tmpl_var(res, "bola"), ==, "guda");
-    balde_response_free(res);
-}
-
-
-void
-test_response_get_tmpl_ref(void)
-{
-    balde_response_t *res = balde_make_response("lol");
-    balde_tmpl_var_t *var = g_new(balde_tmpl_var_t, 1);
-    var->type = BALDE_TMPL_VAR_REF;
-    var->value = GINT_TO_POINTER(20);
-    g_hash_table_insert(res->priv->template_ctx, g_strdup("bola"), var);
-    g_assert_cmpint(GPOINTER_TO_INT(balde_response_get_tmpl_var(res, "bola")),
-        ==, 20);
     balde_response_free(res);
 }
 
@@ -659,12 +627,8 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/fix_header_name", test_fix_header_name);
     g_test_add_func("/wrappers/response_set_tmpl_var",
         test_response_set_tmpl_var);
-    g_test_add_func("/wrappers/response_set_tmpl_ref",
-        test_response_set_tmpl_ref);
     g_test_add_func("/wrappers/response_get_tmpl_var",
         test_response_get_tmpl_var);
-    g_test_add_func("/wrappers/response_get_tmpl_ref",
-        test_response_get_tmpl_ref);
     g_test_add_func("/wrappers/response_set_cookie",
         test_response_set_cookie);
     g_test_add_func("/wrappers/response_set_cookie_with_expires",
