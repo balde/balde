@@ -400,6 +400,10 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
         env = balde_cgi_parse_request(app);
     request->path = env->path_info;
     request->script_name = env->script_name;
+    if (env->path_info == NULL && env->script_name != NULL) {  // dumb webservers :/
+        request->path = env->script_name;
+        request->script_name = NULL;
+    }
     request->method = balde_http_method_str2enum(env->request_method);
     request->priv->headers = env->headers;
     request->priv->args = balde_parse_query_string(env->query_string);
