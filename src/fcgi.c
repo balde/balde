@@ -81,44 +81,20 @@ balde_fcgi_parse_request(balde_app_t *app, FCGX_Request *request)
 
 
 gpointer
-balde_fcgi_thread_run(gpointer user_data)
+balde_fcgi_thread_run(gpointer data, gpointer user_data)
 {
-    balde_fcgi_ctx_t *ctx = user_data;
-    FCGX_Request request;
-    FCGX_InitRequest(&request, ctx->sock, FCGI_FAIL_ACCEPT_ON_INTR);
+    FCGX_Request *request = data;
+    balde_app_t *app = user_data;
 
-    for (;;) {
-        G_LOCK_DEFINE_STATIC(request);
+    balde_request_env_t *env = balde_fcgi_parse_request(app, request);
+    GString *response = balde_app_main_loop(app, env, balde_response_render, NULL);
+    FCGX_PutStr(response->str, response->len, request->out);
+    g_string_free(response, TRUE);
 
-        G_LOCK(request);
-        gint rc = FCGX_Accept_r(&request);
-        G_UNLOCK(request);
-
-        if (rc < 0)
-            break;
-
-        balde_request_env_t *env = balde_fcgi_parse_request(ctx->app, &request);
-        GString *response = balde_app_main_loop(ctx->app, env, balde_response_render, NULL);
-        FCGX_PutStr(response->str, response->len, request.out);
-        g_string_free(response, TRUE);
-
-        FCGX_Finish_r(&request);
-    }
+    FCGX_Finish_r(request);
+    g_free(request);
     return NULL;
 }
-
-
-#if defined(HAVE_SYS_TYPES_H) && defined(HAVE_UNISTD_H)
-
-static void
-balde_fcgi_signal_handler(int signum)
-{
-    FCGX_ShutdownPending();
-    if (signum != SIGINT)
-        kill(getpid(), SIGINT);  // it is dumb, stupid, but works... :/
-}
-
-#endif
 
 
 void
@@ -126,33 +102,33 @@ balde_fcgi_run(balde_app_t *app, const gchar *host, gint16 port,
     gint max_threads, gint backlog, gboolean listen)
 {
     FCGX_Init();
-    balde_fcgi_ctx_t *ctx = g_new(balde_fcgi_ctx_t, 1);
-    ctx->app = app;
-    ctx->sock = 0;
+
+    // initialize socket
+    gint sock = 0;
     if (listen) {
         const gchar *final_host = host != NULL ? host : "127.0.0.1";
         g_printerr(" * Running FastCGI on %s:%d (threads: %d, backlog: %d)\n",
             final_host, port, max_threads, backlog);
         gchar *bind = g_strdup_printf("%s:%d", final_host, port);
-        ctx->sock = FCGX_OpenSocket(bind, backlog);
+        sock = FCGX_OpenSocket(bind, backlog);
         g_free(bind);
     }
 
-    if (max_threads > 1) {
+    // initialize thread pool
+    GThreadPool *pool = g_thread_pool_new ((GFunc) balde_fcgi_thread_run, app,
+        max_threads, TRUE, NULL);
 
-#if defined(HAVE_SYS_TYPES_H) && defined(HAVE_UNISTD_H)
-        signal(SIGTERM, balde_fcgi_signal_handler);
-        signal(SIGUSR1, balde_fcgi_signal_handler);
-#endif
-
-        GThread *threads[max_threads-1];
-        for (guint i = 1; i < max_threads; i++) {
-            gchar *name = g_strdup_printf("balde-%03d", i);
-            threads[i] = g_thread_new(name, balde_fcgi_thread_run, ctx);
-            g_free(name);
+    // accept requests
+    for (;;) {
+        FCGX_Request *request = g_new(FCGX_Request, 1);
+        FCGX_InitRequest(request, sock, FCGI_FAIL_ACCEPT_ON_INTR);
+        if (FCGX_Accept_r(request) < 0) {
+            g_free(request);
+            break;
         }
+        g_thread_pool_push(pool, request, NULL);
     }
-    balde_fcgi_thread_run(ctx);
+
+    g_thread_pool_free(pool, FALSE, TRUE);
     balde_app_free(app);
-    g_free(ctx);
 }
