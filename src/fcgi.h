@@ -13,7 +13,13 @@
 #include <fcgiapp.h>
 #include "balde.h"
 
+typedef struct {
+    balde_app_t *app;
+    gint sock;
+} balde_fcgi_ctx_t;
+
 GHashTable* balde_fcgi_request_headers(const gchar **envp);
-void balde_fcgi_run(balde_app_t *app, gint max_threads);
+void balde_fcgi_run(balde_app_t *app, const gchar *host, gint16 port,
+    gint max_threads, gint backlog, gboolean listen);
 
 #endif /* _BALDE_FCGI_PRIVATE_H */

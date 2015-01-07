@@ -257,9 +257,17 @@ static gboolean version = FALSE;
 
 #ifdef BUILD_WEBSERVER
 static gboolean runserver = FALSE;
+#endif
+
+#ifdef BUILD_FASTCGI
+static gboolean runfcgi = FALSE;
+static gint fcgi_backlog = 1024;
+#endif
+
+#if defined(BUILD_WEBSERVER) || defined(BUILD_FASTCGI)
 static gchar *host = NULL;
 static gint16 port = 8080;
-static gint max_threads = 10;
+static guint64 max_threads = 10;
 #endif
 
 static GOptionEntry entries[] =
@@ -269,13 +277,23 @@ static GOptionEntry entries[] =
 
 #ifdef BUILD_WEBSERVER
     {"runserver", 's', 0, G_OPTION_ARG_NONE, &runserver,
-        "Run embedded server.", NULL},
+        "Run embedded HTTP server. NOT production ready!", NULL},
+#endif
+
+#ifdef BUILD_FASTCGI
+    {"runfcgi", 'f', 0, G_OPTION_ARG_NONE, &runfcgi,
+        "Listen to FastCGI socket.", NULL},
+    {"fcgi-backlog", 'b', 0, G_OPTION_ARG_INT, &fcgi_backlog,
+        "FastCGI socket backlog. (default: 1024)", "BACKLOG"},
+#endif
+
+#if defined(BUILD_WEBSERVER) || defined(BUILD_FASTCGI)
     {"host", 't', 0, G_OPTION_ARG_STRING, &host,
-        "Embedded server host. (default: 127.0.0.1)", "HOST"},
+        "Embedded server/FastCGI host. (default: 127.0.0.1)", "HOST"},
     {"port", 'p', 0, G_OPTION_ARG_INT, &port,
-        "Embedded server port. (default: 8080)", "PORT"},
+        "Embedded server/FastCGI port. (default: 8080)", "PORT"},
     {"max-threads", 'm', 0, G_OPTION_ARG_INT, &max_threads,
-        "Max number of threads for embedded server. (default: 10)", "THREADS"},
+        "Embedded server/FastCGI max threads. (default: 10)", "THREADS"},
 #endif
 
     {NULL}
@@ -302,12 +320,12 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 #endif
 
 #ifdef BUILD_FASTCGI
-    else if (!FCGX_IsCGI()) {
+    else if (runfcgi || !FCGX_IsCGI()) {
         const gchar *threads_str = g_getenv("BALDE_FASTCGI_THREADS");
-        guint64 threads = 1;
+        guint64 threads = max_threads;
         if (threads_str != NULL && threads_str[0] != '\0')
             threads = g_ascii_strtoull(threads_str, NULL, 10);
-        balde_fcgi_run(app, threads);
+        balde_fcgi_run(app, host, port, threads, fcgi_backlog, runfcgi);
     }
 #endif
 
@@ -320,7 +338,7 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
     }
     g_option_context_free(context);
 
-#ifdef BUILD_WEBSERVER
+#if defined(BUILD_WEBSERVER) || defined(BUILD_FASTCGI)
     g_free(host);
 #endif
 
