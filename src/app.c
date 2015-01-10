@@ -36,7 +36,10 @@
 static GLogLevelFlags
 balde_get_log_level_flag_from_string(const gchar *level)
 {
-    gchar *level_str = (level == NULL) ? g_strdup("MESSAGE") : g_ascii_strup(level, -1);
+    if (level == NULL)
+        return G_LOG_LEVEL_MESSAGE;
+
+    gchar *level_str = g_ascii_strup(level, -1);
 
     GLogLevelFlags level_flag = G_LOG_LEVEL_MESSAGE;
     if (g_strcmp0(level_str, "CRITICAL") == 0)
