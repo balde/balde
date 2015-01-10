@@ -24,6 +24,24 @@
  */
 
 
+#define BALDE_LOG_DOMAIN "balde"
+
+#define balde_log_critical(...)                                               \
+    g_log(BALDE_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, __VA_ARGS__)
+
+#define balde_log_warning(...)                                                \
+    g_log(BALDE_LOG_DOMAIN, G_LOG_LEVEL_WARNING, __VA_ARGS__)
+
+#define balde_log_message(...)                                                \
+    g_log(BALDE_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, __VA_ARGS__)
+
+#define balde_log_info(...)                                                   \
+    g_log(BALDE_LOG_DOMAIN, G_LOG_LEVEL_INFO, __VA_ARGS__)
+
+#define balde_log_debug(...)                                                  \
+    g_log(BALDE_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, __VA_ARGS__)
+
+
 /**
  * Supported HTTP methods.
  *

@@ -13,6 +13,7 @@
 #include <glib.h>
 #include <locale.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "balde.h"
 #include "balde-private.h"
 #include "app.h"
@@ -30,6 +31,60 @@
 #include <fcgiapp.h>
 #include "fcgi.h"
 #endif
+
+
+static GLogLevelFlags
+balde_get_log_level_flag_from_string(const gchar *level)
+{
+    gchar *level_str = (level == NULL) ? g_strdup("MESSAGE") : g_ascii_strup(level, -1);
+
+    GLogLevelFlags level_flag = G_LOG_LEVEL_MESSAGE;
+    if (g_strcmp0(level_str, "CRITICAL") == 0)
+        level_flag = G_LOG_LEVEL_CRITICAL;
+    if (g_strcmp0(level_str, "WARNING") == 0)
+        level_flag = G_LOG_LEVEL_WARNING;
+    if (g_strcmp0(level_str, "MESSAGE") == 0)
+        level_flag = G_LOG_LEVEL_MESSAGE;
+    if (g_strcmp0(level_str, "INFO") == 0)
+        level_flag = G_LOG_LEVEL_INFO;
+    if (g_strcmp0(level_str, "DEBUG") == 0)
+        level_flag = G_LOG_LEVEL_DEBUG;
+
+    g_free(level_str);
+    return level_flag;
+}
+
+
+static void
+balde_log_handler(const gchar *log_domain, GLogLevelFlags log_level,
+    const gchar *message, gpointer user_data)
+{
+    GLogLevelFlags wanted_log_level = GPOINTER_TO_INT(user_data);
+    if (log_level <= wanted_log_level) {
+        const gchar *level_str;
+        switch (log_level & G_LOG_LEVEL_MASK) {
+            case G_LOG_LEVEL_ERROR:
+                return;  // INVALID
+            case G_LOG_LEVEL_CRITICAL:
+                level_str = "CRITICAL";
+                break;
+            case G_LOG_LEVEL_WARNING:
+                level_str = "WARNING";
+                break;
+            case G_LOG_LEVEL_MESSAGE:
+                level_str = "MESSAGE";
+                break;
+            case G_LOG_LEVEL_INFO:
+                level_str = "INFO";
+                break;
+            case G_LOG_LEVEL_DEBUG:
+                level_str = "DEBUG";
+                break;
+        }
+        fprintf(stderr, "%s: %s\n", level_str, message);
+    }
+}
+
 
 BALDE_API balde_app_t*
 balde_app_init(void)
@@ -254,6 +309,7 @@ balde_app_url_forv(balde_app_t *app, balde_request_t *request,
  */
 
 static gboolean version = FALSE;
+static gchar *log_level = NULL;
 
 #ifdef BUILD_WEBSERVER
 static gboolean runserver = FALSE;
@@ -274,6 +330,9 @@ static GOptionEntry entries[] =
 {
     {"version", 0, 0, G_OPTION_ARG_NONE, &version,
         "Show balde's version number and exit.", NULL},
+    {"log-level", 'l', 0, G_OPTION_ARG_STRING, &log_level,
+        "Logging level (CRITICAL, WARNING, MESSAGE, INFO, DEBUG). "
+        "(default: MESSAGE)", "LEVEL"},
 
 #ifdef BUILD_WEBSERVER
     {"runserver", 's', 0, G_OPTION_ARG_NONE, &runserver,
@@ -311,6 +370,12 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
         g_printerr("Option parsing failed: %s\n", err->message);
         exit(1);
     }
+
+    g_log_set_handler(BALDE_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL |
+        G_LOG_LEVEL_WARNING | G_LOG_LEVEL_MESSAGE | G_LOG_LEVEL_INFO |
+        G_LOG_LEVEL_DEBUG, balde_log_handler,
+        GINT_TO_POINTER(balde_get_log_level_flag_from_string(log_level)));
+
     if (version)
         g_printerr("%s\n", PACKAGE_STRING);
 
