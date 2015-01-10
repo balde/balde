@@ -410,6 +410,7 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
     g_free(host);
 #endif
 
+    g_free(log_level);
 }
 
 
