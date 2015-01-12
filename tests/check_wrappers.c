@@ -1,6 +1,6 @@
 /*
  * balde: A microframework for C based on GLib and bad intentions.
- * Copyright (C) 2013-2014 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ * Copyright (C) 2013-2015 Rafael G. Martins <rafael@rafaelmartins.eng.br>
  *
  * This program can be distributed under the terms of the LGPL-2 License.
  * See the file COPYING.
@@ -441,6 +441,64 @@ test_make_request(void)
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, NULL);
     g_assert_cmpstr(request->path, ==, "/");
+    g_assert(request->script_name == NULL);
+    g_assert(request->method == BALDE_HTTP_GET);
+    g_assert(g_hash_table_size(request->priv->headers) == 4);
+    g_assert(g_hash_table_size(request->priv->args) == 2);
+    g_assert(g_hash_table_size(request->priv->cookies) == 2);
+    g_assert(request->authorization != NULL);
+    g_assert_cmpstr(request->authorization->username, ==, "bola");
+    g_assert_cmpstr(request->authorization->password, ==, "guda:lol");
+    g_assert(request->priv->view_args == NULL);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
+test_make_request_without_path_info(void)
+{
+    g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
+    g_setenv("HTTP_XD_KKK", "asdf", TRUE);
+    g_setenv("HTTP_COOKIE", "asd=\"qwe\"; bola=guda", TRUE);
+    g_setenv("HTTP_AUTHORIZATION", "Basic Ym9sYTpndWRhOmxvbA==", TRUE);
+    g_setenv("REQUEST_METHOD", "GET", TRUE);
+    g_setenv("QUERY_STRING", "asd=lol&xd=hehe", TRUE);
+    g_unsetenv("PATH_INFO");
+    // FIXME: this thing is too weak :(
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    g_assert(request->path == NULL);
+    g_assert(request->script_name == NULL);
+    g_assert(request->method == BALDE_HTTP_GET);
+    g_assert(g_hash_table_size(request->priv->headers) == 4);
+    g_assert(g_hash_table_size(request->priv->args) == 2);
+    g_assert(g_hash_table_size(request->priv->cookies) == 2);
+    g_assert(request->authorization != NULL);
+    g_assert_cmpstr(request->authorization->username, ==, "bola");
+    g_assert_cmpstr(request->authorization->password, ==, "guda:lol");
+    g_assert(request->priv->view_args == NULL);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
+test_make_request_without_path_info_with_script_name(void)
+{
+    g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
+    g_setenv("HTTP_XD_KKK", "asdf", TRUE);
+    g_setenv("HTTP_COOKIE", "asd=\"qwe\"; bola=guda", TRUE);
+    g_setenv("HTTP_AUTHORIZATION", "Basic Ym9sYTpndWRhOmxvbA==", TRUE);
+    g_setenv("REQUEST_METHOD", "GET", TRUE);
+    g_setenv("QUERY_STRING", "asd=lol&xd=hehe", TRUE);
+    g_setenv("SCRIPT_NAME", "/bola/", TRUE);
+    g_unsetenv("PATH_INFO");
+    // FIXME: this thing is too weak :(
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    g_assert_cmpstr(request->path, ==, "/bola/");
+    g_assert(request->script_name == NULL);
     g_assert(request->method == BALDE_HTTP_GET);
     g_assert(g_hash_table_size(request->priv->headers) == 4);
     g_assert(g_hash_table_size(request->priv->args) == 2);
@@ -665,6 +723,10 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/parse_cookies", test_parse_cookies);
     g_test_add_func("/wrappers/parse_authorization", test_parse_authorization);
     g_test_add_func("/wrappers/make_request", test_make_request);
+    g_test_add_func("/wrappers/make_request_without_path_info",
+        test_make_request_without_path_info);
+    g_test_add_func("/wrappres/make_request_without_path_info_with_script_name",
+        test_make_request_without_path_info_with_script_name);
     g_test_add_func("/wrappers/make_request_with_env", test_make_request_with_env);
     g_test_add_func("/wrappers/request_get_header", test_request_get_header);
     g_test_add_func("/wrappers/request_get_arg", test_request_get_arg);

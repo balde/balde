@@ -1,6 +1,6 @@
 /*
  * balde: A microframework for C based on GLib and bad intentions.
- * Copyright (C) 2013-2014 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ * Copyright (C) 2013-2015 Rafael G. Martins <rafael@rafaelmartins.eng.br>
  *
  * This program can be distributed under the terms of the LGPL-2 License.
  * See the file COPYING.
@@ -22,6 +22,24 @@
  * \file balde.h
  *
  */
+
+
+#define BALDE_LOG_DOMAIN "balde"
+
+#define balde_log_critical(...)                                               \
+    g_log(BALDE_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, __VA_ARGS__)
+
+#define balde_log_warning(...)                                                \
+    g_log(BALDE_LOG_DOMAIN, G_LOG_LEVEL_WARNING, __VA_ARGS__)
+
+#define balde_log_message(...)                                                \
+    g_log(BALDE_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, __VA_ARGS__)
+
+#define balde_log_info(...)                                                   \
+    g_log(BALDE_LOG_DOMAIN, G_LOG_LEVEL_INFO, __VA_ARGS__)
+
+#define balde_log_debug(...)                                                  \
+    g_log(BALDE_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, __VA_ARGS__)
 
 
 /**
@@ -315,22 +333,6 @@ void balde_app_set_user_data_destroy_func(balde_app_t *app,
  *
  */
 void balde_app_free_user_data(balde_app_t *app);
-
-
-/**
- * Gets current error.
- *
- * This function returns the error object of the current context, if any, or
- * NULL.
- *
- * If the function is called from the context of a view, it will return the
- * error from the request context, otherwise it will return the error from the
- * application context.
- *
- * Errors are usually non-2XX HTTP status codes.
- *
- */
-const GError* balde_app_get_error(balde_app_t *app);
 
 
 /**

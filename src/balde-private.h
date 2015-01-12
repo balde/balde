@@ -6,16 +6,9 @@
  * See the file COPYING.
  */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif /* HAVE_CONFIG_H */
+#ifndef _BALDE_PRIVATE_H
+#define _BALDE_PRIVATE_H
 
-#include <glib.h>
-#include "utils.h"
+#define BALDE_API __attribute__((visibility("default")))
 
-
-gchar*
-get_template(const gchar *filename)
-{
-    return g_build_filename("@abs_top_srcdir@", "tests", "templates", filename, NULL);
-}
+#endif /* _BALDE_PRIVATE_H */

@@ -1,6 +1,6 @@
 /*
  * balde: A microframework for C based on GLib and bad intentions.
- * Copyright (C) 2013-2014 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ * Copyright (C) 2013-2015 Rafael G. Martins <rafael@rafaelmartins.eng.br>
  *
  * This program can be distributed under the terms of the LGPL-2 License.
  * See the file COPYING.
@@ -13,7 +13,9 @@
 #include <glib.h>
 #include <locale.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "balde.h"
+#include "balde-private.h"
 #include "app.h"
 #include "cgi.h"
 #include "exceptions.h"
@@ -21,7 +23,7 @@
 #include "routing.h"
 #include "wrappers.h"
 
-#ifdef BUILD_WEBSERVER
+#ifdef BUILD_HTTP
 #include "httpd.h"
 #endif
 
@@ -30,7 +32,66 @@
 #include "fcgi.h"
 #endif
 
-balde_app_t*
+
+static GLogLevelFlags
+balde_get_log_level_flag_from_string(const gchar *level)
+{
+    if (level == NULL)
+        return G_LOG_LEVEL_MESSAGE;
+
+    gchar *level_str = g_ascii_strup(level, -1);
+
+    GLogLevelFlags level_flag = G_LOG_LEVEL_MESSAGE;
+    if (g_strcmp0(level_str, "CRITICAL") == 0)
+        level_flag = G_LOG_LEVEL_CRITICAL;
+    else if (g_strcmp0(level_str, "WARNING") == 0)
+        level_flag = G_LOG_LEVEL_WARNING;
+    else if (g_strcmp0(level_str, "MESSAGE") == 0)
+        level_flag = G_LOG_LEVEL_MESSAGE;
+    else if (g_strcmp0(level_str, "INFO") == 0)
+        level_flag = G_LOG_LEVEL_INFO;
+    else if (g_strcmp0(level_str, "DEBUG") == 0)
+        level_flag = G_LOG_LEVEL_DEBUG;
+    else
+        g_printerr("ERROR: Invalid log level, defaulting to MESSAGE ...\n");
+
+    g_free(level_str);
+    return level_flag;
+}
+
+
+static void
+balde_log_handler(const gchar *log_domain, GLogLevelFlags log_level,
+    const gchar *message, gpointer user_data)
+{
+    GLogLevelFlags wanted_log_level = GPOINTER_TO_INT(user_data);
+    if (log_level <= wanted_log_level) {
+        const gchar *level_str;
+        switch (log_level & G_LOG_LEVEL_MASK) {
+            case G_LOG_LEVEL_ERROR:
+                return;  // INVALID
+            case G_LOG_LEVEL_CRITICAL:
+                level_str = "CRITICAL";
+                break;
+            case G_LOG_LEVEL_WARNING:
+                level_str = "WARNING";
+                break;
+            case G_LOG_LEVEL_MESSAGE:
+                level_str = "MESSAGE";
+                break;
+            case G_LOG_LEVEL_INFO:
+                level_str = "INFO";
+                break;
+            case G_LOG_LEVEL_DEBUG:
+                level_str = "DEBUG";
+                break;
+        }
+        fprintf(stderr, "%s: %s\n", level_str, message);
+    }
+}
+
+
+BALDE_API balde_app_t*
 balde_app_init(void)
 {
     balde_app_t *app = g_new(balde_app_t, 1);
@@ -62,7 +123,7 @@ balde_app_copy(balde_app_t *app)
 
 G_LOCK_DEFINE_STATIC(config);
 
-void
+BALDE_API void
 balde_app_set_config(balde_app_t *app, const gchar *name, const gchar *value)
 {
     BALDE_APP_READ_ONLY(app);
@@ -72,7 +133,7 @@ balde_app_set_config(balde_app_t *app, const gchar *name, const gchar *value)
 }
 
 
-void
+BALDE_API void
 balde_app_set_config_from_envvar(balde_app_t *app, const gchar *name,
     const gchar *env_name, gboolean silent)
 {
@@ -89,7 +150,7 @@ balde_app_set_config_from_envvar(balde_app_t *app, const gchar *name,
 }
 
 
-const gchar*
+BALDE_API const gchar*
 balde_app_get_config(balde_app_t *app, const gchar *name)
 {
     gchar *tmp = g_utf8_strdown(name, -1);
@@ -99,7 +160,7 @@ balde_app_get_config(balde_app_t *app, const gchar *name)
 }
 
 
-void
+BALDE_API void
 balde_app_set_user_data(balde_app_t *app, gpointer user_data)
 {
     BALDE_APP_READ_ONLY(app);
@@ -111,14 +172,14 @@ balde_app_set_user_data(balde_app_t *app, gpointer user_data)
 }
 
 
-gpointer
+BALDE_API gpointer
 balde_app_get_user_data(balde_app_t *app)
 {
     return app->priv->user_data;
 }
 
 
-void
+BALDE_API void
 balde_app_set_user_data_destroy_func(balde_app_t *app, GDestroyNotify destroy_func)
 {
     BALDE_APP_READ_ONLY(app);
@@ -126,7 +187,7 @@ balde_app_set_user_data_destroy_func(balde_app_t *app, GDestroyNotify destroy_fu
 }
 
 
-void
+BALDE_API void
 balde_app_free_user_data(balde_app_t *app)
 {
     if (app->priv->user_data_destroy_func != NULL && app->priv->user_data != NULL) {
@@ -145,9 +206,11 @@ balde_app_free_views(balde_view_t *view)
 }
 
 
-void
+BALDE_API void
 balde_app_free(balde_app_t *app)
 {
+    if (app == NULL)
+        return;
     if (!app->copy) {
         g_slist_free_full(app->priv->views, (GDestroyNotify) balde_app_free_views);
         g_slist_free(app->priv->before_requests);
@@ -163,7 +226,7 @@ balde_app_free(balde_app_t *app)
 
 G_LOCK_DEFINE_STATIC(views);
 
-void
+BALDE_API void
 balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rule,
     const balde_http_method_t method, balde_view_func_t view_func)
 {
@@ -191,7 +254,7 @@ balde_app_add_url_rule(balde_app_t *app, const gchar *endpoint, const gchar *rul
 
 G_LOCK_DEFINE_STATIC(before_requests);
 
-void
+BALDE_API void
 balde_app_add_before_request(balde_app_t *app, balde_before_request_func_t hook_func)
 {
     BALDE_APP_READ_ONLY(app);
@@ -213,7 +276,7 @@ balde_app_get_view_from_endpoint(balde_app_t *app, const gchar *endpoint)
 }
 
 
-gchar*
+BALDE_API gchar*
 balde_app_url_for(balde_app_t *app, balde_request_t *request,
     const gchar *endpoint, gboolean external, ...)
 {
@@ -252,77 +315,206 @@ balde_app_url_forv(balde_app_t *app, balde_request_t *request,
  * A hello world!
  */
 
+static gboolean help = FALSE;
 static gboolean version = FALSE;
+static gchar *log_level = NULL;
 
-#ifdef BUILD_WEBSERVER
+#ifdef BUILD_HTTP
 static gboolean runserver = FALSE;
-static gchar *host = NULL;
-static gint16 port = 8080;
-static gint max_threads = 10;
+#endif
+
+#ifdef BUILD_FASTCGI
+static gboolean runfcgi = FALSE;
 #endif
 
 static GOptionEntry entries[] =
 {
-    {"version", 0, 0, G_OPTION_ARG_NONE, &version,
+    {"help", 'h', 0, G_OPTION_ARG_NONE, &help,
+        "Show help options", NULL},
+    {"version", 'v', 0, G_OPTION_ARG_NONE, &version,
         "Show balde's version number and exit.", NULL},
+    {"log-level", 'l', 0, G_OPTION_ARG_STRING, &log_level,
+        "Logging level (CRITICAL, WARNING, MESSAGE, INFO, DEBUG). "
+        "(default: MESSAGE)", "LEVEL"},
 
-#ifdef BUILD_WEBSERVER
+#ifdef BUILD_HTTP
     {"runserver", 's', 0, G_OPTION_ARG_NONE, &runserver,
-        "Run embedded server.", NULL},
-    {"host", 't', 0, G_OPTION_ARG_STRING, &host,
-        "Embedded server host. (default: 127.0.0.1)", "HOST"},
-    {"port", 'p', 0, G_OPTION_ARG_INT, &port,
-        "Embedded server port. (default: 8080)", "PORT"},
-    {"max-threads", 'm', 0, G_OPTION_ARG_INT, &max_threads,
-        "Max number of threads for embedded server. (default: 10)", "THREADS"},
+        "Run embedded HTTP server. NOT production ready!", NULL},
+#endif
+
+#ifdef BUILD_FASTCGI
+    {"runfcgi", 'f', 0, G_OPTION_ARG_NONE, &runfcgi,
+        "Listen to FastCGI socket.", NULL},
 #endif
 
     {NULL}
 };
 
 
-void
+#ifdef BUILD_HTTP
+static gchar *http_host = NULL;
+static gint16 http_port = 8080;
+static guint64 http_max_threads = 10;
+
+static GOptionEntry entries_http[] =
+{
+    {"http-host", 0, 0, G_OPTION_ARG_STRING, &http_host,
+        "Embedded HTTP server host. (default: 127.0.0.1)", "HOST"},
+    {"http-port", 0, 0, G_OPTION_ARG_INT, &http_port,
+        "Embedded HTTP server port. (default: 8080)", "PORT"},
+    {"http-max-threads", 0, 0, G_OPTION_ARG_INT, &http_max_threads,
+        "Embedded HTTP server max threads. (default: 10)", "THREADS"},
+    {NULL}
+};
+#endif
+
+#ifdef BUILD_FASTCGI
+static gchar *fcgi_host = NULL;
+static gint16 fcgi_port = 1026;
+static gchar *fcgi_socket = NULL;
+static gint fcgi_socket_mode = -1;
+static guint64 fcgi_max_threads = 1;
+static gint fcgi_backlog = 1024;
+
+
+static gboolean
+balde_socket_mode_func(const gchar *option_name, const gchar *value,
+    gpointer data, GError **error)
+{
+    if (value != NULL)
+        fcgi_socket_mode = strtol(value, NULL, 8);
+    return TRUE;
+}
+
+
+static GOptionEntry entries_fcgi[] =
+{
+    {"fcgi-host", 0, 0, G_OPTION_ARG_STRING, &fcgi_host,
+        "FastCGI host, conflicts with UNIX socket. (default: 127.0.0.1)", "HOST"},
+    {"fcgi-port", 0, 0, G_OPTION_ARG_INT, &fcgi_port,
+        "FastCGI port, conflicts with UNIX socket. (default: 1026)", "PORT"},
+    {"fcgi-socket", 0,0, G_OPTION_ARG_STRING, &fcgi_socket,
+        "FastCGI UNIX socket path, conflicts with host and port. (default: not set)",
+        "SOCKET"},
+    {"fcgi-socket-mode", 0, 0, G_OPTION_ARG_CALLBACK, balde_socket_mode_func,
+        "FastCGI UNIX socket mode, octal integer. (default: umask)", "MODE"},
+    {"fcgi-max-threads", 0, 0, G_OPTION_ARG_INT, &fcgi_max_threads,
+        "FastCGI max threads. (default: 1)", "THREADS"},
+    {"fcgi-backlog", 0, 0, G_OPTION_ARG_INT, &fcgi_backlog,
+        "FastCGI socket backlog. (default: 1024)", "BACKLOG"},
+    {NULL}
+};
+#endif
+
+
+BALDE_API void
 balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 {
     setlocale(LC_ALL, "");
     GError *err = NULL;
     GOptionContext *context = g_option_context_new("- a balde application ;-)");
     g_option_context_add_main_entries(context, entries, NULL);
+
+#ifdef BUILD_HTTP
+    GOptionGroup *http_group = g_option_group_new("http", "HTTP Options:",
+        "Show HTTP help options", NULL, NULL);
+    g_option_group_add_entries(http_group, entries_http);
+    g_option_context_add_group(context, http_group);
+#endif
+
+#ifdef BUILD_FASTCGI
+    GOptionGroup *fcgi_group = g_option_group_new("fastcgi", "FastCGI Options:",
+        "Show FastCGI help options", NULL, NULL);
+    g_option_group_add_entries(fcgi_group, entries_fcgi);
+    g_option_context_add_group(context, fcgi_group);
+#endif
+
+    g_option_context_set_help_enabled(context, FALSE);
+
     if (!g_option_context_parse(context, &argc, &argv, &err)) {
         g_printerr("Option parsing failed: %s\n", err->message);
         exit(1);
     }
-    if (version)
-        g_printerr("%s\n", PACKAGE_STRING);
 
-#ifdef BUILD_WEBSERVER
-    else if (runserver)
-        balde_httpd_run(app, host, port, max_threads);
+    g_log_set_handler(BALDE_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL |
+        G_LOG_LEVEL_WARNING | G_LOG_LEVEL_MESSAGE | G_LOG_LEVEL_INFO |
+        G_LOG_LEVEL_DEBUG, balde_log_handler,
+        GINT_TO_POINTER(balde_get_log_level_flag_from_string(log_level)));
+
+#ifdef BUILD_HTTP
+#ifdef BUILD_FASTCGI
+    if (runserver && runfcgi) {
+        g_printerr("ERROR: --runserver conflicts with --runfcgi\n");
+        goto clean;
+    }
+    if (http_host != NULL && (fcgi_host != NULL || fcgi_socket || fcgi_socket_mode > 0)) {
+        g_printerr("ERROR: most --host-* arguments are incompatible with most "
+            "--fcgi-* arguments\n");
+        goto clean;
+    }
+#endif
+#endif
+
+#ifdef BUILD_HTTP
+    if (http_host != NULL)
+        runserver = TRUE;
 #endif
 
 #ifdef BUILD_FASTCGI
-    else if (!FCGX_IsCGI()) {
+    if (fcgi_host != NULL || fcgi_socket || fcgi_socket_mode > 0)
+        runfcgi = TRUE;
+#endif
+
+    if (help) {
+        gchar *help_str = g_option_context_get_help(context, FALSE, NULL);
+        g_print("%s", help_str);
+        g_free(help_str);
+    }
+
+    else if (version)
+        g_printerr("%s\n", PACKAGE_STRING);
+
+#ifdef BUILD_HTTP
+    else if (runserver)
+        balde_httpd_run(app, http_host, http_port, http_max_threads);
+#endif
+
+#ifdef BUILD_FASTCGI
+    else if (runfcgi || !FCGX_IsCGI()) {
+        if (fcgi_socket != NULL && fcgi_host != NULL) {
+            g_printerr("ERROR: --fcgi-socket conflicts with --fcgi-host\n");
+            goto clean;
+        }
         const gchar *threads_str = g_getenv("BALDE_FASTCGI_THREADS");
-        guint64 threads = 1;
+        guint64 threads = fcgi_max_threads;
         if (threads_str != NULL && threads_str[0] != '\0')
             threads = g_ascii_strtoull(threads_str, NULL, 10);
-        balde_fcgi_run(app, threads);
+        balde_fcgi_run(app, fcgi_host, fcgi_port, fcgi_socket, fcgi_socket_mode,
+            threads, fcgi_backlog, runfcgi);
     }
 #endif
 
     else if (g_getenv("REQUEST_METHOD") != NULL)
         balde_cgi_run(app);
     else {
-        gchar *help = g_option_context_get_help(context, FALSE, NULL);
-        g_printerr("%s", help);
-        g_free(help);
+        gchar *help_str = g_option_context_get_help(context, FALSE, NULL);
+        g_printerr("%s", help_str);
+        g_free(help_str);
     }
+
+clean:
     g_option_context_free(context);
 
-#ifdef BUILD_WEBSERVER
-    g_free(host);
+#ifdef BUILD_HTTP
+    g_free(http_host);
 #endif
 
+#ifdef BUILD_FASTCGI
+    g_free(fcgi_host);
+    g_free(fcgi_socket);
+#endif
+
+    g_free(log_level);
 }
 
 

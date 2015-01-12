@@ -1,6 +1,6 @@
 /*
  * balde: A microframework for C based on GLib and bad intentions.
- * Copyright (C) 2013-2014 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ * Copyright (C) 2013-2015 Rafael G. Martins <rafael@rafaelmartins.eng.br>
  *
  * This program can be distributed under the terms of the LGPL-2 License.
  * See the file COPYING.
@@ -12,6 +12,7 @@
 
 #include <glib.h>
 #include "balde.h"
+#include "balde-private.h"
 #include "app.h"
 
 
@@ -22,7 +23,7 @@
  * it on the balde source code.
  */
 
-gchar*
+BALDE_API gchar*
 balde_tmpl_url_for(balde_app_t *app, balde_request_t *request,
     const gchar *endpoint, gboolean external, ...)
 {

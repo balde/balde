@@ -27,6 +27,17 @@ AS_IF([test "x$ac_cv_prog_cc_c99" = "xno"], [
   AC_MSG_ERROR([no C99 compiler found, balde requires a C99 compiler.])
 ])
 
+bkp_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -fvisibility=hidden"
+AC_MSG_CHECKING([if ${CC} supports -fvisibility=hidden])
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([char guda;])], [
+  AC_MSG_RESULT([yes])
+], [
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([no -fvisibility=hidden support found in ${CC}, balde requires -fvisibility=hidden])
+])
+CFLAGS="$bkp_CFLAGS"
+
 AC_ARG_ENABLE([fastcgi], AS_HELP_STRING([--disable-fastcgi], [disable fastcgi support]))
 AS_IF([test "x$enable_fastcgi" != "xno"], [
   AC_SEARCH_LIBS([FCGI_Accept], [fcgi], ,
@@ -41,16 +52,16 @@ AS_IF([test "x$enable_fastcgi" != "xno"], [
 ])
 AM_CONDITIONAL([BUILD_FASTCGI], [test "x$build_fastcgi" = "xyes"])
 
-AC_ARG_ENABLE([webserver], AS_HELP_STRING([--disable-webserver], [disable embedded webserver]))
-AS_IF([test "x$enable_webserver" != "xno"], [
-  build_webserver=yes
-  AC_DEFINE([BUILD_WEBSERVER], [], [embedded webserver enabled])
-  WEBSERVER="enabled"
+AC_ARG_ENABLE([http], AS_HELP_STRING([--disable-http], [disable embedded HTTP webserver]))
+AS_IF([test "x$enable_http" != "xno"], [
+  build_http=yes
+  AC_DEFINE([BUILD_HTTP], [], [embedded HTTP webserver enabled])
+  HTTP="enabled"
 ], [
-  build_webserver=no
-  WEBSERVER="disabled"
+  build_http=no
+  HTTP="disabled"
 ])
-AM_CONDITIONAL([BUILD_WEBSERVER], [test "x$build_webserver" = "xyes"])
+AM_CONDITIONAL([BUILD_HTTP], [test "x$build_http" = "xyes"])
 
 AC_ARG_ENABLE([examples], AS_HELP_STRING([--enable-examples], [build examples]))
 AS_IF([test "x$enable_examples" = "xyes"], [
@@ -157,8 +168,8 @@ AS_ECHO("
         ldflags:      ${LDFLAGS}
 
         fastcgi:      ${FASTCGI}
+        http:         ${HTTP}
         examples:     ${EXAMPLES}
-        webserver:    ${WEBSERVER}
 
         doxygen:      ${DOXYGEN}
         valgrind:     ${VALGRIND}
