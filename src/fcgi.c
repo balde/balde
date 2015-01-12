@@ -15,11 +15,6 @@
 #include <fcgiapp.h>
 #include <string.h>
 
-#if defined(HAVE_SYS_TYPES_H) && defined(HAVE_UNISTD_H)
-#include <sys/types.h>
-#include <unistd.h>
-#endif
-
 #include "balde.h"
 #include "app.h"
 #include "cgi.h"
@@ -122,7 +117,7 @@ balde_fcgi_run(balde_app_t *app, const gchar *host, const gint16 port,
     }
 
     // initialize thread pool
-    GThreadPool *pool = g_thread_pool_new ((GFunc) balde_fcgi_thread_run, app,
+    GThreadPool *pool = g_thread_pool_new((GFunc) balde_fcgi_thread_run, app,
         max_threads, TRUE, NULL);
 
     // accept requests

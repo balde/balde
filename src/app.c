@@ -481,7 +481,6 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 
 #ifdef BUILD_FASTCGI
     else if (runfcgi || !FCGX_IsCGI()) {
-        gchar *path;
         if (fcgi_socket != NULL && fcgi_host != NULL) {
             g_printerr("ERROR: --fcgi-socket conflicts with --fcgi-host\n");
             goto clean;
@@ -492,7 +491,6 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
             threads = g_ascii_strtoull(threads_str, NULL, 10);
         balde_fcgi_run(app, fcgi_host, fcgi_port, fcgi_socket, fcgi_socket_mode,
             threads, fcgi_backlog, runfcgi);
-        g_free(path);
     }
 #endif
 
