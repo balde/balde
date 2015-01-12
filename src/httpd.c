@@ -191,7 +191,8 @@ balde_httpd_run(balde_app_t *app, const gchar *host, gint16 port,
 {
     GError *error = NULL;
     const gchar *final_host = host != NULL ? host : "127.0.0.1";
-    g_printerr(" * Running on http://%s:%d/\n", final_host, port);
+    g_printerr(" * Running on http://%s:%d/ (threads: %d)\n", final_host, port,
+        max_threads);
     GSocketService *service = g_threaded_socket_service_new(max_threads);
     GInetAddress* addr_host = g_inet_address_new_from_string(final_host);
     GSocketAddress *address = g_inet_socket_address_new(addr_host, port);
