@@ -44,14 +44,16 @@ balde_get_log_level_flag_from_string(const gchar *level)
     GLogLevelFlags level_flag = G_LOG_LEVEL_MESSAGE;
     if (g_strcmp0(level_str, "CRITICAL") == 0)
         level_flag = G_LOG_LEVEL_CRITICAL;
-    if (g_strcmp0(level_str, "WARNING") == 0)
+    else if (g_strcmp0(level_str, "WARNING") == 0)
         level_flag = G_LOG_LEVEL_WARNING;
-    if (g_strcmp0(level_str, "MESSAGE") == 0)
+    else if (g_strcmp0(level_str, "MESSAGE") == 0)
         level_flag = G_LOG_LEVEL_MESSAGE;
-    if (g_strcmp0(level_str, "INFO") == 0)
+    else if (g_strcmp0(level_str, "INFO") == 0)
         level_flag = G_LOG_LEVEL_INFO;
-    if (g_strcmp0(level_str, "DEBUG") == 0)
+    else if (g_strcmp0(level_str, "DEBUG") == 0)
         level_flag = G_LOG_LEVEL_DEBUG;
+    else
+        g_printerr("ERROR: Invalid log level, defaulting to MESSAGE ...\n");
 
     g_free(level_str);
     return level_flag;
