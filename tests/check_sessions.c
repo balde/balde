@@ -11,9 +11,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include <balde/sessions-private.h>
+#include "../src/sessions.h"
 
-gboolean valid_timestamp = TRUE;
+gint64 timestamp = 1357098400;
 
 
 void
@@ -75,7 +75,7 @@ test_session_sign(void)
 void
 test_session_unsign(void)
 {
-    valid_timestamp = TRUE;
+    timestamp = 1357098400;
     gsize len;
     gchar *content;
     balde_session_unsign_status_t status = balde_session_unsign((guchar*) "guda",
@@ -89,7 +89,7 @@ test_session_unsign(void)
 void
 test_session_unsign_bad_format(void)
 {
-    valid_timestamp = TRUE;
+    timestamp = 1357098400;
     gsize len;
     gchar *content;
     balde_session_unsign_status_t status = balde_session_unsign((guchar*) "guda",
@@ -106,7 +106,7 @@ test_session_unsign_bad_format(void)
 void
 test_session_unsign_bad_timestamp(void)
 {
-    valid_timestamp = FALSE;
+    timestamp = 1357099400;
     gsize len;
     gchar *content;
     balde_session_unsign_status_t status = balde_session_unsign((guchar*) "guda",
@@ -119,7 +119,7 @@ test_session_unsign_bad_timestamp(void)
 void
 test_session_unsign_bad_sign(void)
 {
-    valid_timestamp = TRUE;
+    timestamp = 1357098400;
     gchar *content;
     balde_session_unsign_status_t status = balde_session_unsign((guchar*) "guda",
         4, 40, "bola|MTAwMDAw.4bf2fd5c755f810d27973750c832b0b818250f14", &content);

@@ -11,7 +11,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include <balde/utils-private.h>
+#include "../src/utils.h"
 
 
 void

@@ -1,6 +1,6 @@
 /*
  * balde: A microframework for C based on GLib and bad intentions.
- * Copyright (C) 2013-2014 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ * Copyright (C) 2013-2015 Rafael G. Martins <rafael@rafaelmartins.eng.br>
  *
  * This program can be distributed under the terms of the LGPL-2 License.
  * See the file COPYING.
@@ -11,10 +11,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include <balde/app.h>
-#include <balde/app-private.h>
-#include <balde/exceptions.h>
-#include <balde/wrappers.h>
+#include "../src/balde.h"
+#include "../src/app.h"
 
 
 void
@@ -23,9 +21,9 @@ test_make_response(void)
     balde_response_t *res = balde_make_response("lol");
     g_assert(res != NULL);
     g_assert(res->status_code == 200);
-    g_assert(g_hash_table_size(res->headers) == 0);
-    g_assert(g_hash_table_size(res->template_ctx) == 0);
-    g_assert_cmpstr(res->body->str, ==, "lol");
+    g_assert(g_hash_table_size(res->priv->headers) == 0);
+    g_assert(g_hash_table_size(res->priv->template_ctx) == 0);
+    g_assert_cmpstr(res->priv->body->str, ==, "lol");
     balde_response_free(res);
 }
 
@@ -36,9 +34,9 @@ test_make_response_len(void)
     balde_response_t *res = balde_make_response_len("lolasdf", 3);
     g_assert(res != NULL);
     g_assert(res->status_code == 200);
-    g_assert(g_hash_table_size(res->headers) == 0);
-    g_assert(g_hash_table_size(res->template_ctx) == 0);
-    g_assert_cmpstr(res->body->str, ==, "lol");
+    g_assert(g_hash_table_size(res->priv->headers) == 0);
+    g_assert(g_hash_table_size(res->priv->template_ctx) == 0);
+    g_assert_cmpstr(res->priv->body->str, ==, "lol");
     balde_response_free(res);
 }
 
@@ -51,10 +49,10 @@ test_make_response_from_exception(void)
     balde_response_t *res = balde_make_response_from_exception(app->error);
     g_assert(res != NULL);
     g_assert(res->status_code == 404);
-    g_assert(g_hash_table_size(res->headers) == 1);
-    GSList *tmp = g_hash_table_lookup(res->headers, "content-type");
+    g_assert(g_hash_table_size(res->priv->headers) == 1);
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "content-type");
     g_assert_cmpstr(tmp->data, ==, "text/plain; charset=utf-8");
-    g_assert_cmpstr(res->body->str, ==,
+    g_assert_cmpstr(res->priv->body->str, ==,
         "404 Not Found\n\nThe requested URL was not found on the server. "
         "If you entered the URL manually please check your spelling and try again.\n");
     balde_response_free(res);
@@ -78,10 +76,10 @@ test_make_response_from_external_exception(void)
     balde_response_t *res = balde_make_response_from_exception(app->error);
     g_assert(res != NULL);
     g_assert(res->status_code == 500);
-    g_assert(g_hash_table_size(res->headers) == 1);
-    GSList *tmp = g_hash_table_lookup(res->headers, "content-type");
+    g_assert(g_hash_table_size(res->priv->headers) == 1);
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "content-type");
     g_assert_cmpstr(tmp->data, ==, "text/plain; charset=utf-8");
-    g_assert_cmpstr(res->body->str, ==,
+    g_assert_cmpstr(res->priv->body->str, ==,
         "500 Internal Server Error\n\nThe server encountered an internal error "
         "and was unable to complete your request. Either the server is "
         "overloaded or there is an error in the application.\n\n(null)\n");
@@ -95,8 +93,8 @@ test_response_set_headers(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_header(res, "AsDf-QwEr", "test");
-    g_assert(g_hash_table_size(res->headers) == 1);
-    GSList *tmp = g_hash_table_lookup(res->headers, "asdf-qwer");
+    g_assert(g_hash_table_size(res->priv->headers) == 1);
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "asdf-qwer");
     g_assert_cmpstr(tmp->data, ==, "test");
     balde_response_free(res);
 }
@@ -107,7 +105,7 @@ test_response_append_body(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_append_body(res, "hehe");
-    g_assert_cmpstr(res->body->str, ==, "lolhehe");
+    g_assert_cmpstr(res->priv->body->str, ==, "lolhehe");
     balde_response_free(res);
 }
 
@@ -117,7 +115,7 @@ test_response_append_body_len(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_append_body_len(res, "heheasd", 4);
-    g_assert_cmpstr(res->body->str, ==, "lolhehe");
+    g_assert_cmpstr(res->priv->body->str, ==, "lolhehe");
     balde_response_free(res);
 }
 
@@ -136,8 +134,8 @@ test_response_set_tmpl_var(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_tmpl_var(res, "bola", "guda");
-    g_assert(g_hash_table_size(res->template_ctx) == 1);
-    g_assert_cmpstr(g_hash_table_lookup(res->template_ctx, "bola"), ==, "guda");
+    g_assert(g_hash_table_size(res->priv->template_ctx) == 1);
+    g_assert_cmpstr(g_hash_table_lookup(res->priv->template_ctx, "bola"), ==, "guda");
     balde_response_free(res);
 }
 
@@ -146,7 +144,7 @@ void
 test_response_get_tmpl_var(void)
 {
     balde_response_t *res = balde_make_response("lol");
-    g_hash_table_insert(res->template_ctx, g_strdup("bola"), g_strdup("guda"));
+    g_hash_table_insert(res->priv->template_ctx, g_strdup("bola"), g_strdup("guda"));
     g_assert_cmpstr(balde_response_get_tmpl_var(res, "bola"), ==, "guda");
     balde_response_free(res);
 }
@@ -158,7 +156,7 @@ test_response_set_cookie(void)
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", -1, -1, NULL, NULL, FALSE,
         FALSE);
-    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "set-cookie");
     g_assert_cmpstr(tmp->data, ==, "bola=\"guda\"; Path=/");
     balde_response_free(res);
 }
@@ -170,7 +168,7 @@ test_response_set_cookie_with_expires(void)
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", -1, 1234567890, NULL, NULL,
         FALSE, FALSE);
-    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "set-cookie");
     g_assert_cmpstr(tmp->data, ==,
         "bola=\"guda\"; Expires=Fri, 13-Feb-2009 23:31:30 GMT; Path=/");
     balde_response_free(res);
@@ -183,7 +181,7 @@ test_response_set_cookie_with_max_age(void)
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", 60, -1, NULL, NULL, FALSE,
         FALSE);
-    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "set-cookie");
     g_assert_cmpstr(tmp->data, ==,
         "bola=\"guda\"; Expires=Fri, 13-Feb-2009 23:32:30 GMT; Max-Age=60; Path=/");
     balde_response_free(res);
@@ -196,7 +194,7 @@ test_response_set_cookie_with_expires_and_max_age(void)
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", 60, 1235555555, NULL, NULL,
             FALSE, FALSE);
-    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "set-cookie");
     g_assert_cmpstr(tmp->data, ==,
         "bola=\"guda\"; Expires=Wed, 25-Feb-2009 09:52:35 GMT; Max-Age=60; Path=/");
     balde_response_free(res);
@@ -209,7 +207,7 @@ test_response_set_cookie_with_path(void)
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", -1, -1, "/bola/", NULL,
         FALSE, FALSE);
-    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "set-cookie");
     g_assert_cmpstr(tmp->data, ==, "bola=\"guda\"; Path=/bola/");
     balde_response_free(res);
 }
@@ -221,7 +219,7 @@ test_response_set_cookie_with_domain(void)
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", -1, -1, NULL, "bola.com",
         FALSE, FALSE);
-    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "set-cookie");
     g_assert_cmpstr(tmp->data, ==, "bola=\"guda\"; Domain=\"bola.com\"; Path=/");
     balde_response_free(res);
 }
@@ -233,7 +231,7 @@ test_response_set_cookie_with_secure(void)
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", -1, -1, NULL, NULL, TRUE,
         FALSE);
-    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "set-cookie");
     g_assert_cmpstr(tmp->data, ==, "bola=\"guda\"; Secure; Path=/");
     balde_response_free(res);
 }
@@ -245,7 +243,7 @@ test_response_set_cookie_with_httponly(void)
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", -1, -1, NULL, NULL, FALSE,
         TRUE);
-    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "set-cookie");
     g_assert_cmpstr(tmp->data, ==, "bola=\"guda\"; HttpOnly; Path=/");
     balde_response_free(res);
 }
@@ -257,7 +255,7 @@ test_response_set_cookie_with_secure_and_httponly(void)
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_cookie(res, "bola", "guda", -1, -1, NULL, NULL, TRUE,
         TRUE);
-    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "set-cookie");
     g_assert_cmpstr(tmp->data, ==, "bola=\"guda\"; Secure; HttpOnly; Path=/");
     balde_response_free(res);
 }
@@ -268,7 +266,7 @@ test_response_delete_cookie(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_delete_cookie(res, "bola", NULL, NULL);
-    GSList *tmp = g_hash_table_lookup(res->headers, "set-cookie");
+    GSList *tmp = g_hash_table_lookup(res->priv->headers, "set-cookie");
     g_assert_cmpstr(tmp->data, ==,
         "bola=\"\"; Expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/");
     balde_response_free(res);
@@ -374,20 +372,6 @@ test_response_render_exception_without_body(void)
 
 
 void
-test_request_headers(void)
-{
-    g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
-    g_setenv("HTTP_XD_KKK", "asdf", TRUE);
-    // FIXME: this thing is too weak :(
-    GHashTable *headers = balde_request_headers();
-    g_assert(g_hash_table_size(headers) == 2);
-    g_assert_cmpstr(g_hash_table_lookup(headers, "lol-hehe"), ==, "12345");
-    g_assert_cmpstr(g_hash_table_lookup(headers, "xd-kkk"), ==, "asdf");
-    g_hash_table_destroy(headers);
-}
-
-
-void
 test_urldecode(void)
 {
     gchar *rv = balde_urldecode("saf%3Dgfd+123");
@@ -457,14 +441,72 @@ test_make_request(void)
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, NULL);
     g_assert_cmpstr(request->path, ==, "/");
+    g_assert(request->script_name == NULL);
     g_assert(request->method == BALDE_HTTP_GET);
-    g_assert(g_hash_table_size(request->headers) == 4);
-    g_assert(g_hash_table_size(request->args) == 2);
-    g_assert(g_hash_table_size(request->cookies) == 2);
+    g_assert(g_hash_table_size(request->priv->headers) == 4);
+    g_assert(g_hash_table_size(request->priv->args) == 2);
+    g_assert(g_hash_table_size(request->priv->cookies) == 2);
     g_assert(request->authorization != NULL);
     g_assert_cmpstr(request->authorization->username, ==, "bola");
     g_assert_cmpstr(request->authorization->password, ==, "guda:lol");
-    g_assert(request->view_args == NULL);
+    g_assert(request->priv->view_args == NULL);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
+test_make_request_without_path_info(void)
+{
+    g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
+    g_setenv("HTTP_XD_KKK", "asdf", TRUE);
+    g_setenv("HTTP_COOKIE", "asd=\"qwe\"; bola=guda", TRUE);
+    g_setenv("HTTP_AUTHORIZATION", "Basic Ym9sYTpndWRhOmxvbA==", TRUE);
+    g_setenv("REQUEST_METHOD", "GET", TRUE);
+    g_setenv("QUERY_STRING", "asd=lol&xd=hehe", TRUE);
+    g_unsetenv("PATH_INFO");
+    // FIXME: this thing is too weak :(
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    g_assert(request->path == NULL);
+    g_assert(request->script_name == NULL);
+    g_assert(request->method == BALDE_HTTP_GET);
+    g_assert(g_hash_table_size(request->priv->headers) == 4);
+    g_assert(g_hash_table_size(request->priv->args) == 2);
+    g_assert(g_hash_table_size(request->priv->cookies) == 2);
+    g_assert(request->authorization != NULL);
+    g_assert_cmpstr(request->authorization->username, ==, "bola");
+    g_assert_cmpstr(request->authorization->password, ==, "guda:lol");
+    g_assert(request->priv->view_args == NULL);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
+test_make_request_without_path_info_with_script_name(void)
+{
+    g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
+    g_setenv("HTTP_XD_KKK", "asdf", TRUE);
+    g_setenv("HTTP_COOKIE", "asd=\"qwe\"; bola=guda", TRUE);
+    g_setenv("HTTP_AUTHORIZATION", "Basic Ym9sYTpndWRhOmxvbA==", TRUE);
+    g_setenv("REQUEST_METHOD", "GET", TRUE);
+    g_setenv("QUERY_STRING", "asd=lol&xd=hehe", TRUE);
+    g_setenv("SCRIPT_NAME", "/bola/", TRUE);
+    g_unsetenv("PATH_INFO");
+    // FIXME: this thing is too weak :(
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    g_assert_cmpstr(request->path, ==, "/bola/");
+    g_assert(request->script_name == NULL);
+    g_assert(request->method == BALDE_HTTP_GET);
+    g_assert(g_hash_table_size(request->priv->headers) == 4);
+    g_assert(g_hash_table_size(request->priv->args) == 2);
+    g_assert(g_hash_table_size(request->priv->cookies) == 2);
+    g_assert(request->authorization != NULL);
+    g_assert_cmpstr(request->authorization->username, ==, "bola");
+    g_assert_cmpstr(request->authorization->password, ==, "guda:lol");
+    g_assert(request->priv->view_args == NULL);
     balde_request_free(request);
     balde_app_free(app);
 }
@@ -474,6 +516,7 @@ void
 test_make_request_with_env(void)
 {
     balde_request_env_t *env = g_new(balde_request_env_t, 1);
+    env->script_name = NULL;
     env->path_info = g_strdup("/");
     env->request_method = g_strdup("GET");
     env->query_string = g_strdup("asd=lol&xd=hehe");
@@ -491,13 +534,13 @@ test_make_request_with_env(void)
     balde_request_t *request = balde_make_request(app, env);
     g_assert_cmpstr(request->path, ==, "/");
     g_assert(request->method == BALDE_HTTP_GET);
-    g_assert(g_hash_table_size(request->headers) == 4);
-    g_assert(g_hash_table_size(request->args) == 2);
-    g_assert(g_hash_table_size(request->cookies) == 2);
+    g_assert(g_hash_table_size(request->priv->headers) == 4);
+    g_assert(g_hash_table_size(request->priv->args) == 2);
+    g_assert(g_hash_table_size(request->priv->cookies) == 2);
     g_assert(request->authorization != NULL);
     g_assert_cmpstr(request->authorization->username, ==, "bola");
     g_assert_cmpstr(request->authorization->password, ==, "guda:lol");
-    g_assert(request->view_args == NULL);
+    g_assert(request->priv->view_args == NULL);
     balde_request_free(request);
     balde_app_free(app);
 }
@@ -540,8 +583,8 @@ test_request_get_form(void)
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, NULL);
-    g_assert(request->stream == NULL);
-    g_assert(request->form == NULL);
+    g_assert(request->priv->body == NULL);
+    g_assert(request->priv->form == NULL);
     g_assert(balde_request_get_form(request, "lol") == NULL);
     balde_request_free(request);
     balde_app_free(app);
@@ -556,8 +599,9 @@ test_request_get_form_with_empty_body(void)
     balde_app_t *app = balde_app_init();
     // ommited CONTENT_LENGTH
     balde_request_t *request = balde_make_request(app, NULL);
-    g_assert(request->stream == NULL);
-    g_assert(g_hash_table_size(request->form) == 0);
+    g_assert_cmpstr(request->priv->body->str, ==, "");
+    g_assert_cmpint(request->priv->body->len, ==, 0);
+    g_assert(g_hash_table_size(request->priv->form) == 0);
     g_assert(balde_request_get_form(request, "lol") == NULL);
     balde_request_free(request);
     balde_app_free(app);
@@ -569,8 +613,8 @@ test_request_get_view_arg(void)
 {
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, NULL);
-    request->view_args = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    g_hash_table_replace(request->view_args, g_strdup("foo"), g_strdup("bar"));
+    request->priv->view_args = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    g_hash_table_replace(request->priv->view_args, g_strdup("foo"), g_strdup("bar"));
     g_assert_cmpstr(balde_request_get_view_arg(request, "foo"), == , "bar");
     g_assert(balde_request_get_view_arg(request, "xd") == NULL);
     balde_request_free(request);
@@ -583,9 +627,38 @@ test_request_get_cookie(void)
 {
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, NULL);
-    g_hash_table_replace(request->cookies, g_strdup("foo"), g_strdup("bar"));
+    g_hash_table_replace(request->priv->cookies, g_strdup("foo"), g_strdup("bar"));
     g_assert_cmpstr(balde_request_get_cookie(request, "foo"), == , "bar");
     g_assert(balde_request_get_cookie(request, "xd") == NULL);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
+test_request_get_body(void)
+{
+    g_setenv("REQUEST_METHOD", "GET", TRUE);
+    // FIXME: this thing is too weak :(
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    g_assert(balde_request_get_body(request) == NULL);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
+test_request_get_body_with_empty_body(void)
+{
+    g_setenv("REQUEST_METHOD", "POST", TRUE);
+    // FIXME: this thing is too weak :(
+    balde_app_t *app = balde_app_init();
+    // ommited CONTENT_LENGTH
+    balde_request_t *request = balde_make_request(app, NULL);
+    const GString *str = balde_request_get_body(request);
+    g_assert_cmpstr(str->str, ==, "");
+    g_assert(str->len == 0);
     balde_request_free(request);
     balde_app_free(app);
 }
@@ -645,12 +718,15 @@ main(int argc, char** argv)
         test_response_render_exception);
     g_test_add_func("/wrappers/response_render_exception_without_body",
         test_response_render_exception_without_body);
-    g_test_add_func("/wrappers/request_headers", test_request_headers);
     g_test_add_func("/wrappers/urldecode", test_urldecode);
     g_test_add_func("/wrappers/parse_query_string", test_parse_query_string);
     g_test_add_func("/wrappers/parse_cookies", test_parse_cookies);
     g_test_add_func("/wrappers/parse_authorization", test_parse_authorization);
     g_test_add_func("/wrappers/make_request", test_make_request);
+    g_test_add_func("/wrappers/make_request_without_path_info",
+        test_make_request_without_path_info);
+    g_test_add_func("/wrappres/make_request_without_path_info_with_script_name",
+        test_make_request_without_path_info_with_script_name);
     g_test_add_func("/wrappers/make_request_with_env", test_make_request_with_env);
     g_test_add_func("/wrappers/request_get_header", test_request_get_header);
     g_test_add_func("/wrappers/request_get_arg", test_request_get_arg);
@@ -659,5 +735,8 @@ main(int argc, char** argv)
         test_request_get_form_with_empty_body);
     g_test_add_func("/wrappers/request_get_view_arg", test_request_get_view_arg);
     g_test_add_func("/wrappers/request_get_cookie", test_request_get_cookie);
+    g_test_add_func("/wrappers/request_get_body", test_request_get_body);
+    g_test_add_func("/wrappers/request_get_body_with_empty_body",
+        test_request_get_body_with_empty_body);
     return g_test_run();
 }
