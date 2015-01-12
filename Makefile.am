@@ -140,7 +140,7 @@ libbalde_la_LIBADD = \
 libbalde_la_LDFLAGS = \
 	-version-info $(LIBBALDE_LT_VERSION_INFO)
 
-if BUILD_WEBSERVER
+if BUILD_HTTP
 libbalde_la_SOURCES += \
 	src/httpd.c
 endif
@@ -344,7 +344,7 @@ examples/templates/%.h: examples/templates/%.html balde-template-gen
 
 ## Build rules: tests
 
-if BUILD_WEBSERVER
+if BUILD_HTTP
 
 check_PROGRAMS += \
 	tests/check_httpd

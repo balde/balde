@@ -52,16 +52,16 @@ AS_IF([test "x$enable_fastcgi" != "xno"], [
 ])
 AM_CONDITIONAL([BUILD_FASTCGI], [test "x$build_fastcgi" = "xyes"])
 
-AC_ARG_ENABLE([webserver], AS_HELP_STRING([--disable-webserver], [disable embedded webserver]))
-AS_IF([test "x$enable_webserver" != "xno"], [
-  build_webserver=yes
-  AC_DEFINE([BUILD_WEBSERVER], [], [embedded webserver enabled])
-  WEBSERVER="enabled"
+AC_ARG_ENABLE([http], AS_HELP_STRING([--disable-http], [disable embedded HTTP webserver]))
+AS_IF([test "x$enable_http" != "xno"], [
+  build_http=yes
+  AC_DEFINE([BUILD_HTTP], [], [embedded HTTP webserver enabled])
+  HTTP="enabled"
 ], [
-  build_webserver=no
-  WEBSERVER="disabled"
+  build_http=no
+  HTTP="disabled"
 ])
-AM_CONDITIONAL([BUILD_WEBSERVER], [test "x$build_webserver" = "xyes"])
+AM_CONDITIONAL([BUILD_HTTP], [test "x$build_http" = "xyes"])
 
 AC_ARG_ENABLE([examples], AS_HELP_STRING([--enable-examples], [build examples]))
 AS_IF([test "x$enable_examples" = "xyes"], [
@@ -168,8 +168,8 @@ AS_ECHO("
         ldflags:      ${LDFLAGS}
 
         fastcgi:      ${FASTCGI}
+        http:         ${HTTP}
         examples:     ${EXAMPLES}
-        webserver:    ${WEBSERVER}
 
         doxygen:      ${DOXYGEN}
         valgrind:     ${VALGRIND}

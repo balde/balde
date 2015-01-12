@@ -11,6 +11,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
+#include <glib/gstdio.h>
 #include <fcgiapp.h>
 #include <string.h>
 
@@ -98,20 +99,26 @@ balde_fcgi_thread_run(gpointer data, gpointer user_data)
 
 
 void
-balde_fcgi_run(balde_app_t *app, const gchar *host, gint16 port,
-    gint max_threads, gint backlog, gboolean listen)
+balde_fcgi_run(balde_app_t *app, const gchar *host, const gint16 port,
+    const gchar *socket, const gint socket_mode, gint max_threads,
+    gint backlog, gboolean listen)
 {
     FCGX_Init();
 
     // initialize socket
     gint sock = 0;
     if (listen) {
-        const gchar *final_host = host != NULL ? host : "127.0.0.1";
-        g_printerr(" * Running FastCGI on %s:%d (threads: %d, backlog: %d)\n",
-            final_host, port, max_threads, backlog);
-        gchar *bind = g_strdup_printf("%s:%d", final_host, port);
-        sock = FCGX_OpenSocket(bind, backlog);
-        g_free(bind);
+        gchar *path;
+        if (socket == NULL)
+            path = g_strdup_printf("%s:%d", host != NULL ? host : "127.0.0.1", port);
+        else
+            path = g_strdup(socket);
+        g_printerr(" * Running FastCGI on %s (threads: %d, backlog: %d)\n",
+            path, max_threads, backlog);
+        sock = FCGX_OpenSocket(path, backlog);
+        if (socket != NULL && socket_mode >= 0)
+            g_chmod(socket, socket_mode);
+        g_free(path);
     }
 
     // initialize thread pool
@@ -130,5 +137,4 @@ balde_fcgi_run(balde_app_t *app, const gchar *host, gint16 port,
     }
 
     g_thread_pool_free(pool, FALSE, TRUE);
-    balde_app_free(app);
 }

@@ -19,7 +19,8 @@ typedef struct {
 } balde_fcgi_ctx_t;
 
 GHashTable* balde_fcgi_request_headers(const gchar **envp);
-void balde_fcgi_run(balde_app_t *app, const gchar *host, gint16 port,
-    gint max_threads, gint backlog, gboolean listen);
+void balde_fcgi_run(balde_app_t *app, const gchar *host, const gint16 port,
+    const gchar *socket, const gint socket_mode, gint max_threads,
+    gint backlog, gboolean listen);
 
 #endif /* _BALDE_FCGI_PRIVATE_H */
