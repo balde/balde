@@ -65,11 +65,20 @@ test_session_unserialize_wrong_type(void)
 
 
 void
+test_session_derive_key(void)
+{
+    gchar *key = balde_session_derive_key((guchar*) "guda", 4);
+    g_assert_cmpstr(key, ==, "94a702e385b8c76d636610137ae654a6ad2d1e01");
+    g_free(key);
+}
+
+
+void
 test_session_sign(void)
 {
     gchar *signed_str = balde_session_sign((guchar*) "guda", 4, "bola");
     g_assert_cmpstr(signed_str, ==,
-        "bola|MTAwMDAw.4bf2fd5c755f810d27973750c832b0b818250f13");
+        "bola|MTAwMDAw.24f2e79663f85946381adcaf5e87687cfa4a610c");
     g_free(signed_str);
 }
 
@@ -275,7 +284,7 @@ test_session_save(void)
     gchar *cookie = cookie_list->data;
     g_assert_cmpstr(cookie, ==,
         "balde_session=\"eyJhc2QiOiJsb2xoZWhlIiwiYm9sYSI6Imd1ZGEifQ==|MTAwMDAw"
-        ".9e62e1a9ff2adbe15c1297e99b36b61c1463c2b8\"; Domain=\".guda\"; Expires"
+        ".7e9e8a554349a652636b1d53cda974eccf5b8fd2\"; Domain=\".guda\"; Expires"
         "=Sat, 02-Feb-2013 03:46:40 GMT; Max-Age=2678400; Secure; HttpOnly; "
         "Path=/");
 
@@ -307,7 +316,7 @@ test_session_save_server_name_with_port(void)
     gchar *cookie = cookie_list->data;
     g_assert_cmpstr(cookie, ==,
         "balde_session=\"eyJhc2QiOiJsb2xoZWhlIiwiYm9sYSI6Imd1ZGEifQ==|MTAwMDAw"
-        ".9e62e1a9ff2adbe15c1297e99b36b61c1463c2b8\"; Domain=\".chunda\"; Expires"
+        ".7e9e8a554349a652636b1d53cda974eccf5b8fd2\"; Domain=\".chunda\"; Expires"
         "=Sat, 02-Feb-2013 03:46:40 GMT; Max-Age=2678400; Secure; HttpOnly; "
         "Path=/");
 
@@ -339,7 +348,7 @@ test_session_save_with_path(void)
     gchar *cookie = cookie_list->data;
     g_assert_cmpstr(cookie, ==,
         "balde_session=\"eyJhc2QiOiJsb2xoZWhlIiwiYm9sYSI6Imd1ZGEifQ==|MTAwMDAw"
-        ".9e62e1a9ff2adbe15c1297e99b36b61c1463c2b8\"; Domain=\"guda\"; Expires"
+        ".7e9e8a554349a652636b1d53cda974eccf5b8fd2\"; Domain=\"guda\"; Expires"
         "=Sat, 02-Feb-2013 03:46:40 GMT; Max-Age=2678400; Secure; HttpOnly; "
         "Path=/bola");
 
@@ -371,7 +380,7 @@ test_session_save_with_null_path(void)
     gchar *cookie = cookie_list->data;
     g_assert_cmpstr(cookie, ==,
         "balde_session=\"eyJhc2QiOiJsb2xoZWhlIiwiYm9sYSI6Imd1ZGEifQ==|MTAwMDAw"
-        ".9e62e1a9ff2adbe15c1297e99b36b61c1463c2b8\"; Domain=\".guda\"; Expires"
+        ".7e9e8a554349a652636b1d53cda974eccf5b8fd2\"; Domain=\".guda\"; Expires"
         "=Sat, 02-Feb-2013 03:46:40 GMT; Max-Age=2678400; Secure; HttpOnly; "
         "Path=/");
 
@@ -403,7 +412,7 @@ test_session_save_with_null_domain(void)
     gchar *cookie = cookie_list->data;
     g_assert_cmpstr(cookie, ==,
         "balde_session=\"eyJhc2QiOiJsb2xoZWhlIiwiYm9sYSI6Imd1ZGEifQ==|MTAwMDAw"
-        ".9e62e1a9ff2adbe15c1297e99b36b61c1463c2b8\"; Expires"
+        ".7e9e8a554349a652636b1d53cda974eccf5b8fd2\"; Expires"
         "=Sat, 02-Feb-2013 03:46:40 GMT; Max-Age=2678400; Secure; HttpOnly; "
         "Path=/");
 
@@ -435,7 +444,7 @@ test_session_save_with_localhost(void)
     gchar *cookie = cookie_list->data;
     g_assert_cmpstr(cookie, ==,
         "balde_session=\"eyJhc2QiOiJsb2xoZWhlIiwiYm9sYSI6Imd1ZGEifQ==|MTAwMDAw"
-        ".9e62e1a9ff2adbe15c1297e99b36b61c1463c2b8\"; Expires"
+        ".7e9e8a554349a652636b1d53cda974eccf5b8fd2\"; Expires"
         "=Sat, 02-Feb-2013 03:46:40 GMT; Max-Age=2678400; Secure; HttpOnly; "
         "Path=/");
 
@@ -541,6 +550,7 @@ main(int argc, char** argv)
         test_session_unserialize_broken_json);
     g_test_add_func("/sessions/unserialize_wrong_type",
         test_session_unserialize_wrong_type);
+    g_test_add_func("/sessions/derive_key", test_session_derive_key);
     g_test_add_func("/sessions/sign", test_session_sign);
     g_test_add_func("/sessions/unsign", test_session_unsign);
     g_test_add_func("/sessions/unsign_bad_format",

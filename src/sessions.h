@@ -30,6 +30,7 @@ struct _balde_session_t {
 
 gchar* balde_session_serialize(GHashTable *session);
 GHashTable* balde_session_unserialize(const gchar* text);
+gchar* balde_session_derive_key(const guchar *key, gsize key_len);
 gchar* balde_session_sign(const guchar *key, gsize key_len,
     const gchar *content);
 balde_session_unsign_status_t balde_session_unsign(const guchar *key,

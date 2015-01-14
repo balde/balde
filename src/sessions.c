@@ -104,14 +104,23 @@ point1:
 
 
 gchar*
+balde_session_derive_key(const guchar *key, gsize key_len)
+{
+    return g_compute_hmac_for_string(G_CHECKSUM_SHA1, key, key_len,
+        "balde-session-cookie", 20);
+}
+
+
+gchar*
 balde_session_sign(const guchar *key, gsize key_len, const gchar *content)
 {
     // content should be nul-terminated.
-    // FIXME: key should/could be derived.
     gchar *timestamp = balde_encoded_timestamp();
     gchar *content_with_ts = g_strdup_printf("%s|%s", content, timestamp);
-    gchar *sign = g_compute_hmac_for_string(G_CHECKSUM_SHA1, key, key_len,
-        content_with_ts, strlen(content_with_ts));
+    gchar *derived_key = balde_session_derive_key(key, key_len);
+    gchar *sign = g_compute_hmac_for_string(G_CHECKSUM_SHA1, (guchar*) derived_key,
+        strlen(derived_key), content_with_ts, strlen(content_with_ts));
+    g_free(derived_key);
     gchar *rv = g_strdup_printf("%s.%s", content_with_ts, sign);
     g_free(timestamp);
     g_free(content_with_ts);
