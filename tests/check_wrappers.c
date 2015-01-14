@@ -730,7 +730,7 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/make_request", test_make_request);
     g_test_add_func("/wrappers/make_request_without_path_info",
         test_make_request_without_path_info);
-    g_test_add_func("/wrappres/make_request_without_path_info_with_script_name",
+    g_test_add_func("/wrappers/make_request_without_path_info_with_script_name",
         test_make_request_without_path_info_with_script_name);
     g_test_add_func("/wrappers/make_request_with_env", test_make_request_with_env);
     g_test_add_func("/wrappers/request_get_header", test_request_get_header);
