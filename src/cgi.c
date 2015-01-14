@@ -65,6 +65,7 @@ balde_request_env_t*
 balde_cgi_parse_request(balde_app_t *app)
 {
     balde_request_env_t *rv = g_new(balde_request_env_t, 1);
+    rv->server_name = g_strdup(g_getenv("SERVER_NAME"));
     rv->script_name = g_strdup(g_getenv("SCRIPT_NAME"));
     rv->path_info = g_strdup(g_getenv("PATH_INFO"));
     rv->request_method = g_strdup(g_getenv("REQUEST_METHOD"));
@@ -72,6 +73,7 @@ balde_cgi_parse_request(balde_app_t *app)
     rv->headers = balde_cgi_request_headers();
     rv->body = balde_cgi_stdin_read(app);
     rv->content_length = balde_cgi_parse_content_length(g_getenv("CONTENT_LENGTH"));
+    rv->https = g_getenv("HTTPS") != NULL;
     return rv;
 }
 

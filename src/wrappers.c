@@ -399,12 +399,14 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
     if (request_env == NULL)
         env = balde_cgi_parse_request(app);
     request->path = env->path_info;
+    request->server_name = env->server_name;
     request->script_name = env->script_name;
     if (env->path_info == NULL && env->script_name != NULL) {  // dumb webservers :/
         request->path = env->script_name;
         request->script_name = NULL;
     }
     request->method = balde_http_method_str2enum(env->request_method);
+    request->https = env->https;
     request->priv->headers = env->headers;
     request->priv->args = balde_parse_query_string(env->query_string);
     request->priv->cookies = balde_parse_cookies(
@@ -493,6 +495,7 @@ balde_request_free(balde_request_t *request)
     if (request == NULL)
         return;
     g_free((gchar*) request->path);
+    g_free((gchar*) request->server_name);
     g_free((gchar*) request->script_name);
     g_hash_table_destroy(request->priv->headers);
     g_hash_table_destroy(request->priv->args);
@@ -513,6 +516,8 @@ balde_request_free(balde_request_t *request)
 void
 balde_request_env_free(balde_request_env_t *request)
 {
+    g_free(request->server_name);
+    g_free(request->script_name);
     g_free(request->path_info);
     g_free(request->request_method);
     g_free(request->query_string);

@@ -145,9 +145,7 @@ typedef struct {
  * This structure stores everything related to the HTTP session.
  *
  */
-typedef struct {
-    GHashTable *storage;
-} balde_session_t;
+typedef struct _balde_session_t balde_session_t;
 
 
 /**
@@ -195,6 +193,12 @@ typedef struct {
     balde_authorization_t *authorization;
 
     /**
+     * Request server name.
+     *
+     */
+    const gchar *server_name;
+
+    /**
      * Request script name.
      *
      */
@@ -212,6 +216,12 @@ typedef struct {
      *
      */
     balde_http_method_t method;
+
+    /**
+     * Request using encrypted connection.
+     *
+     */
+    gboolean https;
 
     /**
      * Private structure. Shouldn't be touched by users.
@@ -593,6 +603,41 @@ balde_response_t* balde_abort(balde_app_t *app,
  */
 balde_response_t* balde_abort_with_description(balde_app_t *app,
     const balde_http_exception_code_t code, const gchar *description);
+
+
+/**
+ * Initializes an HTTP session context
+ *
+ */
+balde_session_t* balde_session_open(balde_app_t *app, balde_request_t *request);
+
+
+/**
+ * Saves an HTTP session context and attaches it to a response context
+ *
+ */
+void balde_session_save(balde_response_t *response, balde_session_t *session);
+
+
+/**
+ * Gets a value from an HTTP session context
+ *
+ */
+const gchar* balde_session_get(balde_session_t *session, const gchar *key);
+
+
+/**
+ * Sets a value into an HTTP session context
+ *
+ */
+void balde_session_set(balde_session_t *session, const gchar *key, const gchar *value);
+
+
+/**
+ * Deletes a value from an HTTP session context
+ *
+ */
+void balde_session_delete(balde_session_t *session, const gchar *key);
 
 
 /**

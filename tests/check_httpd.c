@@ -44,6 +44,7 @@ test_httpd_parse_request(void)
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "content-length"), ==, "6");
     g_assert_cmpint(req->content_length, ==, 6);
     g_assert_cmpstr(req->body, ==, "XD=asd");
+    g_assert(!req->https);
     g_free(data->request_line);
     g_free(data);
     balde_request_env_free(req);

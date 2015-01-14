@@ -18,6 +18,16 @@ typedef enum {
     BALDE_SESSION_UNSIGN_BAD_TIMESTAMP,
 } balde_session_unsign_status_t;
 
+struct _balde_session_t {
+    GHashTable *storage;
+    gboolean secure;
+    gint64 max_age;
+    const gchar *key;
+    gint key_len;
+    const gchar *path;
+    const gchar *domain;
+};
+
 gchar* balde_session_serialize(GHashTable *session);
 GHashTable* balde_session_unserialize(const gchar* text);
 gchar* balde_session_sign(const guchar *key, gsize key_len,

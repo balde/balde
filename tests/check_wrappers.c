@@ -437,10 +437,12 @@ test_make_request(void)
     g_setenv("PATH_INFO", "/", TRUE);
     g_setenv("REQUEST_METHOD", "GET", TRUE);
     g_setenv("QUERY_STRING", "asd=lol&xd=hehe", TRUE);
+    g_setenv("SERVER_NAME", "bola", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, NULL);
     g_assert_cmpstr(request->path, ==, "/");
+    g_assert_cmpstr(request->server_name, ==, "bola");
     g_assert(request->script_name == NULL);
     g_assert(request->method == BALDE_HTTP_GET);
     g_assert(g_hash_table_size(request->priv->headers) == 4);
@@ -497,6 +499,7 @@ test_make_request_without_path_info_with_script_name(void)
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, NULL);
+    g_assert_cmpstr(request->server_name, ==, "bola");
     g_assert_cmpstr(request->path, ==, "/bola/");
     g_assert(request->script_name == NULL);
     g_assert(request->method == BALDE_HTTP_GET);
@@ -516,6 +519,7 @@ void
 test_make_request_with_env(void)
 {
     balde_request_env_t *env = g_new(balde_request_env_t, 1);
+    env->server_name = g_strdup("localhost");
     env->script_name = NULL;
     env->path_info = g_strdup("/");
     env->request_method = g_strdup("GET");
@@ -533,6 +537,7 @@ test_make_request_with_env(void)
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, env);
     g_assert_cmpstr(request->path, ==, "/");
+    g_assert_cmpstr(request->server_name, ==, "localhost");
     g_assert(request->method == BALDE_HTTP_GET);
     g_assert(g_hash_table_size(request->priv->headers) == 4);
     g_assert(g_hash_table_size(request->priv->args) == 2);

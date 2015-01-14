@@ -15,6 +15,7 @@
 #include <string.h>
 #include <json-glib/json-glib.h>
 #include "balde.h"
+#include "balde-private.h"
 #include "utils.h"
 #include "sessions.h"
 
@@ -156,51 +157,59 @@ point1:
 }
 
 
-// TODO: test me!
-balde_session_t*
+BALDE_API balde_session_t*
 balde_session_open(balde_app_t *app, balde_request_t *request)
 {
-    balde_session_t *session = NULL;
+    if (app->error != NULL)
+        return NULL;
+    balde_session_t *session = g_new(balde_session_t, 1);
+    session->storage = NULL;
+    session->secure = request->https;
+    session->key = NULL;
+    session->key_len = -1;
+    session->path = request->script_name;
+    session->domain = request->server_name;
 
-    // first of all, verify if we have the cookie
-    const gchar *cookie = balde_request_get_cookie(request, "balde_session");
-    if (cookie == NULL)
-        return session;
+    // verify session lifetime
+    const gchar *session_lifetime = balde_app_get_config(app,
+        "PERMANENT_SESSION_LIFETIME");
+    session->max_age = 31 * 24 * 60 * 60;  // 31 days
+    if (session_lifetime != NULL) {
+        session->max_age = g_ascii_strtoll(session_lifetime, NULL, 10);
+    }
 
     // verify if secret_key is set
-    const gchar *secret_key = balde_app_get_config(app, "SECRET_KEY");
-    if (secret_key == NULL) {
+    session->key = balde_app_get_config(app, "SECRET_KEY");
+    if (session->key == NULL) {
         balde_abort_set_error_with_description(app, 500,
             "To be able to use sessions you need to set the SECRET_KEY "
             "configuration parameter in your application.");
-        return session;
+        g_free(session->storage);
+        g_free(session);
+        return NULL;
     }
 
     // verify if secret_key length is set manually, otherwise defaults to strlen
     const gchar *secret_key_len_str = balde_app_get_config(app, "SECRET_KEY_LENGTH");
-    gint secret_key_len;
     if (secret_key_len_str != NULL) {
-        secret_key_len = atoi(secret_key_len_str);
-        if (secret_key_len < 0)
-            secret_key_len = strlen(secret_key);
+        session->key_len = atoi(secret_key_len_str);
+        if (session->key_len < 0)
+            session->key_len = strlen(session->key);
     }
-    else {
-        secret_key_len = strlen(secret_key);
-    }
+    else
+        session->key_len = strlen(session->key);
 
-    // verify session lifetime
-    const gchar *session_lifetime_str = balde_app_get_config(app,
-        "PERMANENT_SESSION_LIFETIME");
-    gint64 session_lifetime = 31 * 24 * 60 * 60;  // 31 days
-    if (session_lifetime_str != NULL) {
-        session_lifetime = g_ascii_strtoll(session_lifetime_str, NULL, 10);
-    }
+    // verify if we have the cookie
+    const gchar *cookie = balde_request_get_cookie(request, "balde_session");
+    if (cookie == NULL)
+        return session;
 
     gchar *signed_cookie;
     balde_session_unsign_status_t status = balde_session_unsign(
-        (const guchar*) secret_key, secret_key_len, session_lifetime, cookie,
+        (const guchar*) session->key, session->key_len, session->max_age, cookie,
         &signed_cookie);
 
+    // FIXME: tests! status codes are tested, but the code below, no.
     switch (status) {
         case BALDE_SESSION_UNSIGN_BAD_FORMAT:
             balde_abort_set_error_with_description(app, 400,
@@ -218,7 +227,88 @@ balde_session_open(balde_app_t *app, balde_request_t *request)
             break;
     }
 
-    session = g_new(balde_session_t, 1);
     session->storage = balde_session_unserialize(signed_cookie);
+
+    g_free(signed_cookie);
+
     return session;
+}
+
+
+BALDE_API void
+balde_session_save(balde_response_t *response, balde_session_t *session)
+{
+    if (session == NULL)
+        return;
+
+    if (session->storage == NULL)
+        goto clean2;
+
+    gchar *serialized = balde_session_serialize(session->storage);
+    gchar *serialized_signed = balde_session_sign((const guchar*) session->key,
+        session->key_len, serialized);
+    g_free(serialized);
+
+    const gchar *path;
+    if (session->path == NULL || session->path[0] == '\0')
+        path = "/";
+    else
+        path = session->path;
+
+    gchar *domain = NULL;
+    if (session->domain != NULL) {
+        gchar **pieces = g_strsplit(session->domain, ":", 2);
+        if (g_strcmp0(pieces[0], "localhost") != 0) {
+            if (g_strcmp0(path, "/") == 0)
+                domain = g_strdup_printf(".%s", pieces[0]);
+            else
+                domain = g_strdup(pieces[0]);
+        }
+        g_strfreev(pieces);
+    }
+
+    balde_response_set_cookie(response, "balde_session", serialized_signed,
+        session->max_age, -1, path, domain, session->secure, TRUE);
+
+    g_free(domain);
+    g_free(serialized_signed);
+
+clean:
+    g_hash_table_destroy(session->storage);
+
+clean2:
+    g_free(session);
+}
+
+
+BALDE_API const gchar*
+balde_session_get(balde_session_t *session, const gchar *key)
+{
+    if (session == NULL || session->storage == NULL)
+        return NULL;
+
+    return g_hash_table_lookup(session->storage, key);
+}
+
+
+BALDE_API void
+balde_session_set(balde_session_t *session, const gchar *key, const gchar *value)
+{
+    if (session == NULL)
+        return;
+
+    if (session->storage == NULL)
+        session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+
+    g_hash_table_insert(session->storage, g_strdup(key), g_strdup(value));
+}
+
+
+BALDE_API void
+balde_session_delete(balde_session_t *session, const gchar *key)
+{
+    if (session == NULL || session->storage == NULL)
+        return;
+
+    g_hash_table_remove(session->storage, key);
 }

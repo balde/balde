@@ -65,6 +65,7 @@ balde_request_env_t*
 balde_fcgi_parse_request(balde_app_t *app, FCGX_Request *request)
 {
     balde_request_env_t *rv = g_new(balde_request_env_t, 1);
+    rv->server_name = g_strdup(FCGX_GetParam("SERVER_NAME", request->envp));
     rv->script_name = g_strdup(FCGX_GetParam("SCRIPT_NAME", request->envp));
     rv->path_info = g_strdup(FCGX_GetParam("PATH_INFO", request->envp));
     rv->request_method = g_strdup(FCGX_GetParam("REQUEST_METHOD", request->envp));
@@ -72,6 +73,7 @@ balde_fcgi_parse_request(balde_app_t *app, FCGX_Request *request)
     rv->headers = balde_fcgi_request_headers((const gchar **) request->envp);
     rv->body = balde_fcgi_stdin_read(app, request);
     rv->content_length = (rv->body != NULL) ? strlen(rv->body) : 0;
+    rv->https = FCGX_GetParam("HTTPS", request->envp) != NULL;
     return rv;
 }
 

@@ -14,12 +14,14 @@
 
 typedef struct {
     gchar *request_method;
+    gchar *server_name;
     gchar *script_name;
     gchar *path_info;
     gchar *query_string;
     GHashTable *headers;
     guint64 content_length;
     gchar *body;
+    gboolean https;
 } balde_request_env_t;
 
 struct _balde_request_private_t {
