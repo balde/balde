@@ -140,15 +140,6 @@ typedef struct {
 
 
 /**
- * balde session context
- *
- * This structure stores everything related to the HTTP session.
- *
- */
-typedef struct _balde_session_t balde_session_t;
-
-
-/**
  * balde HTTP authorization context.
  *
  * This struct stores everything related to authorization data sent in the
@@ -609,35 +600,35 @@ balde_response_t* balde_abort_with_description(balde_app_t *app,
  * Initializes an HTTP session context
  *
  */
-balde_session_t* balde_session_open(balde_app_t *app, balde_request_t *request);
+void balde_session_open(balde_app_t *app, balde_request_t *request);
 
 
 /**
  * Saves an HTTP session context and attaches it to a response context
  *
  */
-void balde_session_save(balde_response_t *response, balde_session_t *session);
+void balde_session_save(balde_request_t *request, balde_response_t *response);
 
 
 /**
  * Gets a value from an HTTP session context
  *
  */
-const gchar* balde_session_get(balde_session_t *session, const gchar *key);
+const gchar* balde_session_get(balde_request_t *request, const gchar *key);
 
 
 /**
  * Sets a value into an HTTP session context
  *
  */
-void balde_session_set(balde_session_t *session, const gchar *key, const gchar *value);
+void balde_session_set(balde_request_t *request, const gchar *key, const gchar *value);
 
 
 /**
  * Deletes a value from an HTTP session context
  *
  */
-void balde_session_delete(balde_session_t *session, const gchar *key);
+void balde_session_delete(balde_request_t *request, const gchar *key);
 
 
 /**

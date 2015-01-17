@@ -11,6 +11,7 @@
 
 #include <glib.h>
 #include "balde.h"
+#include "sessions.h"
 
 typedef struct {
     gchar *request_method;
@@ -31,6 +32,7 @@ struct _balde_request_private_t {
     GHashTable *headers;
     GHashTable *cookies;
     GString *body;
+    balde_session_t *session;
 };
 
 struct _balde_response_private_t {

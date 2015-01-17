@@ -395,6 +395,7 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
     request->priv->view_args = NULL;
     request->priv->body = NULL;
     request->priv->form = NULL;
+    request->priv->session = NULL;
     balde_request_env_t *env = request_env;
     if (request_env == NULL)
         env = balde_cgi_parse_request(app);

@@ -586,6 +586,7 @@ balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
         rv = render(error_response, with_body);
         if (status_code != NULL)
             *status_code = error_response->status_code;
+        balde_response_free(response);
         balde_response_free(error_response);
         balde_app_free(app_copy);
         return rv;

@@ -78,7 +78,7 @@ test_session_sign(void)
 {
     gchar *signed_str = balde_session_sign((guchar*) "guda", 4, "bola");
     g_assert_cmpstr(signed_str, ==,
-        "bola|MTAwMDAw.24f2e79663f85946381adcaf5e87687cfa4a610c");
+        "bola|MTAwMDAw.4bf2fd5c755f810d27973750c832b0b818250f13");
     g_free(signed_str);
 }
 
@@ -144,6 +144,7 @@ test_session_open(void)
 {
     timestamp = 1357098400;
     g_unsetenv("HTTP_COOKIE");
+    g_setenv("HTTPS", "on", TRUE);
     g_setenv("SERVER_NAME", "guda", TRUE);
     g_setenv("SCRIPT_NAME", "/bola", TRUE);
     g_setenv("PATH_INFO", "/", TRUE);
@@ -151,19 +152,20 @@ test_session_open(void)
     balde_app_t *app = balde_app_init();
     balde_app_set_config(app, "SECRET_KEY", "bola");
     balde_request_t *request = balde_make_request(app, NULL);
-    balde_session_t *session = balde_session_open(app, request);
+    balde_session_open(app, request);
 
     g_assert(app->error == NULL);
-    g_assert(session != NULL);
-    g_assert(session->storage == NULL);
-    g_assert(!session->secure);
-    g_assert_cmpstr(session->key, ==, "bola");
-    g_assert_cmpint(session->key_len, ==, 4);
-    g_assert_cmpstr(session->path, ==, "/bola");
-    g_assert_cmpstr(session->domain, ==, "guda");
-    g_assert_cmpint(session->max_age, ==, 2678400);
+    g_assert(request->priv->session != NULL);
+    g_assert(request->priv->session->storage == NULL);
+    g_assert(request->https);
+    g_assert_cmpstr(request->priv->session->key, ==,
+        "d1ddfb31487e2d921cd823f42f7336dbd1e181ae");
+    g_assert_cmpint(request->priv->session->max_age, ==, 2678400);
+    g_assert_cmpstr(request->script_name, ==, "/bola");
+    g_assert_cmpstr(request->server_name, ==, "guda");
 
-    g_free(session);
+    g_free(request->priv->session->key);
+    g_free(request->priv->session);
     balde_request_free(request);
     balde_app_free(app);
 }
@@ -180,11 +182,11 @@ test_session_open_no_secret_key(void)
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, NULL);
-    balde_session_t *session = balde_session_open(app, request);
+    balde_session_open(app, request);
 
     g_assert(app->error != NULL);
     g_assert_cmpint(app->error->code, ==, 500);
-    g_assert(session == NULL);
+    g_assert(request->priv->session == NULL);
 
     balde_request_free(request);
     balde_app_free(app);
@@ -195,8 +197,9 @@ void
 test_session_open_with_cookie(void)
 {
     timestamp = 1357098400;
+    g_unsetenv("HTTPS");
     g_setenv("HTTP_COOKIE", "balde_session=\"eyJjaHVuZGEiOiAibG9saGVoZSJ9|MTAwMDAw."
-        "ce018465cdce573f4616db012499f57f230d770a\"", TRUE);
+        "3b290eab326aab9b3f830797c7b900c077daebd0\"", TRUE);
     g_setenv("SERVER_NAME", "guda", TRUE);
     g_setenv("SCRIPT_NAME", "/bola", TRUE);
     g_setenv("PATH_INFO", "/", TRUE);
@@ -204,22 +207,24 @@ test_session_open_with_cookie(void)
     balde_app_t *app = balde_app_init();
     balde_app_set_config(app, "SECRET_KEY", "guda");
     balde_request_t *request = balde_make_request(app, NULL);
-    balde_session_t *session = balde_session_open(app, request);
+    balde_session_open(app, request);
 
     g_assert(app->error == NULL);
-    g_assert(session != NULL);
-    g_assert(session->storage != NULL);
-    g_assert_cmpint(g_hash_table_size(session->storage), ==, 1);
-    g_assert_cmpstr(g_hash_table_lookup(session->storage, "chunda"), ==, "lolhehe");
-    g_assert(!session->secure);
-    g_assert_cmpstr(session->key, ==, "guda");
-    g_assert_cmpint(session->key_len, ==, 4);
-    g_assert_cmpstr(session->path, ==, "/bola");
-    g_assert_cmpstr(session->domain, ==, "guda");
-    g_assert_cmpint(session->max_age, ==, 2678400);
+    g_assert(request->priv->session != NULL);
+    g_assert(request->priv->session->storage != NULL);
+    g_assert_cmpint(g_hash_table_size(request->priv->session->storage), ==, 1);
+    g_assert_cmpstr(g_hash_table_lookup(request->priv->session->storage, "chunda"),
+        ==, "lolhehe");
+    g_assert(!request->https);
+    g_assert_cmpstr(request->priv->session->key, ==,
+        "94a702e385b8c76d636610137ae654a6ad2d1e01");
+    g_assert_cmpint(request->priv->session->max_age, ==, 2678400);
+    g_assert_cmpstr(request->script_name, ==, "/bola");
+    g_assert_cmpstr(request->server_name, ==, "guda");
 
-    g_hash_table_destroy(session->storage);
-    g_free(session);
+    g_hash_table_destroy(request->priv->session->storage);
+    g_free(request->priv->session->key);
+    g_free(request->priv->session);
     balde_request_free(request);
     balde_app_free(app);
 }
@@ -229,8 +234,9 @@ void
 test_session_open_with_cookie_and_key_length(void)
 {
     timestamp = 1357098400;
+    g_unsetenv("HTTPS");
     g_setenv("HTTP_COOKIE", "balde_session=\"eyJjaHVuZGEiOiAibG9saGVoZSJ9|MTAwMDAw."
-        "ce018465cdce573f4616db012499f57f230d770a\"", TRUE);
+        "3b290eab326aab9b3f830797c7b900c077daebd0\"", TRUE);
     g_setenv("SERVER_NAME", "guda", TRUE);
     g_setenv("SCRIPT_NAME", "/bola", TRUE);
     g_setenv("PATH_INFO", "/", TRUE);
@@ -239,22 +245,24 @@ test_session_open_with_cookie_and_key_length(void)
     balde_app_set_config(app, "SECRET_KEY", "guda-moises");
     balde_app_set_config(app, "SECRET_KEY_LENGTH", "4");
     balde_request_t *request = balde_make_request(app, NULL);
-    balde_session_t *session = balde_session_open(app, request);
+    balde_session_open(app, request);
 
     g_assert(app->error == NULL);
-    g_assert(session != NULL);
-    g_assert(session->storage != NULL);
-    g_assert_cmpint(g_hash_table_size(session->storage), ==, 1);
-    g_assert_cmpstr(g_hash_table_lookup(session->storage, "chunda"), ==, "lolhehe");
-    g_assert(!session->secure);
-    g_assert_cmpstr(session->key, ==, "guda-moises");
-    g_assert_cmpint(session->key_len, ==, 4);
-    g_assert_cmpstr(session->path, ==, "/bola");
-    g_assert_cmpstr(session->domain, ==, "guda");
-    g_assert_cmpint(session->max_age, ==, 2678400);
+    g_assert(request->priv->session != NULL);
+    g_assert(request->priv->session->storage != NULL);
+    g_assert_cmpint(g_hash_table_size(request->priv->session->storage), ==, 1);
+    g_assert_cmpstr(g_hash_table_lookup(request->priv->session->storage, "chunda"),
+        ==, "lolhehe");
+    g_assert(!request->https);
+    g_assert_cmpstr(request->priv->session->key, ==,
+        "94a702e385b8c76d636610137ae654a6ad2d1e01");
+    g_assert_cmpint(request->priv->session->max_age, ==, 2678400);
+    g_assert_cmpstr(request->script_name, ==, "/bola");
+    g_assert_cmpstr(request->server_name, ==, "guda");
 
-    g_hash_table_destroy(session->storage);
-    g_free(session);
+    g_hash_table_destroy(request->priv->session->storage);
+    g_free(request->priv->session->key);
+    g_free(request->priv->session);
     balde_request_free(request);
     balde_app_free(app);
 }
@@ -269,14 +277,16 @@ test_session_save(void)
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_insert(session->storage, g_strdup("bola"), g_strdup("guda"));
     g_hash_table_insert(session->storage, g_strdup("asd"), g_strdup("lolhehe"));
-    session->secure = TRUE;
-    session->key = "bola";
-    session->key_len = 4;
-    session->path = "/";
-    session->domain = "guda";
+    g_setenv("HTTPS", "on", TRUE);
+    g_setenv("SCRIPT_NAME", "/", TRUE);
+    g_setenv("SERVER_NAME", "guda", TRUE);
+    session->key = g_strdup("bola");
     session->max_age = 2678400;
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    request->priv->session = session;
 
-    balde_session_save(response, session);
+    balde_session_save(request, response);
 
     g_assert_cmpint(g_hash_table_size(response->priv->headers), ==, 1);
     GSList *cookie_list = g_hash_table_lookup(response->priv->headers, "set-cookie");
@@ -284,11 +294,13 @@ test_session_save(void)
     gchar *cookie = cookie_list->data;
     g_assert_cmpstr(cookie, ==,
         "balde_session=\"eyJhc2QiOiJsb2xoZWhlIiwiYm9sYSI6Imd1ZGEifQ==|MTAwMDAw"
-        ".7e9e8a554349a652636b1d53cda974eccf5b8fd2\"; Domain=\".guda\"; Expires"
+        ".9e62e1a9ff2adbe15c1297e99b36b61c1463c2b8\"; Domain=\".guda\"; Expires"
         "=Sat, 02-Feb-2013 03:46:40 GMT; Max-Age=2678400; Secure; HttpOnly; "
         "Path=/");
 
+    balde_request_free(request);
     balde_response_free(response);
+    balde_app_free(app);
 }
 
 
@@ -301,14 +313,16 @@ test_session_save_server_name_with_port(void)
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_insert(session->storage, g_strdup("bola"), g_strdup("guda"));
     g_hash_table_insert(session->storage, g_strdup("asd"), g_strdup("lolhehe"));
-    session->secure = TRUE;
-    session->key = "bola";
-    session->key_len = 4;
-    session->path = "/";
-    session->domain = "chunda:8080";
+    g_setenv("HTTPS", "on", TRUE);
+    g_setenv("SCRIPT_NAME", "/", TRUE);
+    g_setenv("SERVER_NAME", "chunda:8080", TRUE);
+    session->key = g_strdup("bola");
     session->max_age = 2678400;
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    request->priv->session = session;
 
-    balde_session_save(response, session);
+    balde_session_save(request, response);
 
     g_assert_cmpint(g_hash_table_size(response->priv->headers), ==, 1);
     GSList *cookie_list = g_hash_table_lookup(response->priv->headers, "set-cookie");
@@ -316,11 +330,13 @@ test_session_save_server_name_with_port(void)
     gchar *cookie = cookie_list->data;
     g_assert_cmpstr(cookie, ==,
         "balde_session=\"eyJhc2QiOiJsb2xoZWhlIiwiYm9sYSI6Imd1ZGEifQ==|MTAwMDAw"
-        ".7e9e8a554349a652636b1d53cda974eccf5b8fd2\"; Domain=\".chunda\"; Expires"
+        ".9e62e1a9ff2adbe15c1297e99b36b61c1463c2b8\"; Domain=\".chunda\"; Expires"
         "=Sat, 02-Feb-2013 03:46:40 GMT; Max-Age=2678400; Secure; HttpOnly; "
         "Path=/");
 
+    balde_request_free(request);
     balde_response_free(response);
+    balde_app_free(app);
 }
 
 
@@ -333,14 +349,16 @@ test_session_save_with_path(void)
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_insert(session->storage, g_strdup("bola"), g_strdup("guda"));
     g_hash_table_insert(session->storage, g_strdup("asd"), g_strdup("lolhehe"));
-    session->secure = TRUE;
-    session->key = "bola";
-    session->key_len = 4;
-    session->path = "/bola";
-    session->domain = "guda";
+    g_setenv("HTTPS", "on", TRUE);
+    g_setenv("SCRIPT_NAME", "/bola", TRUE);
+    g_setenv("SERVER_NAME", "guda", TRUE);
+    session->key = g_strdup("bola");
     session->max_age = 2678400;
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    request->priv->session = session;
 
-    balde_session_save(response, session);
+    balde_session_save(request, response);
 
     g_assert_cmpint(g_hash_table_size(response->priv->headers), ==, 1);
     GSList *cookie_list = g_hash_table_lookup(response->priv->headers, "set-cookie");
@@ -348,11 +366,13 @@ test_session_save_with_path(void)
     gchar *cookie = cookie_list->data;
     g_assert_cmpstr(cookie, ==,
         "balde_session=\"eyJhc2QiOiJsb2xoZWhlIiwiYm9sYSI6Imd1ZGEifQ==|MTAwMDAw"
-        ".7e9e8a554349a652636b1d53cda974eccf5b8fd2\"; Domain=\"guda\"; Expires"
+        ".9e62e1a9ff2adbe15c1297e99b36b61c1463c2b8\"; Domain=\"guda\"; Expires"
         "=Sat, 02-Feb-2013 03:46:40 GMT; Max-Age=2678400; Secure; HttpOnly; "
         "Path=/bola");
 
+    balde_request_free(request);
     balde_response_free(response);
+    balde_app_free(app);
 }
 
 
@@ -365,14 +385,16 @@ test_session_save_with_null_path(void)
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_insert(session->storage, g_strdup("bola"), g_strdup("guda"));
     g_hash_table_insert(session->storage, g_strdup("asd"), g_strdup("lolhehe"));
-    session->secure = TRUE;
-    session->key = "bola";
-    session->key_len = 4;
-    session->path = NULL;
-    session->domain = "guda";
+    g_setenv("HTTPS", "on", TRUE);
+    g_unsetenv("SCRIPT_NAME");
+    g_setenv("SERVER_NAME", "guda", TRUE);
+    session->key = g_strdup("bola");
     session->max_age = 2678400;
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    request->priv->session = session;
 
-    balde_session_save(response, session);
+    balde_session_save(request, response);
 
     g_assert_cmpint(g_hash_table_size(response->priv->headers), ==, 1);
     GSList *cookie_list = g_hash_table_lookup(response->priv->headers, "set-cookie");
@@ -380,11 +402,13 @@ test_session_save_with_null_path(void)
     gchar *cookie = cookie_list->data;
     g_assert_cmpstr(cookie, ==,
         "balde_session=\"eyJhc2QiOiJsb2xoZWhlIiwiYm9sYSI6Imd1ZGEifQ==|MTAwMDAw"
-        ".7e9e8a554349a652636b1d53cda974eccf5b8fd2\"; Domain=\".guda\"; Expires"
+        ".9e62e1a9ff2adbe15c1297e99b36b61c1463c2b8\"; Domain=\".guda\"; Expires"
         "=Sat, 02-Feb-2013 03:46:40 GMT; Max-Age=2678400; Secure; HttpOnly; "
         "Path=/");
 
+    balde_request_free(request);
     balde_response_free(response);
+    balde_app_free(app);
 }
 
 
@@ -397,14 +421,16 @@ test_session_save_with_null_domain(void)
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_insert(session->storage, g_strdup("bola"), g_strdup("guda"));
     g_hash_table_insert(session->storage, g_strdup("asd"), g_strdup("lolhehe"));
-    session->secure = TRUE;
-    session->key = "bola";
-    session->key_len = 4;
-    session->path = NULL;
-    session->domain = NULL;
+    g_setenv("HTTPS", "on", TRUE);
+    g_unsetenv("SCRIPT_NAME");
+    g_unsetenv("SERVER_NAME");
+    session->key = g_strdup("bola");
     session->max_age = 2678400;
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    request->priv->session = session;
 
-    balde_session_save(response, session);
+    balde_session_save(request, response);
 
     g_assert_cmpint(g_hash_table_size(response->priv->headers), ==, 1);
     GSList *cookie_list = g_hash_table_lookup(response->priv->headers, "set-cookie");
@@ -412,11 +438,13 @@ test_session_save_with_null_domain(void)
     gchar *cookie = cookie_list->data;
     g_assert_cmpstr(cookie, ==,
         "balde_session=\"eyJhc2QiOiJsb2xoZWhlIiwiYm9sYSI6Imd1ZGEifQ==|MTAwMDAw"
-        ".7e9e8a554349a652636b1d53cda974eccf5b8fd2\"; Expires"
+        ".9e62e1a9ff2adbe15c1297e99b36b61c1463c2b8\"; Expires"
         "=Sat, 02-Feb-2013 03:46:40 GMT; Max-Age=2678400; Secure; HttpOnly; "
         "Path=/");
 
+    balde_request_free(request);
     balde_response_free(response);
+    balde_app_free(app);
 }
 
 
@@ -429,14 +457,16 @@ test_session_save_with_localhost(void)
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_insert(session->storage, g_strdup("bola"), g_strdup("guda"));
     g_hash_table_insert(session->storage, g_strdup("asd"), g_strdup("lolhehe"));
-    session->secure = TRUE;
-    session->key = "bola";
-    session->key_len = 4;
-    session->path = NULL;
-    session->domain = "localhost";
+    g_setenv("HTTPS", "on", TRUE);
+    g_unsetenv("SCRIPT_NAME");
+    g_setenv("SERVER_NAME", "localhost", TRUE);
+    session->key = g_strdup("bola");
     session->max_age = 2678400;
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    request->priv->session = session;
 
-    balde_session_save(response, session);
+    balde_session_save(request, response);
 
     g_assert_cmpint(g_hash_table_size(response->priv->headers), ==, 1);
     GSList *cookie_list = g_hash_table_lookup(response->priv->headers, "set-cookie");
@@ -444,11 +474,13 @@ test_session_save_with_localhost(void)
     gchar *cookie = cookie_list->data;
     g_assert_cmpstr(cookie, ==,
         "balde_session=\"eyJhc2QiOiJsb2xoZWhlIiwiYm9sYSI6Imd1ZGEifQ==|MTAwMDAw"
-        ".7e9e8a554349a652636b1d53cda974eccf5b8fd2\"; Expires"
+        ".9e62e1a9ff2adbe15c1297e99b36b61c1463c2b8\"; Expires"
         "=Sat, 02-Feb-2013 03:46:40 GMT; Max-Age=2678400; Secure; HttpOnly; "
         "Path=/");
 
+    balde_request_free(request);
     balde_response_free(response);
+    balde_app_free(app);
 }
 
 
@@ -458,19 +490,29 @@ test_session_save_empty(void)
     timestamp = 1357098400;
     balde_response_t *response = balde_make_response("");
     balde_session_t *session = g_new(balde_session_t, 1);
+    g_setenv("HTTPS", "on", TRUE);
+    g_setenv("SCRIPT_NAME", "/bola", TRUE);
+    g_setenv("SERVER_NAME", "guda", TRUE);
     session->storage = NULL;
-    session->secure = TRUE;
-    session->key = "bola";
-    session->key_len = 4;
-    session->path = "/bola";
-    session->domain = "guda";
+    session->key = g_strdup("bola");
     session->max_age = 2678400;
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    request->priv->session = session;
 
-    balde_session_save(response, session);
+    balde_session_save(request, response);
 
-    g_assert_cmpint(g_hash_table_size(response->priv->headers), ==, 0);
+    g_assert_cmpint(g_hash_table_size(response->priv->headers), ==, 1);
+    GSList *cookie_list = g_hash_table_lookup(response->priv->headers, "set-cookie");
+    g_assert(cookie_list != NULL);
+    gchar *cookie = cookie_list->data;
+    g_assert_cmpstr(cookie, ==,
+        "balde_session=\"\"; Domain=\"guda\"; Expires=Thu, 01-Jan-1970 00:00:00 "
+        "GMT; Max-Age=0; Path=/bola");
 
+    balde_request_free(request);
     balde_response_free(response);
+    balde_app_free(app);
 }
 
 
@@ -480,9 +522,14 @@ test_session_get(void)
     balde_session_t *session = g_new(balde_session_t, 1);
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_insert(session->storage, g_strdup("bola"), g_strdup("guda"));
-    g_assert_cmpstr(balde_session_get(session, "bola"), ==, "guda");
-    g_hash_table_destroy(session->storage);
-    g_free(session);
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    request->priv->session = session;
+    g_assert_cmpstr(balde_session_get(request, "bola"), ==, "guda");
+    g_hash_table_destroy(request->priv->session->storage);
+    g_free(request->priv->session);
+    balde_request_free(request);
+    balde_app_free(app);
 }
 
 
@@ -491,9 +538,14 @@ test_session_get_not_found(void)
 {
     balde_session_t *session = g_new(balde_session_t, 1);
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    g_assert(balde_session_get(session, "bola") == NULL);
-    g_hash_table_destroy(session->storage);
-    g_free(session);
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    request->priv->session = session;
+    g_assert(balde_session_get(request, "bola") == NULL);
+    g_hash_table_destroy(request->priv->session->storage);
+    g_free(request->priv->session);
+    balde_request_free(request);
+    balde_app_free(app);
 }
 
 
@@ -502,15 +554,23 @@ test_session_set(void)
 {
     balde_session_t *session = g_new(balde_session_t, 1);
     session->storage = NULL;
-    balde_session_set(session, "bola", "guda");
-    g_assert_cmpint(g_hash_table_size(session->storage), ==, 1);
-    g_assert_cmpstr(g_hash_table_lookup(session->storage, "bola"), ==, "guda");
-    balde_session_set(session, "chunda", "lolhehe");
-    g_assert_cmpint(g_hash_table_size(session->storage), ==, 2);
-    g_assert_cmpstr(g_hash_table_lookup(session->storage, "bola"), ==, "guda");
-    g_assert_cmpstr(g_hash_table_lookup(session->storage, "chunda"), ==, "lolhehe");
-    g_hash_table_destroy(session->storage);
-    g_free(session);
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    request->priv->session = session;
+    balde_session_set(request, "bola", "guda");
+    g_assert_cmpint(g_hash_table_size(request->priv->session->storage), ==, 1);
+    g_assert_cmpstr(g_hash_table_lookup(request->priv->session->storage, "bola"),
+        ==, "guda");
+    balde_session_set(request, "chunda", "lolhehe");
+    g_assert_cmpint(g_hash_table_size(request->priv->session->storage), ==, 2);
+    g_assert_cmpstr(g_hash_table_lookup(request->priv->session->storage, "bola"),
+        ==, "guda");
+    g_assert_cmpstr(g_hash_table_lookup(request->priv->session->storage, "chunda"),
+        ==, "lolhehe");
+    g_hash_table_destroy(request->priv->session->storage);
+    g_free(request->priv->session);
+    balde_request_free(request);
+    balde_app_free(app);
 }
 
 
@@ -520,10 +580,15 @@ test_session_delete(void)
     balde_session_t *session = g_new(balde_session_t, 1);
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_insert(session->storage, g_strdup("bola"), g_strdup("guda"));
-    balde_session_delete(session, "bola");
-    g_assert_cmpint(g_hash_table_size(session->storage), ==, 0);
-    g_hash_table_destroy(session->storage);
-    g_free(session);
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    request->priv->session = session;
+    balde_session_delete(request, "bola");
+    g_assert_cmpint(g_hash_table_size(request->priv->session->storage), ==, 0);
+    g_hash_table_destroy(request->priv->session->storage);
+    g_free(request->priv->session);
+    balde_request_free(request);
+    balde_app_free(app);
 }
 
 
@@ -533,10 +598,15 @@ test_session_delete_not_found(void)
     balde_session_t *session = g_new(balde_session_t, 1);
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_insert(session->storage, g_strdup("bola"), g_strdup("guda"));
-    balde_session_delete(session, "chunda");
-    g_assert_cmpint(g_hash_table_size(session->storage), ==, 1);
-    g_hash_table_destroy(session->storage);
-    g_free(session);
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    request->priv->session = session;
+    balde_session_delete(request, "chunda");
+    g_assert_cmpint(g_hash_table_size(request->priv->session->storage), ==, 1);
+    g_hash_table_destroy(request->priv->session->storage);
+    g_free(request->priv->session);
+    balde_request_free(request);
+    balde_app_free(app);
 }
 
 
