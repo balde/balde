@@ -522,10 +522,10 @@ GString*
 balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
     balde_response_render_t render, balde_http_exception_code_t *status_code)
 {
-    balde_request_t *request;
-    balde_response_t *response;
-    balde_response_t *error_response;
-    gchar *endpoint;
+    balde_request_t *request = NULL;
+    balde_response_t *response = NULL;
+    balde_response_t *error_response = NULL;
+    gchar *endpoint = NULL;
     gboolean with_body = TRUE;
     GString *rv = NULL;
 

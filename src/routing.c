@@ -21,7 +21,6 @@ balde_url_match(const gchar *path, const balde_url_rule_match_t *rule,
     GHashTable **matches)
 {
     g_return_val_if_fail(rule != NULL, FALSE);
-    GError *_error = NULL;
     if (path == NULL || path[0] == '\0')
         path = "/";
     GMatchInfo *info;
