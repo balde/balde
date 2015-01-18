@@ -295,7 +295,14 @@ balde_parse_query_string(const gchar *query_string)
         gchar **pieces = g_strsplit(kv[i], "=", 2);
         if (g_strv_length(pieces) != 2)
             goto point2;
-        g_hash_table_replace(qs, balde_urldecode(pieces[0]), balde_urldecode(pieces[1]));
+        gchar *key = balde_urldecode(pieces[0]);
+        gchar *value = balde_urldecode(pieces[1]);
+        if (key == NULL || value == NULL) {
+            g_free(key);
+            g_free(value);
+            goto point2;
+        }
+        g_hash_table_replace(qs, key, value);
 point2:
         g_strfreev(pieces);
     }
