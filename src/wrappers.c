@@ -426,7 +426,7 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
     if (request->method & (BALDE_HTTP_POST | BALDE_HTTP_PUT | BALDE_HTTP_PATCH)) {
         request->priv->body = g_string_new_len(env->body, env->content_length);
         const gchar *ct = g_hash_table_lookup(request->priv->headers, "content-type");
-        if (g_str_has_prefix(ct, "multipart/form-data;")) {
+        if (ct != NULL && g_str_has_prefix(ct, "multipart/form-data;")) {
             gchar *boundary = balde_multipart_parse_boundary(ct);
             balde_multipart_data_t *data = balde_multipart_parse(boundary,
                 request->priv->body);
