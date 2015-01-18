@@ -87,7 +87,6 @@ void
 test_session_unsign(void)
 {
     timestamp = 1357098400;
-    gsize len;
     gchar *content;
     balde_session_unsign_status_t status = balde_session_unsign((guchar*) "guda",
         4, 40, "bola|MTAwMDAw.4bf2fd5c755f810d27973750c832b0b818250f13", &content);
@@ -101,7 +100,6 @@ void
 test_session_unsign_bad_format(void)
 {
     timestamp = 1357098400;
-    gsize len;
     gchar *content;
     balde_session_unsign_status_t status = balde_session_unsign((guchar*) "guda",
         4, 40, "bola|MTAwMDAw4bf2fd5c755f810d27973750c832b0b818250f13", &content);
@@ -118,7 +116,6 @@ void
 test_session_unsign_bad_timestamp(void)
 {
     timestamp = 1357099400;
-    gsize len;
     gchar *content;
     balde_session_unsign_status_t status = balde_session_unsign((guchar*) "guda",
         4, 40, "bola|MTAwMDAw.4bf2fd5c755f810d27973750c832b0b818250f13", &content);
