@@ -83,6 +83,8 @@ noinst_HEADERS = \
 	src/exceptions.h \
 	src/fcgi.h \
 	src/httpd.h \
+	src/multipart.h \
+	src/multipart_parser.h \
 	src/resources.h \
 	src/routing.h \
 	src/sessions.h \
@@ -90,7 +92,6 @@ noinst_HEADERS = \
 	src/template/template.h \
 	src/template/parser.h \
 	src/utils.h \
-	src/multipart_parser.h \
 	tests/utils.h
 
 lib_LTLIBRARIES = \
@@ -129,13 +130,14 @@ libbalde_la_SOURCES = \
 	src/cgi.c \
 	src/datetime.c \
 	src/exceptions.c \
+	src/multipart.c \
+	src/multipart_parser.c \
 	src/resources.c \
 	src/routing.c \
 	src/sessions.c \
 	src/template-helpers.c \
 	src/utils.c \
-	src/wrappers.c \
-	src/multipart_parser.c
+	src/wrappers.c
 
 libbalde_la_CFLAGS = \
 	-fvisibility=hidden \

@@ -17,6 +17,7 @@
 #include "cgi.h"
 #include "datetime.h"
 #include "exceptions.h"
+#include "multipart.h"
 #include "resources.h"
 #include "routing.h"
 #include "wrappers.h"
@@ -402,6 +403,7 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
     request->priv->view_args = NULL;
     request->priv->body = NULL;
     request->priv->form = NULL;
+    request->priv->files = NULL;
     request->priv->session = NULL;
     balde_request_env_t *env = request_env;
     if (request_env == NULL)
@@ -423,7 +425,21 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
         balde_request_get_header(request, "authorization"));
     if (request->method & (BALDE_HTTP_POST | BALDE_HTTP_PUT | BALDE_HTTP_PATCH)) {
         request->priv->body = g_string_new_len(env->body, env->content_length);
-        request->priv->form = balde_parse_query_string(request->priv->body->str);
+        const gchar *ct = g_hash_table_lookup(request->priv->headers, "content-type");
+        if (g_str_has_prefix(ct, "multipart/form-data;")) {
+            gchar *boundary = balde_multipart_parse_boundary(ct);
+            balde_multipart_data_t *data = balde_multipart_parse(boundary,
+                request->priv->body);
+            g_free(boundary);
+            if (data != NULL) {
+                request->priv->files = data->files;
+                request->priv->form = data->form;
+            }
+            g_free(data);
+        }
+        else {
+            request->priv->form = balde_parse_query_string(request->priv->body->str);
+        }
     }
     g_free(env->body);
     g_free(env->query_string);

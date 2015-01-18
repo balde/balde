@@ -28,6 +28,7 @@ typedef struct {
 struct _balde_request_private_t {
     GHashTable *args;
     GHashTable *form;
+    GHashTable *files;
     GHashTable *view_args;
     GHashTable *headers;
     GHashTable *cookies;
