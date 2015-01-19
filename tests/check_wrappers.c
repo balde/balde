@@ -13,6 +13,7 @@
 #include <glib.h>
 #include "../src/balde.h"
 #include "../src/app.h"
+#include "utils.h"
 
 
 void
@@ -552,6 +553,51 @@ test_make_request_with_env(void)
 
 
 void
+test_make_request_with_body(void)
+{
+    balde_request_env_t *env = g_new(balde_request_env_t, 1);
+    env->server_name = g_strdup("localhost");
+    env->script_name = NULL;
+    env->path_info = g_strdup("/");
+    env->request_method = g_strdup("POST");
+    env->query_string = g_strdup("asd=lol&xd=hehe");
+    env->headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
+        g_free);
+    g_hash_table_replace(env->headers, g_strdup("content-type"),
+        g_strdup(
+            "multipart/form-data; boundary=---------------------------"
+            "12056991879709948637505812"));
+    g_hash_table_replace(env->headers, g_strdup("xd"), g_strdup("asdf"));
+    g_hash_table_replace(env->headers, g_strdup("cookie"),
+        g_strdup("asd=\"qwe\"; bola=guda"));
+    g_hash_table_replace(env->headers, g_strdup("authorization"),
+        g_strdup("Basic Ym9sYTpndWRhOmxvbA=="));
+    GString *body = get_upload("simple.txt");
+    env->content_length = body->len;
+    env->body = g_string_free(body, FALSE);
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, env);
+    g_assert_cmpstr(request->path, ==, "/");
+    g_assert_cmpstr(request->server_name, ==, "localhost");
+    g_assert(request->method == BALDE_HTTP_POST);
+    g_assert(g_hash_table_size(request->priv->headers) == 4);
+    g_assert(g_hash_table_size(request->priv->args) == 2);
+    g_assert(g_hash_table_size(request->priv->cookies) == 2);
+    g_assert(request->authorization != NULL);
+    g_assert_cmpstr(request->authorization->username, ==, "bola");
+    g_assert_cmpstr(request->authorization->password, ==, "guda:lol");
+    g_assert(request->priv->view_args == NULL);
+    g_assert_cmpint(g_hash_table_size(request->priv->form), ==, 1);
+    g_assert_cmpstr(g_hash_table_lookup(request->priv->form, "name"), ==,
+        "chunda");
+    g_assert_cmpint(g_hash_table_size(request->priv->files), ==, 1);
+    g_assert(g_hash_table_lookup(request->priv->files, "bola") != NULL);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
 test_request_get_header(void)
 {
     g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
@@ -733,6 +779,7 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/make_request_without_path_info_with_script_name",
         test_make_request_without_path_info_with_script_name);
     g_test_add_func("/wrappers/make_request_with_env", test_make_request_with_env);
+    g_test_add_func("/wrappers/make_request_with_body", test_make_request_with_body);
     g_test_add_func("/wrappers/request_get_header", test_request_get_header);
     g_test_add_func("/wrappers/request_get_arg", test_request_get_arg);
     g_test_add_func("/wrappers/request_get_form", test_request_get_form);

@@ -63,6 +63,7 @@ Makefile.in
 /tests/check_template_helpers
 /tests/check_utils
 /tests/check_wrappers
+/tests/check_multipart
 /tests/*.log
 /tests/*.trs
 /tests/valgrind-*.xml

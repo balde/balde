@@ -54,7 +54,11 @@ EXTRA_DIST = \
 	tests/templates/foo6.html \
 	tests/templates/foo7.html \
 	tests/templates/foo8.html \
-	tests/templates/foo9.html
+	tests/templates/foo9.html \
+	tests/uploads/simple.txt \
+	tests/uploads/without-filename.txt \
+	tests/uploads/without-filetype.txt \
+	tests/uploads/multiple.txt
 
 CLEANFILES = \
 	examples/static-resources.c \
@@ -110,6 +114,7 @@ check_PROGRAMS = \
 	tests/check_cgi \
 	tests/check_datetime \
 	tests/check_exceptions \
+	tests/check_multipart \
 	tests/check_resources \
 	tests/check_routing \
 	tests/check_sessions \
@@ -481,6 +486,29 @@ tests_check_exceptions_LDADD = \
 	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
+tests_check_multipart_SOURCES = \
+	tests/check_multipart.c \
+	tests/utils.c
+
+tests_check_multipart_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS)
+
+tests_check_multipart_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_multipart_LDADD = \
+	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
+
+tests/tests_check_multipart-check_multipart.$(OBJEXT): \
+	tests/uploads/simple.txt \
+	tests/uploads/without-filename.txt \
+	tests/uploads/without-filetype.txt \
+	tests/uploads/multiple.txt
+
 tests_check_resources_SOURCES = \
 	tests/check_resources.c
 
@@ -622,6 +650,7 @@ tests_check_utils_LDADD = \
 
 tests_check_wrappers_SOURCES = \
 	tests/check_wrappers.c \
+	tests/utils.c \
 	tests/mock_wrappers.c
 
 tests_check_wrappers_CFLAGS = \

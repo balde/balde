@@ -529,6 +529,8 @@ balde_request_free(balde_request_t *request)
         g_string_free(request->priv->body, TRUE);
     if (request->priv->form != NULL)
         g_hash_table_destroy(request->priv->form);
+    if (request->priv->files != NULL)
+        g_hash_table_destroy(request->priv->files);
     if (request->priv->cookies != NULL)
         g_hash_table_destroy(request->priv->cookies);
     balde_authorization_free(request->authorization);

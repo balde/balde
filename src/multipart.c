@@ -63,8 +63,7 @@ read_header_value(multipart_parser *p, const char *at, size_t length)
         state->file_type = g_strndup(at, length);
     }
     else if (g_strcmp0(state->header_name, "content-disposition") == 0) {
-        // do shit with filename
-        if (g_str_has_prefix(at, "form-data")) {  // other types aren't supported
+        if (g_str_has_prefix(at, "form-data;")) {  // other types aren't supported
             gchar *header_value = g_strndup(at, length);
             gchar **pieces = g_strsplit(header_value, ";", 0);
             g_free(header_value);
@@ -82,7 +81,6 @@ clean:
             }
             g_strfreev(pieces);
         }
-
     }
     g_free(state->header_name);
     state->header_name = NULL;
@@ -98,7 +96,7 @@ read_part_data(multipart_parser *p, const char *at, size_t length)
     if (state == NULL || state->field_name == NULL)
         return 1;
 
-    if (state->file_name != NULL || state->file_type != NULL) {
+    if (state->file_name != NULL && state->file_type != NULL) {
         balde_resource_t *resource = g_new(balde_resource_t, 1);
         resource->name = g_strdup(state->file_name);
         resource->content = g_string_new_len(at, length);
