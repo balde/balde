@@ -20,6 +20,7 @@ typedef struct {
     gchar *header_name;
     gchar *file_name;
     gchar *file_type;
+    GString *file_content;
     gchar *field_name;
     balde_multipart_data_t *data;
 } balde_multipart_state_t;

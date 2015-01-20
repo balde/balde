@@ -40,7 +40,7 @@ done:
 }
 
 
-gchar*
+GString*
 balde_fcgi_stdin_read(balde_app_t *app, FCGX_Request *request)
 {
     guint64 clen = balde_cgi_parse_content_length(
@@ -57,7 +57,7 @@ balde_fcgi_stdin_read(balde_app_t *app, FCGX_Request *request)
         }
         g_string_append_c(rv, (gchar) ch);
     }
-    return (gchar*) g_string_free(rv, FALSE);
+    return rv;
 }
 
 
@@ -72,7 +72,6 @@ balde_fcgi_parse_request(balde_app_t *app, FCGX_Request *request)
     rv->query_string = g_strdup(FCGX_GetParam("QUERY_STRING", request->envp));
     rv->headers = balde_fcgi_request_headers((const gchar **) request->envp);
     rv->body = balde_fcgi_stdin_read(app, request);
-    rv->content_length = (rv->body != NULL) ? strlen(rv->body) : 0;
     rv->https = FCGX_GetParam("HTTPS", request->envp) != NULL;
     return rv;
 }

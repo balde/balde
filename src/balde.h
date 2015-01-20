@@ -168,6 +168,37 @@ typedef struct {
 
 
 /**
+ * balde file representation.
+ *
+ * This struct stores a file sent by the browser through a file upload.
+ *
+ * Added in balde 0.2
+ *
+ */
+typedef struct {
+
+    /**
+     * File name.
+     *
+     */
+    const gchar *name;
+
+    /**
+     * File type.
+     *
+     */
+    const gchar *type;
+
+    /**
+     * File content.
+     *
+     */
+    GString *content;
+
+} balde_file_t;
+
+
+/**
  * balde HTTP request context
  *
  * This struct stores everything related to the request context. It stays
@@ -523,6 +554,16 @@ const gchar* balde_request_get_arg(balde_request_t *request, const gchar *name);
  *
  */
 const gchar* balde_request_get_form(balde_request_t *request, const gchar *name);
+
+
+/**
+ * Gets a file uploaded.
+ *
+ * The form input name name *IS* case-sensitive, and the function will always
+ * return NULL for HTTP methods that does not accepts request body.
+ *
+ */
+const balde_file_t* balde_request_get_file(balde_request_t *request, const gchar *name);
 
 
 /**

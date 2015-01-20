@@ -20,8 +20,7 @@ typedef struct {
     gchar *path_info;
     gchar *query_string;
     GHashTable *headers;
-    guint64 content_length;
-    gchar *body;
+    GString *body;
     gboolean https;
 } balde_request_env_t;
 

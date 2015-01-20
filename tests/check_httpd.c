@@ -42,8 +42,8 @@ test_httpd_parse_request(void)
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "location"), ==, "/foo");
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "chunda"), ==, "rs");
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "content-length"), ==, "6");
-    g_assert_cmpint(req->content_length, ==, 6);
-    g_assert_cmpstr(req->body, ==, "XD=asd");
+    g_assert_cmpstr(req->body->str, ==, "XD=asd");
+    g_assert_cmpint(req->body->len, ==, 6);
     g_assert(!req->https);
     g_free(data->request_line);
     g_free(data);
@@ -77,8 +77,8 @@ test_httpd_parse_request_without_query_string(void)
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "location"), ==, "/foo");
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "chunda"), ==, "rs");
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "content-length"), ==, "6");
-    g_assert_cmpint(req->content_length, ==, 6);
-    g_assert_cmpstr(req->body, ==, "XD=asd");
+    g_assert_cmpstr(req->body->str, ==, "XD=asd");
+    g_assert_cmpint(req->body->len, ==, 6);
     g_free(data->request_line);
     g_free(data);
     balde_request_env_free(req);

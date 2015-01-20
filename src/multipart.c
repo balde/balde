@@ -12,9 +12,9 @@
 
 #include <glib.h>
 #include <string.h>
+#include "balde.h"
 #include "multipart.h"
 #include "multipart_parser.h"
-#include "resources.h"
 
 
 gchar*
@@ -89,28 +89,36 @@ clean:
 
 
 static int
-read_part_data(multipart_parser *p, const char *at, size_t length)
+read_part_data_begin(multipart_parser *p)
 {
     balde_multipart_state_t *state = multipart_parser_get_data(p);
+    if (state == NULL)
+        return 1;
 
+    state->file_content = g_string_new(NULL);
+
+    return 0;
+}
+
+
+static int
+read_part_data_end(multipart_parser *p)
+{
+    balde_multipart_state_t *state = multipart_parser_get_data(p);
     if (state == NULL || state->field_name == NULL)
         return 1;
 
     if (state->file_name != NULL && state->file_type != NULL) {
-        balde_resource_t *resource = g_new(balde_resource_t, 1);
-        resource->name = g_strdup(state->file_name);
-        resource->content = g_string_new_len(at, length);
-        resource->type = g_strdup(state->file_type);
-        resource->hash_name = g_compute_checksum_for_string(G_CHECKSUM_MD5,
-            state->file_name, strlen(state->file_name));
-        resource->hash_content = g_compute_checksum_for_string(G_CHECKSUM_MD5,
-            resource->content->str, resource->content->len);
+        balde_file_t *file = g_new(balde_file_t, 1);
+        file->name = g_strdup(state->file_name);
+        file->content = state->file_content;
+        file->type = g_strdup(state->file_type);
         g_hash_table_replace(state->data->files, g_strdup(state->field_name),
-            resource);
+            file);
     }
     else {
         g_hash_table_replace(state->data->form, g_strdup(state->field_name),
-            g_strndup(at, length));
+            g_string_free(state->file_content, FALSE));
     }
 
     g_free(state->file_name);
@@ -119,8 +127,33 @@ read_part_data(multipart_parser *p, const char *at, size_t length)
     state->file_name = NULL;
     state->file_type = NULL;
     state->field_name = NULL;
+    state->file_content = NULL;
 
     return 0;
+}
+
+
+static int
+read_part_data(multipart_parser *p, const char *at, size_t length)
+{
+    balde_multipart_state_t *state = multipart_parser_get_data(p);
+    if (state == NULL)
+        return 1;
+
+    g_string_append_len(state->file_content, at, length);
+
+    return 0;
+}
+
+
+void
+balde_file_free(balde_file_t *file)
+{
+    g_return_if_fail(file != NULL);
+    g_free((gchar*) file->name);
+    g_free((gchar*) file->type);
+    g_string_free(file->content, TRUE);
+    g_free(file);
 }
 
 
@@ -136,6 +169,8 @@ balde_multipart_parse(const gchar *boundary, const GString *body)
     callbacks.on_header_field = read_header_name;
     callbacks.on_header_value = read_header_value;
     callbacks.on_part_data = read_part_data;
+    callbacks.on_part_data_begin = read_part_data_begin;
+    callbacks.on_part_data_end = read_part_data_end;
 
     multipart_parser* parser = multipart_parser_init(boundary, &callbacks);
 
@@ -146,7 +181,7 @@ balde_multipart_parse(const gchar *boundary, const GString *body)
     state->field_name = NULL;
     state->data = g_new(balde_multipart_data_t, 1);
     state->data->files = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
-        (GDestroyNotify) balde_resource_free);
+        (GDestroyNotify) balde_file_free);
     state->data->form = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
         g_free);
     multipart_parser_set_data(parser, state);

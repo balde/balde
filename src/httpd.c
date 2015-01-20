@@ -39,7 +39,7 @@ balde_httpd_parse_request(balde_app_t *app, GInputStream *istream)
     gchar *query_string = NULL;
     gchar *key = NULL;
     gchar *value = NULL;
-    gchar *body = NULL;
+    GString *body = NULL;
     GHashTable *headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     gchar **pieces = g_strsplit(line, " ", 3);
     g_free(line);
@@ -74,8 +74,10 @@ balde_httpd_parse_request(balde_app_t *app, GInputStream *istream)
 
     if (content_length > 0) {
         gchar body_[content_length];
-        g_input_stream_read(G_INPUT_STREAM(data), body_, sizeof(body_), NULL, NULL);
-        body = g_strndup(body_, content_length);
+        gsize real_content_length;
+        g_input_stream_read_all(G_INPUT_STREAM(data), body_, content_length,
+            &real_content_length, NULL, NULL);
+        body = g_string_new_len(body_, real_content_length);
     }
 
     g_object_unref(data);
@@ -87,7 +89,6 @@ balde_httpd_parse_request(balde_app_t *app, GInputStream *istream)
     env->request_method = request_method;
     env->query_string = query_string;
     env->headers = headers;
-    env->content_length = content_length;
     env->body = body;
     env->https = FALSE;
 

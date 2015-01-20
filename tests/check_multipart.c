@@ -11,35 +11,28 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
+#include "../src/balde.h"
 #include "../src/resources.h"
 #include "../src/multipart.h"
 #include "utils.h"
 
 
 void
-balde_assert_resource(const balde_resource_t *resource, gchar *name,
-    gchar *content, gchar *type, gchar *hash_name, gchar *hash_content)
+balde_assert_file(const balde_file_t *file, gchar *name, gchar *content,
+    gchar *type)
 {
     if (name != NULL)
-        g_assert_cmpstr(resource->name, ==, name);
+        g_assert_cmpstr(file->name, ==, name);
     else
-        g_assert(resource->name == NULL);
+        g_assert(file->name == NULL);
     if (content != NULL)
-        g_assert_cmpstr(resource->content->str, ==, content);
+        g_assert_cmpstr(file->content->str, ==, content);
     else
-        g_assert(resource->content == NULL);
+        g_assert(file->content == NULL);
     if (type != NULL)
-        g_assert_cmpstr(resource->type, ==, type);
+        g_assert_cmpstr(file->type, ==, type);
     else
-        g_assert(resource->type == NULL);
-    if (hash_name != NULL)
-        g_assert_cmpstr(resource->hash_name, ==, hash_name);
-    else
-        g_assert(resource->hash_name == NULL);
-    if (hash_content != NULL)
-        g_assert_cmpstr(resource->hash_content, ==, hash_content);
-    else
-        g_assert(resource->hash_content == NULL);
+        g_assert(file->type == NULL);
 }
 
 
@@ -79,11 +72,10 @@ test_multipart_parse(void)
     g_assert_cmpint(g_hash_table_size(data->files), ==, 1);
     g_assert_cmpint(g_hash_table_size(data->form), ==, 1);
 
-    const balde_resource_t *file = g_hash_table_lookup(data->files, "bola");
+    const balde_file_t *file = g_hash_table_lookup(data->files, "bola");
     g_assert(file != NULL);
-    balde_assert_resource(file, "foo.txt", "This is a random file!!!!\n\n:D\n",
-        "text/plain", "4fd8cc85ca9eebd2fa3c550069ce2846",
-        "d4278ab98e74c3009f849e155fa2ee51");
+    balde_assert_file(file, "foo.txt", "This is a random file!!!!\n\n:D\n",
+        "text/plain");
 
     const gchar *form = g_hash_table_lookup(data->form, "name");
     g_assert_cmpstr(form, ==, "chunda");
@@ -158,17 +150,15 @@ test_multipart_parse_multiple(void)
     g_assert_cmpint(g_hash_table_size(data->files), ==, 2);
     g_assert_cmpint(g_hash_table_size(data->form), ==, 2);
 
-    const balde_resource_t *file = g_hash_table_lookup(data->files, "bola");
+    const balde_file_t *file = g_hash_table_lookup(data->files, "bola");
     g_assert(file != NULL);
-    balde_assert_resource(file, "foo.txt", "This is a random file!!!!\n\n:D\n",
-        "text/plain", "4fd8cc85ca9eebd2fa3c550069ce2846",
-        "d4278ab98e74c3009f849e155fa2ee51");
+    balde_assert_file(file, "foo.txt", "This is a random file!!!!\n\n:D\n",
+        "text/plain");
 
     file = g_hash_table_lookup(data->files, "bola2");
     g_assert(file != NULL);
-    balde_assert_resource(file, "foo2.txt", "This is another random file!!!!\n\n:D\n",
-        "text/plain", "5e6caa8011f4387069acd5c3ebecf488",
-        "449916399a7a33dc2739a961ed7f9ac2");
+    balde_assert_file(file, "foo2.txt", "This is another random file!!!!\n\n:D\n",
+        "text/plain");
 
     const gchar *form = g_hash_table_lookup(data->form, "name");
     g_assert_cmpstr(form, ==, "chunda");

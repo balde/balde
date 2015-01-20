@@ -533,7 +533,6 @@ test_make_request_with_env(void)
         g_strdup("asd=\"qwe\"; bola=guda"));
     g_hash_table_replace(env->headers, g_strdup("authorization"),
         g_strdup("Basic Ym9sYTpndWRhOmxvbA=="));
-    env->content_length = 0;
     env->body = NULL;
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, env);
@@ -573,8 +572,7 @@ test_make_request_with_body(void)
     g_hash_table_replace(env->headers, g_strdup("authorization"),
         g_strdup("Basic Ym9sYTpndWRhOmxvbA=="));
     GString *body = get_upload("simple.txt");
-    env->content_length = body->len;
-    env->body = g_string_free(body, FALSE);
+    env->body = body;
     balde_app_t *app = balde_app_init();
     balde_request_t *request = balde_make_request(app, env);
     g_assert_cmpstr(request->path, ==, "/");
@@ -650,10 +648,40 @@ test_request_get_form_with_empty_body(void)
     balde_app_t *app = balde_app_init();
     // ommited CONTENT_LENGTH
     balde_request_t *request = balde_make_request(app, NULL);
-    g_assert_cmpstr(request->priv->body->str, ==, "");
-    g_assert_cmpint(request->priv->body->len, ==, 0);
+    g_assert(request->priv->body == NULL);
     g_assert(g_hash_table_size(request->priv->form) == 0);
     g_assert(balde_request_get_form(request, "lol") == NULL);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
+test_request_get_file(void)
+{
+    g_setenv("REQUEST_METHOD", "GET", TRUE);
+    // FIXME: this thing is too weak :(
+    balde_app_t *app = balde_app_init();
+    balde_request_t *request = balde_make_request(app, NULL);
+    g_assert(request->priv->body == NULL);
+    g_assert(request->priv->files == NULL);
+    g_assert(balde_request_get_file(request, "lol") == NULL);
+    balde_request_free(request);
+    balde_app_free(app);
+}
+
+
+void
+test_request_get_file_with_empty_body(void)
+{
+    g_setenv("REQUEST_METHOD", "POST", TRUE);
+    // FIXME: this thing is too weak :(
+    balde_app_t *app = balde_app_init();
+    // ommited CONTENT_LENGTH
+    balde_request_t *request = balde_make_request(app, NULL);
+    g_assert(request->priv->body == NULL);
+    g_assert(request->priv->files == NULL);
+    g_assert(balde_request_get_file(request, "lol") == NULL);
     balde_request_free(request);
     balde_app_free(app);
 }
@@ -708,8 +736,7 @@ test_request_get_body_with_empty_body(void)
     // ommited CONTENT_LENGTH
     balde_request_t *request = balde_make_request(app, NULL);
     const GString *str = balde_request_get_body(request);
-    g_assert_cmpstr(str->str, ==, "");
-    g_assert(str->len == 0);
+    g_assert(str == NULL);
     balde_request_free(request);
     balde_app_free(app);
 }
@@ -785,6 +812,9 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/request_get_form", test_request_get_form);
     g_test_add_func("/wrappers/request_get_form_with_empty_body",
         test_request_get_form_with_empty_body);
+    g_test_add_func("/wrappers/request_get_file", test_request_get_file);
+    g_test_add_func("/wrappers/request_get_file_with_empty_body",
+        test_request_get_file_with_empty_body);
     g_test_add_func("/wrappers/request_get_view_arg", test_request_get_view_arg);
     g_test_add_func("/wrappers/request_get_cookie", test_request_get_cookie);
     g_test_add_func("/wrappers/request_get_body", test_request_get_body);

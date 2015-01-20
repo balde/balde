@@ -424,7 +424,7 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
     request->authorization = balde_parse_authorization(
         balde_request_get_header(request, "authorization"));
     if (request->method & (BALDE_HTTP_POST | BALDE_HTTP_PUT | BALDE_HTTP_PATCH)) {
-        request->priv->body = g_string_new_len(env->body, env->content_length);
+        request->priv->body = env->body;
         const gchar *ct = g_hash_table_lookup(request->priv->headers, "content-type");
         if (ct != NULL && g_str_has_prefix(ct, "multipart/form-data;")) {
             gchar *boundary = balde_multipart_parse_boundary(ct);
@@ -438,10 +438,12 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
             g_free(data);
         }
         else {
-            request->priv->form = balde_parse_query_string(request->priv->body->str);
+            gchar *tmp = NULL;
+            if (request->priv->body != NULL)
+                tmp = request->priv->body->str;
+            request->priv->form = balde_parse_query_string(tmp);
         }
     }
-    g_free(env->body);
     g_free(env->query_string);
     g_free(env->request_method);
     g_free(env);
@@ -479,6 +481,15 @@ balde_request_get_form(balde_request_t *request, const gchar *name)
     if (request->priv->form == NULL)
         return NULL;
     return g_hash_table_lookup(request->priv->form, name);
+}
+
+
+BALDE_API const balde_file_t*
+balde_request_get_file(balde_request_t *request, const gchar *name)
+{
+    if (request->priv->files == NULL)
+        return NULL;
+    return g_hash_table_lookup(request->priv->files, name);
 }
 
 
@@ -548,6 +559,6 @@ balde_request_env_free(balde_request_env_t *request)
     g_free(request->request_method);
     g_free(request->query_string);
     g_hash_table_destroy(request->headers);
-    g_free(request->body);
+    g_string_free(request->body, TRUE);
     g_free(request);
 }

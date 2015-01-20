@@ -26,7 +26,7 @@ balde_cgi_parse_content_length(const gchar *str)
 }
 
 
-gchar*
+GString*
 balde_cgi_stdin_read(balde_app_t *app)
 {
     guint64 clen = balde_cgi_parse_content_length(g_getenv("CONTENT_LENGTH"));
@@ -42,7 +42,7 @@ balde_cgi_stdin_read(balde_app_t *app)
         }
         g_string_append_c(rv, (gchar) ch);
     }
-    return (gchar*) g_string_free(rv, FALSE);
+    return rv;
 }
 
 
@@ -72,7 +72,6 @@ balde_cgi_parse_request(balde_app_t *app)
     rv->query_string = g_strdup(g_getenv("QUERY_STRING"));
     rv->headers = balde_cgi_request_headers();
     rv->body = balde_cgi_stdin_read(app);
-    rv->content_length = balde_cgi_parse_content_length(g_getenv("CONTENT_LENGTH"));
     rv->https = g_getenv("HTTPS") != NULL;
     return rv;
 }
