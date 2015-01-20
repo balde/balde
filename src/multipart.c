@@ -15,6 +15,7 @@
 #include "balde.h"
 #include "multipart.h"
 #include "multipart_parser.h"
+#include "wrappers.h"
 
 
 gchar*
@@ -143,17 +144,6 @@ read_part_data(multipart_parser *p, const char *at, size_t length)
     g_string_append_len(state->file_content, at, length);
 
     return 0;
-}
-
-
-void
-balde_file_free(balde_file_t *file)
-{
-    g_return_if_fail(file != NULL);
-    g_free((gchar*) file->name);
-    g_free((gchar*) file->type);
-    g_string_free(file->content, TRUE);
-    g_free(file);
 }
 
 

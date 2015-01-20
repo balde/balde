@@ -595,6 +595,20 @@ const GString* balde_request_get_body(balde_request_t *request);
 
 
 /**
+ * Saves a file to disk.
+ *
+ * destdir is the path of the destination directory, that must exists before
+ * this function call. if name is NULL, the default name element of the file
+ * structure will be used.
+ *
+ * Returns the path of the file saved on disk or NULL on errors.
+ *
+ */
+gchar* balde_file_save_to_disk(const balde_file_t *file, const gchar *destdir,
+    const gchar *name);
+
+
+/**
  * Sets application error with an HTTP status code
  *
  * It is called "error" to be consistent with GLib naming standards,

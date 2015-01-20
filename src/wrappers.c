@@ -562,3 +562,28 @@ balde_request_env_free(balde_request_env_t *request)
     g_string_free(request->body, TRUE);
     g_free(request);
 }
+
+
+BALDE_API gchar*
+balde_file_save_to_disk(const balde_file_t *file, const gchar *destdir,
+    const gchar *name)
+{
+    const gchar *fname = name != NULL ? name : file->name;
+    if (fname == NULL)
+        return NULL;
+    gchar *fpath = g_build_filename(destdir, fname, NULL);
+    if (g_file_set_contents(fpath, file->content->str, file->content->len, NULL))
+        return fpath;
+    return NULL;
+}
+
+
+void
+balde_file_free(balde_file_t *file)
+{
+    g_return_if_fail(file != NULL);
+    g_free((gchar*) file->name);
+    g_free((gchar*) file->type);
+    g_string_free(file->content, TRUE);
+    g_free(file);
+}

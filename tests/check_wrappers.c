@@ -11,6 +11,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
+#include <glib/gstdio.h>
 #include "../src/balde.h"
 #include "../src/app.h"
 #include "utils.h"
@@ -742,6 +743,76 @@ test_request_get_body_with_empty_body(void)
 }
 
 
+typedef struct {
+    gchar *tmpdir;
+} tmpdir_fixture_t;
+
+
+void
+tmpdir_setup(tmpdir_fixture_t *f, gconstpointer data)
+{
+    f->tmpdir = g_build_filename(g_get_tmp_dir(), "test.balde.XXXXXX", NULL);
+    f->tmpdir = g_mkdtemp(f->tmpdir);
+}
+
+
+void
+tmpdir_teardown(tmpdir_fixture_t *f, gconstpointer data)
+{
+    g_rmdir(f->tmpdir);
+    g_free(f->tmpdir);
+}
+
+
+void
+tmpdir_runner(tmpdir_fixture_t *f, gconstpointer data)
+{
+    ((void (*) (const gchar*)) data) (f->tmpdir);
+}
+
+
+void
+test_file_save_to_disk(gchar *tmpdir)
+{
+    balde_file_t *f = g_new(balde_file_t, 1);
+    f->name = g_strdup("bola.txt");
+    f->type = NULL;
+    f->content = g_string_new("bola\nguda\n");
+    gchar *fname = balde_file_save_to_disk(f, tmpdir, NULL);
+    g_assert(g_str_has_suffix(fname, "bola.txt"));
+    gchar *contents;
+    gsize len;
+    g_file_get_contents(fname, &contents, &len, NULL);
+    g_assert_cmpstr(contents, ==, "bola\nguda\n");
+    g_assert_cmpint(len, ==, 10);
+    g_free(contents);
+    g_unlink(fname);
+    g_free(fname);
+    balde_file_free(f);
+}
+
+
+void
+test_file_save_to_disk_with_new_name(gchar *tmpdir)
+{
+    balde_file_t *f = g_new(balde_file_t, 1);
+    f->name = g_strdup("bola.txt");
+    f->type = NULL;
+    f->content = g_string_new("bola\nguda\n");
+    gchar *fname = balde_file_save_to_disk(f, tmpdir, "chunda.txt");
+    g_assert(g_str_has_suffix(fname, "chunda.txt"));
+    gchar *contents;
+    gsize len;
+    g_file_get_contents(fname, &contents, &len, NULL);
+    g_assert_cmpstr(contents, ==, "bola\nguda\n");
+    g_assert_cmpint(len, ==, 10);
+    g_free(contents);
+    g_unlink(fname);
+    g_free(fname);
+    balde_file_free(f);
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -820,5 +891,11 @@ main(int argc, char** argv)
     g_test_add_func("/wrappers/request_get_body", test_request_get_body);
     g_test_add_func("/wrappers/request_get_body_with_empty_body",
         test_request_get_body_with_empty_body);
+    g_test_add("/wrappers/file_save_to_disk", tmpdir_fixture_t,
+        (gpointer) test_file_save_to_disk, tmpdir_setup, tmpdir_runner,
+        tmpdir_teardown);
+    g_test_add("/wrappers/file_save_to_disk_with_new_name", tmpdir_fixture_t,
+        (gpointer) test_file_save_to_disk_with_new_name, tmpdir_setup,
+        tmpdir_runner, tmpdir_teardown);
     return g_test_run();
 }

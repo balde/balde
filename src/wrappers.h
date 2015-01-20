@@ -59,5 +59,6 @@ void balde_authorization_free(balde_authorization_t *authorization);
 balde_request_t* balde_make_request(balde_app_t *app, balde_request_env_t *env);
 void balde_request_free(balde_request_t *request);
 void balde_request_env_free(balde_request_env_t *request);
+void balde_file_free(balde_file_t *file);
 
 #endif /* _BALDE_WRAPPERS_PRIVATE_H */
