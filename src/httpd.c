@@ -73,11 +73,19 @@ balde_httpd_parse_request(balde_app_t *app, GInputStream *istream)
         content_length = g_ascii_strtoull(clen_str, NULL, 10);
 
     if (content_length > 0) {
-        gchar body_[content_length];
-        gsize real_content_length;
-        g_input_stream_read_all(G_INPUT_STREAM(data), body_, content_length,
-            &real_content_length, NULL, NULL);
-        body = g_string_new_len(body_, real_content_length);
+        gchar body_[1024];
+        gssize real_content_length = 0;
+        gssize size;
+        gssize to_read = sizeof(body_);
+        body = g_string_new(NULL);
+        while (real_content_length < content_length) {
+            if (content_length - real_content_length < to_read)
+                to_read = content_length - real_content_length;
+            size = g_input_stream_read(G_INPUT_STREAM(data), body_, to_read,
+                NULL, NULL);
+            g_string_append_len(body, body_, size);
+            real_content_length += size;
+        }
     }
 
     g_object_unref(data);
