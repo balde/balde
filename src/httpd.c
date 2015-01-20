@@ -169,7 +169,7 @@ balde_incoming_callback(GThreadedSocketService *service,
     GString *response = balde_app_main_loop(app, parser_data->env,
         balde_httpd_response_render, &status_code);
     GOutputStream *ostream = g_io_stream_get_output_stream(G_IO_STREAM(connection));
-    g_output_stream_write(ostream, response->str, response->len, NULL, &error);
+    g_output_stream_write_all(ostream, response->str, response->len, NULL, NULL, &error);
     g_string_free(response, TRUE);
     if (error != NULL) {
         g_printerr("Failed to send: %s\n", error->message);
