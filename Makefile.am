@@ -492,7 +492,8 @@ tests_check_multipart_SOURCES = \
 
 tests_check_multipart_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/tests
 
 tests_check_multipart_LDFLAGS = \
 	-static \
@@ -655,7 +656,8 @@ tests_check_wrappers_SOURCES = \
 
 tests_check_wrappers_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/tests
 
 tests_check_wrappers_LDFLAGS = \
 	-static \
