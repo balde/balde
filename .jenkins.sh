@@ -39,6 +39,7 @@ pushd "${BALDE_BUILD_DIR}" > /dev/null
 "${BALDE_SRC_DIR}"/configure \
     CFLAGS="-O2 -g -Wall" \
     --enable-examples \
+    --enable-fastcgi \
     --enable-http \
     --with-leg \
     --with-valgrind
