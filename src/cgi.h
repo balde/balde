@@ -11,7 +11,7 @@
 
 #include <glib.h>
 #include "balde.h"
-#include "wrappers.h"
+#include "requests.h"
 
 guint64 balde_cgi_parse_content_length(const gchar *str);
 GString* balde_cgi_stdin_read(balde_app_t *app);

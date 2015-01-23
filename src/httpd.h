@@ -12,7 +12,8 @@
 #include <glib.h>
 #include <gio/gio.h>
 #include "balde.h"
-#include "wrappers.h"
+#include "requests.h"
+#include "responses.h"
 
 typedef struct {
     balde_request_env_t *env;

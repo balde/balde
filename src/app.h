@@ -12,7 +12,8 @@
 #include <glib.h>
 #include "balde.h"
 #include "routing.h"
-#include "wrappers.h"
+#include "requests.h"
+#include "responses.h"
 
 #define BALDE_APP_READ_ONLY(app)                                            \
     if ((app)->copy)                                                        \

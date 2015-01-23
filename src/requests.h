@@ -6,8 +6,8 @@
  * See the file COPYING.
  */
 
-#ifndef _BALDE_WRAPPERS_PRIVATE_H
-#define _BALDE_WRAPPERS_PRIVATE_H
+#ifndef _BALDE_REQUESTS_PRIVATE_H
+#define _BALDE_REQUESTS_PRIVATE_H
 
 #include <glib.h>
 #include "balde.h"
@@ -35,21 +35,6 @@ struct _balde_request_private_t {
     balde_session_t *session;
 };
 
-struct _balde_response_private_t {
-    GHashTable *headers;
-    GHashTable *template_ctx;
-    GString *body;
-};
-
-void balde_response_headers_free(gpointer l);
-void balde_response_free(balde_response_t *response);
-balde_response_t* balde_make_response_from_gstring(GString *content);
-balde_response_t* balde_make_response_from_exception(GError *error);
-void balde_fix_header_name(gchar *name);
-void balde_header_render(const gchar *key, GSList *value, GString *str);
-GString* balde_response_render(balde_response_t *response,
-    const gboolean with_body);
-void balde_response_print(GString *response);
 gchar* balde_parse_header_name_from_envvar(const gchar *env_name);
 gchar* balde_urldecode(const gchar* str);
 GHashTable* balde_parse_query_string(const gchar *query_string);

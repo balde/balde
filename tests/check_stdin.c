@@ -14,7 +14,7 @@
 #include <string.h>
 #include "../src/balde.h"
 #include "../src/cgi.h"
-#include "../src/wrappers.h"
+#include "../src/requests.h"
 
 const gchar *query_string = "guda=bola&moises=arcoiro";
 

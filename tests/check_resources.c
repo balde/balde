@@ -14,7 +14,8 @@
 #include "../src/balde.h"
 #include "../src/app.h"
 #include "../src/resources.h"
-#include "../src/wrappers.h"
+#include "../src/requests.h"
+#include "../src/responses.h"
 #include "resources.h"
 
 

@@ -19,7 +19,7 @@
 #include "app.h"
 #include "cgi.h"
 #include "fcgi.h"
-#include "wrappers.h"
+#include "requests.h"
 
 
 GHashTable*

@@ -13,7 +13,8 @@
 #include <glib.h>
 #include "../src/balde.h"
 #include "../src/app.h"
-#include "../src/wrappers.h"
+#include "../src/requests.h"
+#include "../src/responses.h"
 
 
 static guint i = 0;

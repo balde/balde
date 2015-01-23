@@ -12,7 +12,7 @@
 #include <glib.h>
 #include <fcgiapp.h>
 #include "balde.h"
-#include "../src/wrappers.h"
+#include "requests.h"
 
 typedef struct {
     balde_app_t *app;

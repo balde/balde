@@ -21,7 +21,8 @@
 #include "exceptions.h"
 #include "resources.h"
 #include "routing.h"
-#include "wrappers.h"
+#include "requests.h"
+#include "responses.h"
 
 #ifdef BUILD_HTTP
 #include "httpd.h"

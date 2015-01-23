@@ -89,10 +89,11 @@ noinst_HEADERS = \
 	src/httpd.h \
 	src/multipart.h \
 	src/multipart_parser.h \
+	src/requests.h \
 	src/resources.h \
+	src/responses.h \
 	src/routing.h \
 	src/sessions.h \
-	src/wrappers.h \
 	src/template/template.h \
 	src/template/parser.h \
 	src/utils.h \
@@ -115,14 +116,15 @@ check_PROGRAMS = \
 	tests/check_datetime \
 	tests/check_exceptions \
 	tests/check_multipart \
+	tests/check_requests \
 	tests/check_resources \
+	tests/check_responses \
 	tests/check_routing \
 	tests/check_sessions \
 	tests/check_stdin \
 	tests/check_template \
 	tests/check_template_helpers \
-	tests/check_utils \
-	tests/check_wrappers
+	tests/check_utils
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = balde.pc
@@ -137,12 +139,13 @@ libbalde_la_SOURCES = \
 	src/exceptions.c \
 	src/multipart.c \
 	src/multipart_parser.c \
+	src/requests.c \
 	src/resources.c \
+	src/responses.c \
 	src/routing.c \
 	src/sessions.c \
 	src/template-helpers.c \
-	src/utils.c \
-	src/wrappers.c
+	src/utils.c
 
 libbalde_la_CFLAGS = \
 	-fvisibility=hidden \
@@ -649,21 +652,37 @@ tests_check_utils_LDADD = \
 	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
-tests_check_wrappers_SOURCES = \
-	tests/check_wrappers.c \
-	tests/utils.c \
-	tests/mock_wrappers.c
+tests_check_requests_SOURCES = \
+	tests/check_requests.c \
+	tests/utils.c
 
-tests_check_wrappers_CFLAGS = \
+tests_check_requests_CFLAGS = \
 	$(GLIB_CFLAGS) \
 	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/tests
 
-tests_check_wrappers_LDFLAGS = \
+tests_check_requests_LDFLAGS = \
 	-static \
 	-no-install
 
-tests_check_wrappers_LDADD = \
+tests_check_requests_LDADD = \
+	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
+
+tests_check_responses_SOURCES = \
+	tests/check_responses.c \
+	tests/mock_responses.c
+
+tests_check_responses_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS)
+
+tests_check_responses_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_responses_LDADD = \
 	$(GLIB_LIBS) \
 	$(JSON_GLIB_LIBS) \
 	libbalde.la
