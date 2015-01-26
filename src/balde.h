@@ -280,6 +280,15 @@ typedef struct {
 
 
 /**
+ * balde generic value type
+ *
+ * This struct stores arbitrary data from some supported data types.
+ *
+ */
+typedef struct _balde_value_t balde_value_t;
+
+
+/**
  * View type definition
  *
  * Each view should accept the application context and the request context,
@@ -707,5 +716,26 @@ void balde_resources_load(balde_app_t *app, GResource *resources);
  */
 gchar* balde_tmpl_url_for(balde_app_t *app, balde_request_t *request,
     const gchar *endpoint, gboolean external, ...);
+
+
+#define DECLARE_VALUE_FUNC(type)                                             \
+    balde_value_t* balde_value_##type(g##type value);
+
+DECLARE_VALUE_FUNC(boolean);
+DECLARE_VALUE_FUNC(char);
+DECLARE_VALUE_FUNC(uchar);
+DECLARE_VALUE_FUNC(int);
+DECLARE_VALUE_FUNC(uint);
+DECLARE_VALUE_FUNC(long);
+DECLARE_VALUE_FUNC(ulong);
+DECLARE_VALUE_FUNC(int64);
+DECLARE_VALUE_FUNC(uint64);
+DECLARE_VALUE_FUNC(float);
+DECLARE_VALUE_FUNC(double);
+
+#undef DECLARE_VALUE_FUNC
+
+gchar* balde_value_to_string(balde_value_t *value);
+
 
 #endif /* _BALDE_H */

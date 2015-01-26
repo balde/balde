@@ -97,6 +97,7 @@ noinst_HEADERS = \
 	src/template/template.h \
 	src/template/parser.h \
 	src/utils.h \
+	src/value.h \
 	tests/utils.h
 
 lib_LTLIBRARIES = \
@@ -145,7 +146,8 @@ libbalde_la_SOURCES = \
 	src/routing.c \
 	src/sessions.c \
 	src/template-helpers.c \
-	src/utils.c
+	src/utils.c \
+	src/value.c
 
 libbalde_la_CFLAGS = \
 	-fvisibility=hidden \
