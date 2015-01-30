@@ -151,14 +151,16 @@ balde_template_generate_source(const gchar *template_name, const gchar *file_nam
     g_string_append_printf(rv,
         "\n"
         "static const gchar *balde_template_%s_format = \"%s\";\n"
+        "extern gchar* balde_str_template_%s(balde_app_t *app, "
+        "balde_request_t *request, balde_response_t *response);\n"
         "extern void balde_template_%s(balde_app_t *app, balde_request_t *request, "
         "balde_response_t *response);\n"
         "\n"
-        "void\n"
-        "balde_template_%s(balde_app_t *app, balde_request_t *request, "
+        "gchar*\n"
+        "balde_str_template_%s(balde_app_t *app, balde_request_t *request, "
         "balde_response_t *response)\n"
         "{\n",
-        template_name, escaped, template_name, template_name);
+        template_name, escaped, template_name, template_name, template_name);
 
     for (GSList *tmp = state->decls; tmp != NULL; tmp = g_slist_next(tmp))
         g_string_append_printf(rv, "    %s;\n", (gchar*) tmp->data);
@@ -182,14 +184,21 @@ balde_template_generate_source(const gchar *template_name, const gchar *file_nam
             g_string_append(rv, ");\n");
     }
 
-    g_string_append(rv,
-        "    balde_response_append_body(response, rv);\n"
-        "    g_free(rv);\n");
-
     for (GSList *tmp = state->free_decls; tmp != NULL; tmp = g_slist_next(tmp))
         g_string_append_printf(rv, "    g_free(%s);\n", (gchar*) tmp->data);
 
-    g_string_append(rv, "}\n");
+    g_string_append_printf(rv,
+        "    return rv;\n"
+        "}\n"
+        "\n"
+        "void\n"
+        "balde_template_%s(balde_app_t *app, balde_request_t *request, "
+        "balde_response_t *response)\n"
+        "{\n"
+        "    gchar *rv = balde_str_template_%s(app, request, response);\n"
+        "    balde_response_append_body(response, rv);\n"
+        "    g_free(rv);\n"
+        "}\n", template_name, template_name);
 
     g_free(escaped);
     balde_template_free_state(state);
@@ -209,10 +218,12 @@ balde_template_generate_header(const gchar *template_name)
         "\n"
         "#include <balde.h>\n"
         "\n"
+        "extern gchar* balde_str_template_%s(balde_app_t *app, "
+        "balde_request_t *request, balde_response_t *response);\n"
         "extern void balde_template_%s(balde_app_t *app, balde_request_t *request, "
         "balde_response_t *response);\n"
         "\n"
-        "#endif\n", template_name, template_name, template_name);
+        "#endif\n", template_name, template_name, template_name, template_name);
 }
 
 
