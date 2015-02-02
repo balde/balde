@@ -37,6 +37,25 @@ balde_assert_template_include(GSList *l, const gchar *include)
 
 
 void
+balde_assert_template_if(GSList *l, const gchar *if_var)
+{
+    balde_template_block_t *node = l->data;
+    g_assert(node->type == BALDE_TEMPLATE_IF_BLOCK);
+    balde_template_if_block_t *block = node->block;
+    g_assert_cmpstr(block->if_var, ==, if_var);
+}
+
+
+void
+balde_assert_template_if_end(GSList *l)
+{
+    balde_template_block_t *node = l->data;
+    g_assert(node->type == BALDE_TEMPLATE_IF_END_BLOCK);
+    g_assert(node->block == NULL);
+}
+
+
+void
 balde_assert_template_content(GSList *l, const gchar *content)
 {
     balde_template_block_t *node = l->data;
@@ -559,7 +578,9 @@ test_template_parse(void)
         "foo {{ bola(gude, 'asd', \"zxc\", TRUE, NULL, 1.5, -2, \"chun\\\"da\", 'gu\\'da', FALSE, xd, +5, \"\") }}\n"
         "  {{ test }} \n"
         "    {% include 'foo.html' %}\n"
+        "{% if chunda %}\n"
         "bola\n"
+        "{% endif %}\n"
         "{% import 'asd.h' %}");
     g_assert(blocks != NULL);
     balde_assert_template_content(blocks, "Test\n\n   ");
@@ -575,10 +596,17 @@ test_template_parse(void)
     balde_assert_template_include(blocks->next->next->next->next->next->next->next,
         "foo.html");
     balde_assert_template_content(blocks->next->next->next->next->next->next->next->next,
+        "\n");
+    balde_assert_template_if(blocks->next->next->next->next->next->next->next->next->next,
+        "chunda");
+    balde_assert_template_content(blocks->next->next->next->next->next->next->next->next->next->next,
         "\nbola\n");
-    balde_assert_template_import(blocks->next->next->next->next->next->next->next->next->next,
+    balde_assert_template_if_end(blocks->next->next->next->next->next->next->next->next->next->next->next);
+    balde_assert_template_content(blocks->next->next->next->next->next->next->next->next->next->next->next->next,
+        "\n");
+    balde_assert_template_import(blocks->next->next->next->next->next->next->next->next->next->next->next->next->next,
         "asd.h");
-    g_assert(blocks->next->next->next->next->next->next->next->next->next->next == NULL);
+    g_assert(blocks->next->next->next->next->next->next->next->next->next->next->next->next->next->next == NULL);
     balde_template_free_blocks(blocks);
 }
 

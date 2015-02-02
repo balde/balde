@@ -18,6 +18,7 @@
 }
 
 static GSList *nodes = NULL;
+static gint if_count = 0;
 static gchar *fn_name = NULL;
 static GSList *fn_args = NULL;
 static balde_template_fn_arg_type_t fn_arg_type;
@@ -46,6 +47,32 @@ balde_template_include_block(const gchar *include)
     node->type = BALDE_TEMPLATE_INCLUDE_BLOCK;
     nodes = g_slist_append(nodes, node);
 }
+
+
+static void
+balde_template_if_block(const gchar *if_var)
+{
+    balde_template_if_block_t *block = g_new(balde_template_if_block_t, 1);
+    block->if_var = g_strdup(if_var);
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = block;
+    node->type = BALDE_TEMPLATE_IF_BLOCK;
+    nodes = g_slist_append(nodes, node);
+    if_count++;
+}
+
+
+static void
+balde_template_endif_block(void)
+{
+    if (if_count-- <= 0)
+        g_error("Syntax error: {" "%% endif %%" "} block before any {" "%% if ... %%" "} block");
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = NULL;
+    node->type = BALDE_TEMPLATE_IF_END_BLOCK;
+    nodes = g_slist_append(nodes, node);
+}
+
 
 static void
 balde_template_content_block(const gchar *content)
@@ -107,8 +134,8 @@ balde_template_print_block(void)
 
 %}
 
-page = import | include | print_call | content | anything
-    { g_printerr("Syntax error near: %s\n", yytext); }
+page = import | include | if | if_end | print_call | content | anything
+    { g_error("Syntax error near: %s", yytext); }
 
 
 # Useful rules
@@ -139,6 +166,12 @@ include_close = - '%}'
 include = include_open 'include' ' '+ str include_close
     { balde_template_include_block(yytext); }
 
+# Conditionals
+if_open = '{%' -
+if_close = - '%}'
+if = if_open 'if' ' '+ < id > if_close  { balde_template_if_block(yytext); }
+if_end = if_open 'endif' if_close       { balde_template_endif_block(); }
+
 # Print calls
 print_open = '{{' -
 print_close = - '}}'
@@ -162,18 +195,26 @@ print_fn = print_fn_id - '(' print_fn_args ')'
 print_call = print_open ( print_fn | print_var ) print_close
 
 # Generic content
-content = < ( !eof !import_open !import_close !include_open !include_close !print_open !print_close . )+ >
+content = < ( !eof !import_open !import_close !include_open !include_close !if_open !if_close !print_open !print_close . )+ >
     { balde_template_content_block(yytext); }
 
 %%
 
+
+G_LOCK_DEFINE_STATIC(parse);
+
 GSList*
 balde_template_parse(const gchar *tmpl)
 {
+    G_LOCK(parse);
+    if_count = 0;
     charbuf = tmpl;
     while(yyparse());
+    if (if_count != 0)
+        g_error("Syntax error: You left %d open {" "%% if ... %%" "} blocks.", if_count);
     GSList *rv = nodes;
     charbuf = NULL;
     nodes = NULL;
+    G_UNLOCK(parse);
     return rv;
 }
