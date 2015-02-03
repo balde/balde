@@ -52,6 +52,7 @@ balde_template_free_blocks(GSList *blocks)
                 ifblock = block->block;
                 g_free(ifblock->if_var);
                 break;
+            case BALDE_TEMPLATE_ELSE_BLOCK:
             case BALDE_TEMPLATE_IF_END_BLOCK:
                 break;
             case BALDE_TEMPLATE_CONTENT_BLOCK:

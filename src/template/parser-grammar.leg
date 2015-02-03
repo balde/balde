@@ -48,7 +48,6 @@ balde_template_include_block(const gchar *include)
     nodes = g_slist_append(nodes, node);
 }
 
-
 static void
 balde_template_if_block(const gchar *if_var)
 {
@@ -61,6 +60,16 @@ balde_template_if_block(const gchar *if_var)
     if_count++;
 }
 
+static void
+balde_template_else_block(void)
+{
+    if (if_count <= 0)
+        g_error("Syntax error: {" "%% else %%" "} block without any open {" "%% if ... %%" "} block");
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = NULL;
+    node->type = BALDE_TEMPLATE_ELSE_BLOCK;
+    nodes = g_slist_append(nodes, node);
+}
 
 static void
 balde_template_endif_block(void)
@@ -72,7 +81,6 @@ balde_template_endif_block(void)
     node->type = BALDE_TEMPLATE_IF_END_BLOCK;
     nodes = g_slist_append(nodes, node);
 }
-
 
 static void
 balde_template_content_block(const gchar *content)
@@ -134,7 +142,7 @@ balde_template_print_block(void)
 
 %}
 
-page = import | include | if | if_end | print_call | content | anything
+page = import | include | if | else | if_end | print_call | content | anything
     { g_error("Syntax error near: %s", yytext); }
 
 
@@ -170,6 +178,7 @@ include = include_open 'include' ' '+ str include_close
 if_open = '{%' -
 if_close = - '%}'
 if = if_open 'if' ' '+ < id > if_close  { balde_template_if_block(yytext); }
+else = if_open 'else' if_close          { balde_template_else_block(); }
 if_end = if_open 'endif' if_close       { balde_template_endif_block(); }
 
 # Print calls

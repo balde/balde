@@ -47,6 +47,15 @@ balde_assert_template_if(GSList *l, const gchar *if_var)
 
 
 void
+balde_assert_template_else(GSList *l)
+{
+    balde_template_block_t *node = l->data;
+    g_assert(node->type == BALDE_TEMPLATE_ELSE_BLOCK);
+    g_assert(node->block == NULL);
+}
+
+
+void
 balde_assert_template_if_end(GSList *l)
 {
     balde_template_block_t *node = l->data;
@@ -249,7 +258,7 @@ test_template_generate_source_with_include_with_url_for(void)
 
 
 void
-test_template_generate_source_with_include_with_if(void)
+test_template_generate_source_with_if(void)
 {
     gchar *tmpl = get_template("base3.html");
     gchar *exp = get_expected_template("base3.c");
@@ -262,10 +271,23 @@ test_template_generate_source_with_include_with_if(void)
 
 
 void
-test_template_generate_source_with_include_with_multiple_if(void)
+test_template_generate_source_with_multiple_if(void)
 {
     gchar *tmpl = get_template("base4.html");
     gchar *exp = get_expected_template("base4.c");
+    gchar *rv = balde_template_generate_source("bola", tmpl);
+    g_free(tmpl);
+    balde_assert_template_equal(rv, exp);
+    g_free(rv);
+    g_free(exp);
+}
+
+
+void
+test_template_generate_source_with_else(void)
+{
+    gchar *tmpl = get_template("base5.html");
+    gchar *exp = get_expected_template("base5.c");
     gchar *rv = balde_template_generate_source("bola", tmpl);
     g_free(tmpl);
     balde_assert_template_equal(rv, exp);
@@ -317,6 +339,8 @@ test_template_parse(void)
         "    {% include 'foo.html' %}\n"
         "{% if chunda %}\n"
         "bola\n"
+        "{% else %}\n"
+        "guda\n"
         "{% endif %}\n"
         "{% import 'asd.h' %}");
     g_assert(blocks != NULL);
@@ -338,12 +362,15 @@ test_template_parse(void)
         "chunda");
     balde_assert_template_content(blocks->next->next->next->next->next->next->next->next->next->next,
         "\nbola\n");
-    balde_assert_template_if_end(blocks->next->next->next->next->next->next->next->next->next->next->next);
+    balde_assert_template_else(blocks->next->next->next->next->next->next->next->next->next->next->next);
     balde_assert_template_content(blocks->next->next->next->next->next->next->next->next->next->next->next->next,
+        "\nguda\n");
+    balde_assert_template_if_end(blocks->next->next->next->next->next->next->next->next->next->next->next->next->next);
+    balde_assert_template_content(blocks->next->next->next->next->next->next->next->next->next->next->next->next->next->next,
         "\n");
-    balde_assert_template_import(blocks->next->next->next->next->next->next->next->next->next->next->next->next->next,
+    balde_assert_template_import(blocks->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next,
         "asd.h");
-    g_assert(blocks->next->next->next->next->next->next->next->next->next->next->next->next->next->next == NULL);
+    g_assert(blocks->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next->next == NULL);
     balde_template_free_blocks(blocks);
 }
 
@@ -374,10 +401,12 @@ main(int argc, char** argv)
         test_template_generate_source_with_include);
     g_test_add_func("/template/generate_source_with_include_with_url_for",
         test_template_generate_source_with_include_with_url_for);
-    g_test_add_func("/template/generate_source_with_include_with_if",
-        test_template_generate_source_with_include_with_if);
-    g_test_add_func("/template/generate_source_with_include_with_multiple_if",
-        test_template_generate_source_with_include_with_multiple_if);
+    g_test_add_func("/template/generate_source_with_if",
+        test_template_generate_source_with_if);
+    g_test_add_func("/template/generate_source_with_multiple_if",
+        test_template_generate_source_with_multiple_if);
+    g_test_add_func("/template/generate_source_with_else",
+        test_template_generate_source_with_else);
     g_test_add_func("/template/generate_header",
         test_template_generate_header);
     g_test_add_func("/template/get_name", test_template_get_name);

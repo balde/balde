@@ -72,6 +72,11 @@ balde_template_build_state(const gchar *filename, balde_template_state_t **state
                     ((balde_template_if_block_t*) node->block)->if_var);
                 (*state)->indent += 4;
                 break;
+            case BALDE_TEMPLATE_ELSE_BLOCK:
+                g_string_append_printf((*state)->body,
+                    "%*s}\n"
+                    "%*selse {\n", (*state)->indent - 4, "", (*state)->indent - 4, "");
+                break;
             case BALDE_TEMPLATE_IF_END_BLOCK:
                 (*state)->indent -= 4;
                 g_string_append_printf((*state)->body, "%*s}\n", (*state)->indent, "");
