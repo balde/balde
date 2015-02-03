@@ -42,18 +42,35 @@ EXTRA_DIST = \
 	tests/static/lol.css \
 	tests/static/lol.js \
 	tests/static/zz.sh \
+	tests/templates/base.c \
 	tests/templates/base.html \
+	tests/templates/base2.c \
 	tests/templates/base2.html \
+	tests/templates/base3.c \
+	tests/templates/base3.html \
+	tests/templates/base4.c \
+	tests/templates/base4.html \
+	tests/templates/base5.c \
+	tests/templates/base5.html \
 	tests/templates/body.html \
 	tests/templates/body2.html \
+	tests/templates/foo.c \
 	tests/templates/foo.html \
+	tests/templates/foo2.c \
 	tests/templates/foo2.html \
+	tests/templates/foo3.c \
 	tests/templates/foo3.html \
+	tests/templates/foo4.c \
 	tests/templates/foo4.html \
+	tests/templates/foo5.c \
 	tests/templates/foo5.html \
+	tests/templates/foo6.c \
 	tests/templates/foo6.html \
+	tests/templates/foo7.c \
 	tests/templates/foo7.html \
+	tests/templates/foo8.c \
 	tests/templates/foo8.html \
+	tests/templates/foo9.c \
 	tests/templates/foo9.html \
 	tests/uploads/simple.txt \
 	tests/uploads/without-filename.txt \
