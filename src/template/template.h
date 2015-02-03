@@ -13,11 +13,9 @@
 
 typedef struct {
     GSList *includes;
-    GSList *decls;
-    GSList *free_decls;
-    GSList *args;
-    GString *format;
-    guint decl_count;
+    GString *body;
+    guint indent;
+    gboolean declare_tmp;
 } balde_template_state_t;
 
 void balde_template_build_state(const gchar *filename, balde_template_state_t **state);

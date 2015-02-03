@@ -499,6 +499,16 @@ const gchar* balde_response_get_tmpl_var(balde_response_t *response,
 
 
 /**
+ * Gets a template variable and returns an empty string, if not found.
+ *
+ * The template variable name *IS* case-sensitive.
+ *
+ */
+const gchar* balde_response_get_tmpl_var_or_empty(balde_response_t *response,
+    const gchar *name);
+
+
+/**
  * Sets a cookie.
  *
  * Integer arguments should be set to -1 to be ignored.

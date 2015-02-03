@@ -10,6 +10,7 @@
 #define _BALDE_TESTS_UTILS_H
 
 gchar* get_template(const gchar *filename);
+gchar* get_expected_template(const gchar *filename);
 GString* get_upload(const gchar *filename);
 
 #endif

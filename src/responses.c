@@ -109,6 +109,16 @@ balde_response_get_tmpl_var(balde_response_t *response, const gchar *name)
 }
 
 
+BALDE_API const gchar*
+balde_response_get_tmpl_var_or_empty(balde_response_t *response, const gchar *name)
+{
+    const gchar *rv = balde_response_get_tmpl_var(response, name);
+    if (rv == NULL)
+        return "";
+    return rv;
+}
+
+
 BALDE_API void
 balde_response_set_cookie(balde_response_t *response, const gchar *name,
     const gchar *value, const gint max_age, const gint64 expires,
