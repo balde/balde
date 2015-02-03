@@ -28,7 +28,6 @@ balde_template_build_state(const gchar *filename, balde_template_state_t **state
         (*state)->declare_tmp = FALSE;
     }
 
-    GRegex *re_percent = g_regex_new("%", 0, 0, NULL);
     gchar *dirname = g_path_get_dirname(filename);
     gchar *template_source;
     if (!g_file_get_contents(filename, &template_source, NULL, NULL))
@@ -126,7 +125,6 @@ balde_template_build_state(const gchar *filename, balde_template_state_t **state
 
     balde_template_free_blocks(blocks);
     g_free(dirname);
-    g_regex_unref(re_percent);
 }
 
 
