@@ -32,12 +32,12 @@ balde_template_build_state(const gchar *filename, balde_template_state_t **state
     gchar *template_source;
     if (!g_file_get_contents(filename, &template_source, NULL, NULL))
         g_error("Failed to read source file: %s\n", filename);
-    GSList *blocks = balde_template_parse(template_source);
+    GList *blocks = balde_template_parse(template_source);
     g_free(template_source);
 
     gchar *tmp_str;
 
-    for (GSList *tmp = blocks; tmp != NULL; tmp = g_slist_next(tmp)) {
+    for (GList *tmp = blocks; tmp != NULL; tmp = g_list_next(tmp)) {
         balde_template_block_t *node = tmp->data;
         switch (node->type) {
             case BALDE_TEMPLATE_IMPORT_BLOCK:

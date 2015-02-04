@@ -27,7 +27,7 @@ balde_unescape_single_quoted_strings(gchar** str)
 
 
 void
-balde_template_free_blocks(GSList *blocks)
+balde_template_free_blocks(GList *blocks)
 {
     balde_template_block_t *block;
     balde_template_import_block_t *imblock;
@@ -37,7 +37,7 @@ balde_template_free_blocks(GSList *blocks)
     balde_template_print_var_block_t *vblock;
     balde_template_print_fn_call_block_t *fblock;
     balde_template_fn_arg_t *arg;
-    for(GSList *tmp = blocks; tmp != NULL; tmp = g_slist_next(tmp)) {
+    for(GList *tmp = blocks; tmp != NULL; tmp = g_list_next(tmp)) {
         block = tmp->data;
         switch(block->type) {
             case BALDE_TEMPLATE_IMPORT_BLOCK:
@@ -77,5 +77,5 @@ balde_template_free_blocks(GSList *blocks)
         g_free(block->block);
         g_free(block);
     }
-    g_slist_free(blocks);
+    g_list_free(blocks);
 }

@@ -67,7 +67,7 @@ typedef struct {
 } balde_template_block_t;
 
 void balde_unescape_single_quoted_strings(gchar** str);
-GSList* balde_template_parse(const gchar *tmpl);
-void balde_template_free_blocks(GSList *blocks);
+GList* balde_template_parse(const gchar *tmpl);
+void balde_template_free_blocks(GList *blocks);
 
 #endif /* _BALDE_TEMPLATE_PARSER_H */
