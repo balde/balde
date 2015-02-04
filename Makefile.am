@@ -52,6 +52,12 @@ EXTRA_DIST = \
 	tests/templates/base4.html \
 	tests/templates/base5.c \
 	tests/templates/base5.html \
+	tests/templates/base6.c \
+	tests/templates/base6.html \
+	tests/templates/base7.c \
+	tests/templates/base7.html \
+	tests/templates/base8.c \
+	tests/templates/base8.html \
 	tests/templates/body.html \
 	tests/templates/body2.html \
 	tests/templates/foo.c \
@@ -624,6 +630,12 @@ tests_check_template_LDADD = \
 tests/tests_check_template-check_template.$(OBJEXT): \
 	tests/templates/base.html \
 	tests/templates/base2.html \
+	tests/templates/base3.html \
+	tests/templates/base4.html \
+	tests/templates/base5.html \
+	tests/templates/base6.html \
+	tests/templates/base7.html \
+	tests/templates/base8.html \
 	tests/templates/body.html \
 	tests/templates/body2.html \
 	tests/templates/foo.html \
