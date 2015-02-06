@@ -778,11 +778,11 @@ doc-html: docs/conf.py
 	test "$(top_builddir)" = "$(top_srcdir)" \
 		|| cp $(top_builddir)/docs/conf.py $(top_srcdir)/docs/
 	$(SPHINX_BUILD) \
-		-b html \
+		-b dirhtml \
 		-d $(top_builddir)/docs/_build/doctrees \
 		$(SPHINXOPTS) \
 		$(top_srcdir)/docs/ \
-		$(top_builddir)/docs/_build/html
+		$(top_builddir)/docs/_build/dirhtml
 
 if BUILD_DOCS_PDF
 doc-pdf: docs/conf.py
