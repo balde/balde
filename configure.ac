@@ -73,35 +73,41 @@ AS_IF([test "x$enable_examples" = "xyes"], [
 ])
 AM_CONDITIONAL([BUILD_EXAMPLES], [test "x$build_examples" = "xyes"])
 
-AC_ARG_WITH([doxygen], AS_HELP_STRING([--without-doxygen],
-            [ignore presence of doxygen and disable documentation build]))
-AS_IF([test "x$with_doxygen" != "xno"], [
-  AC_PATH_PROG([doxygen], [doxygen])
-  AS_IF([test "x$ac_cv_path_doxygen" = "x"], [
-    have_doxygen=no
+AC_ARG_ENABLE([doc], AS_HELP_STRING([--disable-doc],
+              [disable documentation build]))
+AS_IF([test "x$enable_doc" != "xno"], [
+  AC_PATH_PROG([sphinx_build], [sphinx-build])
+  AS_IF([test "x$ac_cv_path_sphinx_build" = "x"], [
+    have_sphinx_build=no
   ], [
-    have_doxygen=yes
+    have_sphinx_build=yes
   ])
   AC_PATH_PROG([github_pages_publish], [github-pages-publish])
+
+  # FIXME: check for LaTeX stuff required by sphinx
+  AC_PATH_PROG([pdflatex], [pdflatex])
 ])
-AS_IF([test "x$have_doxygen" = "xyes"], , [
-  AS_IF([test "x$with_doxygen" = "xyes"], [
-    AC_MSG_ERROR([doxygen requested but not found])
+AS_IF([test "x$have_sphinx_build" = "xyes"], , [
+  AS_IF([test "x$enable_doc" = "xyes"], [
+    AC_MSG_ERROR([sphinx-build requested but not found])
   ])
 ])
 
-AM_CONDITIONAL([BUILD_DOCS], [test "x$have_doxygen" = "xyes"])
+AM_CONDITIONAL([BUILD_DOCS], [test "x$have_sphinx_build" = "xyes"])
+AM_CONDITIONAL([BUILD_DOCS_PDF], [test "x$ac_cv_path_pdflatex" != "x"])
 AM_CONDITIONAL([PUBLISH_DOCS], [test "x$ac_cv_path_github_pages_publish" != "x"])
 
-DOXYGEN="$ac_cv_path_doxygen"
+SPHINX_BUILD="$ac_cv_path_sphinx_build"
 GITHUB_PAGES_PUBLISH="$ac_cv_path_github_pages_publish"
+PDFLATEX="$ac_cv_path_pdflatex"
 
-AC_SUBST(DOXYGEN)
+AC_SUBST(SPHINX_BUILD)
 AC_SUBST(GITHUB_PAGES_PUBLISH)
+AC_SUBST(PDFLATEX)
 
-AC_ARG_WITH([valgrind], AS_HELP_STRING([--without-valgrind],
-            [ignore presence of valgrind]))
-AS_IF([test "x$with_valgrind" != "xno"], [
+AC_ARG_ENABLE([valgrind], AS_HELP_STRING([--disable-valgrind],
+              [ignore presence of valgrind]))
+AS_IF([test "x$enable_valgrind" != "xno"], [
   AC_PATH_PROG([valgrind], [valgrind])
   AS_IF([test "x$ac_cv_path_valgrind" = "x"], [
     have_valgrind=no
@@ -110,7 +116,7 @@ AS_IF([test "x$with_valgrind" != "xno"], [
   ])
 ])
 AS_IF([test "x$have_valgrind" = "xyes"], , [
-  AS_IF([test "x$with_valgrind" = "xyes"], [
+  AS_IF([test "x$enable_valgrind" = "xyes"], [
     AC_MSG_ERROR([valgrind requested but not found])
   ])
 ])
@@ -118,9 +124,9 @@ AM_CONDITIONAL([USE_VALGRIND], [test "x$have_valgrind" = "xyes"])
 VALGRIND="$ac_cv_path_valgrind"
 AC_SUBST(VALGRIND)
 
-AC_ARG_WITH([leg], AS_HELP_STRING([--without-leg],
-            [ignore presence of peg/leg and disable template parser grammar regeneration]))
-AS_IF([test "x$with_leg" != "xno"], [
+AC_ARG_ENABLE([leg], AS_HELP_STRING([--disable-leg],
+              [ignore presence of peg/leg and disable template parser grammar regeneration]))
+AS_IF([test "x$enable_leg" != "xno"], [
   AC_PATH_PROG([leg], [leg])
   AS_IF([test "x$ac_cv_path_leg" = "x"], [
     have_leg=no
@@ -129,7 +135,7 @@ AS_IF([test "x$with_leg" != "xno"], [
   ])
 ])
 AS_IF([test "x$have_leg" = "xyes"], , [
-  AS_IF([test "x$with_leg" = "xyes"], [
+  AS_IF([test "x$enable_leg" = "xyes"], [
     AC_MSG_ERROR([peg/leg requested but not found])
   ])
 ])
@@ -154,7 +160,7 @@ AC_SUBST(GLIB_COMPILE_RESOURCES)
 AC_CONFIG_FILES([
     Makefile
     balde.pc
-    Doxyfile
+    docs/conf.py
     tests/utils.c
 ])
 AC_OUTPUT
@@ -174,7 +180,8 @@ AS_ECHO("
         http:         ${HTTP}
         examples:     ${EXAMPLES}
 
-        doxygen:      ${DOXYGEN}
+        sphinx-build: ${SPHINX_BUILD}
+        pdflatex:     ${PDFLATEX}
         valgrind:     ${VALGRIND}
         leg:          ${LEG}
 ")

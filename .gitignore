@@ -38,9 +38,12 @@ Makefile.in
 !/build-aux/git-version-gen
 /.version
 
-# doxygen
-/Doxyfile
-/doc/build/
+# sphinx
+/docs/_build/*
+!/docs/_build/.keep
+/docs/*.py
+/docs/*.pyc
+/docs/*.pyo
 
 # installed .m4 files
 /m4/*.m4

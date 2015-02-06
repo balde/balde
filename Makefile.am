@@ -20,15 +20,10 @@ EXTRA_DIST = \
 	artwork/balde-logo.png \
 	artwork/balde-logo-small.png \
 	artwork/balde-logo.svg \
-	doc/style.css \
-	doc/00_index.md \
-	doc/01_concepts.md \
-	doc/02_getting-started.md \
-	doc/05_application.md \
-	doc/10_requests.md \
-	doc/15_responses.md \
-	doc/20_template-engine.md \
-	doc/25-static-resources.md \
+	docs/_build/.keep \
+	docs/_static/.keep \
+	docs/_templates/.keep \
+	docs/index.rst \
 	src/template/parser-grammar.leg \
 	examples/static-resources.xml \
 	examples/static/foo.js \
@@ -779,13 +774,23 @@ clean-local:
 # Helpers: Documentation
 
 if BUILD_DOCS
-doxygen: clean-local Doxyfile
-	$(DOXYGEN) Doxyfile
+doc-html: docs/conf.py
+	$(SPHINX_BUILD) -b html -d docs/_build/doctrees $(SPHINXOPTS) docs/ docs/_build/html
+
+if BUILD_DOCS_PDF
+doc-pdf: docs/conf.py
+	$(SPHINX_BUILD) -b latex -d docs/_build/doctrees -D latex_paper_size=a4 $(SPHINXOPTS) docs/ docs/_build/latex
+	$(MAKE) -C docs/_build/latex all-pdf
+
+doc: doc-html doc-pdf
+else
+doc: doc-html
+endif
 
 if PUBLISH_DOCS
-publish_docs: doxygen
+publish_docs: doc-html
 	$(GITHUB_PAGES_PUBLISH) --verbose \
 		--cname docs.balde.io \
-		. doc/build/html
+		. docs/_build/html
 endif
 endif
