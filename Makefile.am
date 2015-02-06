@@ -767,19 +767,34 @@ dist-hook:
 # Helpers: Cleanup of helper files
 
 clean-local:
-	-rm -rf doc/build/
-	-rm -rf valgrind-*.xml
+	-rm -rf $(top_builddir)/doc/build/
+	-rm -rf $(top_builddir)/valgrind-*.xml
 
 
 # Helpers: Documentation
 
 if BUILD_DOCS
 doc-html: docs/conf.py
-	$(SPHINX_BUILD) -b html -d docs/_build/doctrees $(SPHINXOPTS) docs/ docs/_build/html
+	test "$(top_builddir)" = "$(top_srcdir)" \
+		|| cp $(top_builddir)/docs/conf.py $(top_srcdir)/docs/
+	$(SPHINX_BUILD) \
+		-b html \
+		-d $(top_builddir)/docs/_build/doctrees \
+		$(SPHINXOPTS) \
+		$(top_srcdir)/docs/ \
+		$(top_builddir)/docs/_build/html
 
 if BUILD_DOCS_PDF
 doc-pdf: docs/conf.py
-	$(SPHINX_BUILD) -b latex -d docs/_build/doctrees -D latex_paper_size=a4 $(SPHINXOPTS) docs/ docs/_build/latex
+	test "$(top_builddir)" = "$(top_srcdir)" \
+		|| cp $(top_builddir)/docs/conf.py $(top_srcdir)/docs/
+	$(SPHINX_BUILD) \
+		-b latex \
+		-d $(top_builddir)/docs/_build/doctrees \
+		-D latex_paper_size=a4 \
+		$(SPHINXOPTS) \
+		$(top_srcdir)/docs/ \
+		$(top_builddir)/docs/_build/latex
 	$(MAKE) -C docs/_build/latex all-pdf
 
 doc: doc-html doc-pdf
