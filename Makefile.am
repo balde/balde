@@ -767,14 +767,24 @@ dist-hook:
 # Helpers: Cleanup of helper files
 
 clean-local:
-	-rm -rf $(top_builddir)/doc/build/
+	-rm -rf $(top_builddir)/docs/_build/*
 	-rm -rf $(top_builddir)/valgrind-*.xml
 
 
 # Helpers: Documentation
 
 if BUILD_DOCS
-doc-html: docs/conf.py
+doc-html: clean-local docs/conf.py
+	test "$(top_builddir)" = "$(top_srcdir)" \
+		|| cp $(top_builddir)/docs/conf.py $(top_srcdir)/docs/
+	$(SPHINX_BUILD) \
+		-b html \
+		-d $(top_builddir)/docs/_build/doctrees \
+		$(SPHINXOPTS) \
+		$(top_srcdir)/docs/ \
+		$(top_builddir)/docs/_build/html
+
+doc-dirhtml: docs/conf.py
 	test "$(top_builddir)" = "$(top_srcdir)" \
 		|| cp $(top_builddir)/docs/conf.py $(top_srcdir)/docs/
 	$(SPHINX_BUILD) \
@@ -797,9 +807,9 @@ doc-pdf: docs/conf.py
 		$(top_builddir)/docs/_build/latex
 	$(MAKE) -C docs/_build/latex all-pdf
 
-doc: doc-html doc-pdf
+doc: clean-local doc-dirhtml doc-pdf
 else
-doc: doc-html
+doc: clean-local doc-dirhtml
 endif
 
 if PUBLISH_DOCS
