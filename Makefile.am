@@ -4,8 +4,8 @@ ACLOCAL_AMFLAGS = -I m4
 
 AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-examples \
-	--enable-webserver \
-	--without-leg
+	--enable-http \
+	--disable-leg
 
 
 ## File listings
