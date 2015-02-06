@@ -24,6 +24,7 @@ EXTRA_DIST = \
 	docs/_static/.keep \
 	docs/_templates/.keep \
 	docs/index.rst \
+	docs/api.rst \
 	src/template/parser-grammar.leg \
 	examples/static-resources.xml \
 	examples/static/foo.js \
