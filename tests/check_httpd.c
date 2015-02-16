@@ -1,6 +1,6 @@
 /*
  * balde: A microframework for C based on GLib and bad intentions.
- * Copyright (C) 2013-2014 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ * Copyright (C) 2013-2015 Rafael G. Martins <rafael@rafaelmartins.eng.br>
  *
  * This program can be distributed under the terms of the LGPL-2 License.
  * See the file COPYING.
@@ -12,13 +12,17 @@
 
 #include <glib.h>
 #include <string.h>
-#include <balde/exceptions.h>
-#include <balde/httpd-private.h>
+#include "../src/balde.h"
+#include "../src/app.h"
+#include "../src/httpd.h"
+#include "../src/requests.h"
+#include "../src/responses.h"
 
 
 void
 test_httpd_parse_request(void)
 {
+    balde_app_t *app = balde_app_init();
     const gchar *test =
         "GET /bola?foo=bar&baz=lol HTTP/1.1\r\n"
         "Host: example.com\r\n"
@@ -27,9 +31,10 @@ test_httpd_parse_request(void)
         "Content-Length: 6\r\n"
         "\r\n"
         "XD=asd\r\n";
-    GString *tmp = g_string_new(test);
-    balde_request_env_t *req = balde_httpd_parse_request(tmp);
-    g_string_free(tmp, TRUE);
+    GInputStream *tmp = g_memory_input_stream_new_from_data (test, strlen(test), NULL);
+    balde_httpd_parser_data_t *data = balde_httpd_parse_request(app, tmp);
+    balde_request_env_t *req = data->env;
+    g_object_unref(tmp);
     g_assert(req != NULL);
     g_assert_cmpstr(req->request_method, ==, "GET");
     g_assert_cmpstr(req->path_info, ==, "/bola");
@@ -39,15 +44,20 @@ test_httpd_parse_request(void)
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "location"), ==, "/foo");
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "chunda"), ==, "rs");
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "content-length"), ==, "6");
-    g_assert_cmpint(req->content_length, ==, 6);
-    g_assert_cmpstr(req->body, ==, "XD=asd");
+    g_assert_cmpstr(req->body->str, ==, "XD=asd");
+    g_assert_cmpint(req->body->len, ==, 6);
+    g_assert(!req->https);
+    g_free(data->request_line);
+    g_free(data);
     balde_request_env_free(req);
+    balde_app_free(app);
 }
 
 
 void
 test_httpd_parse_request_without_query_string(void)
 {
+    balde_app_t *app = balde_app_init();
     const gchar *test =
         "GET /bola HTTP/1.1\r\n"
         "Host: example.com\r\n"
@@ -56,9 +66,10 @@ test_httpd_parse_request_without_query_string(void)
         "Content-Length: 6\r\n"
         "\r\n"
         "XD=asd\r\n";
-    GString *tmp = g_string_new(test);
-    balde_request_env_t *req = balde_httpd_parse_request(tmp);
-    g_string_free(tmp, TRUE);
+    GInputStream *tmp = g_memory_input_stream_new_from_data (test, strlen(test), NULL);
+    balde_httpd_parser_data_t *data = balde_httpd_parse_request(app, tmp);
+    balde_request_env_t *req = data->env;
+    g_object_unref(tmp);
     g_assert(req != NULL);
     g_assert_cmpstr(req->request_method, ==, "GET");
     g_assert_cmpstr(req->path_info, ==, "/bola");
@@ -68,9 +79,12 @@ test_httpd_parse_request_without_query_string(void)
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "location"), ==, "/foo");
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "chunda"), ==, "rs");
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "content-length"), ==, "6");
-    g_assert_cmpint(req->content_length, ==, 6);
-    g_assert_cmpstr(req->body, ==, "XD=asd");
+    g_assert_cmpstr(req->body->str, ==, "XD=asd");
+    g_assert_cmpint(req->body->len, ==, 6);
+    g_free(data->request_line);
+    g_free(data);
     balde_request_env_free(req);
+    balde_app_free(app);
 }
 
 
@@ -80,7 +94,7 @@ test_httpd_response_render(void)
     balde_response_t *res = balde_make_response("lol");
     GString *out = balde_httpd_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
-        "HTTP/1.1 200 OK\r\n"
+        "HTTP/1.0 200 OK\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Connection: close\r\n"
         "Content-Type: text/html; charset=utf-8\r\n"
@@ -99,7 +113,7 @@ test_httpd_response_render_with_custom_mime_type(void)
     balde_response_set_header(res, "content-type", "text/plain");
     GString *out = balde_httpd_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
-        "HTTP/1.1 200 OK\r\n"
+        "HTTP/1.0 200 OK\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Connection: close\r\n"
         "Content-Type: text/plain\r\n"
@@ -120,7 +134,7 @@ test_httpd_response_render_with_multiple_cookies(void)
     balde_response_set_cookie(res, "xd", ":D", -1, -1, "/bola/", NULL, TRUE, FALSE);
     GString *out = balde_httpd_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
-        "HTTP/1.1 200 OK\r\n"
+        "HTTP/1.0 200 OK\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Set-Cookie: bola=\"guda\"; Expires=Fri, 13-Feb-2009 23:32:30 GMT; Max-Age=60; Path=/\r\n"
         "Set-Cookie: asd=\"qwe\"; HttpOnly; Path=/\r\n"
@@ -141,7 +155,7 @@ test_httpd_response_render_without_body(void)
     balde_response_t *res = balde_make_response("lol");
     GString *out = balde_httpd_response_render(res, FALSE);
     g_assert_cmpstr(out->str, ==,
-        "HTTP/1.1 200 OK\r\n"
+        "HTTP/1.0 200 OK\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Connection: close\r\n"
         "Content-Type: text/html; charset=utf-8\r\n"
@@ -161,7 +175,7 @@ test_httpd_response_render_exception(void)
     g_assert(res != NULL);
     GString *out = balde_httpd_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
-        "HTTP/1.1 404 NOT FOUND\r\n"
+        "HTTP/1.0 404 NOT FOUND\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Connection: close\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"
@@ -184,7 +198,7 @@ test_httpd_response_render_exception_without_body(void)
     g_assert(res != NULL);
     GString *out = balde_httpd_response_render(res, FALSE);
     g_assert_cmpstr(out->str, ==,
-        "HTTP/1.1 404 NOT FOUND\r\n"
+        "HTTP/1.0 404 NOT FOUND\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
         "Connection: close\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"

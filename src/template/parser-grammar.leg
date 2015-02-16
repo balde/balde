@@ -1,0 +1,258 @@
+#
+# balde: A microframework for C based on GLib and bad intentions.
+# Copyright (C) 2013-2015 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+#
+# This program can be distributed under the terms of the LGPL-2 License.
+# See the file COPYING.
+#
+
+%{
+
+#include <glib.h>
+#include "parser.h"
+
+#define YY_INPUT(buf, result, max_size)                          \
+{                                                                \
+    int yyc = (charbuf && *charbuf != '\0') ? *charbuf++ : EOF;  \
+    result = (EOF == yyc) ? 0 : (*buf = yyc, 1);                 \
+}
+
+static GList *nodes = NULL;
+static gint if_count = 0;
+static gchar *fn_name = NULL;
+static GSList *fn_args = NULL;
+static balde_template_fn_arg_type_t fn_arg_type;
+static const gchar *charbuf = NULL;
+static gboolean clean_whitespace_next = FALSE;
+
+static void
+balde_template_clean_whitespace_prev(void)
+{
+    GList *last = g_list_last(nodes);
+    for (GList *tmp = last; tmp != NULL; tmp = g_list_previous(tmp)) {
+        balde_template_block_t *block = tmp->data;
+        if (block->type == BALDE_TEMPLATE_CONTENT_BLOCK) {
+            balde_template_content_block_t *content = block->block;
+            g_strchomp(content->content);
+            break;
+        }
+    }
+}
+
+static void
+balde_template_clean_whitespace_next(void)
+{
+    clean_whitespace_next = TRUE;
+}
+
+static void
+balde_template_import_block(const gchar *import)
+{
+    balde_template_import_block_t *block = g_new(balde_template_import_block_t, 1);
+    block->import = g_strdup(import);
+    balde_unescape_single_quoted_strings(&(block->import));
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = block;
+    node->type = BALDE_TEMPLATE_IMPORT_BLOCK;
+    nodes = g_list_append(nodes, node);
+}
+
+static void
+balde_template_include_block(const gchar *include)
+{
+    balde_template_include_block_t *block = g_new(balde_template_include_block_t, 1);
+    block->include = g_strdup(include);
+    balde_unescape_single_quoted_strings(&(block->include));
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = block;
+    node->type = BALDE_TEMPLATE_INCLUDE_BLOCK;
+    nodes = g_list_append(nodes, node);
+}
+
+static void
+balde_template_if_block(const gchar *if_var)
+{
+    balde_template_if_block_t *block = g_new(balde_template_if_block_t, 1);
+    block->if_var = g_strdup(if_var);
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = block;
+    node->type = BALDE_TEMPLATE_IF_BLOCK;
+    nodes = g_list_append(nodes, node);
+    if_count++;
+}
+
+static void
+balde_template_else_block(void)
+{
+    if (if_count <= 0)
+        g_error("Syntax error: {" "%% else %%" "} block without any open {" "%% if ... %%" "} block");
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = NULL;
+    node->type = BALDE_TEMPLATE_ELSE_BLOCK;
+    nodes = g_list_append(nodes, node);
+}
+
+static void
+balde_template_endif_block(void)
+{
+    if (if_count-- <= 0)
+        g_error("Syntax error: {" "%% endif %%" "} block before any {" "%% if ... %%" "} block");
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = NULL;
+    node->type = BALDE_TEMPLATE_IF_END_BLOCK;
+    nodes = g_list_append(nodes, node);
+}
+
+static void
+balde_template_content_block(const gchar *content)
+{
+    balde_template_content_block_t *block = g_new(balde_template_content_block_t, 1);
+    block->content = g_strdup(content);
+    if (clean_whitespace_next) {
+        g_strchug(block->content);
+        clean_whitespace_next = FALSE;
+    }
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = block;
+    node->type = BALDE_TEMPLATE_CONTENT_BLOCK;
+    nodes = g_list_append(nodes, node);
+}
+
+static void
+balde_template_print_var_block(const gchar *var)
+{
+    balde_template_print_var_block_t *block = g_new(balde_template_print_var_block_t, 1);
+    block->variable = g_strdup(var);
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = block;
+    node->type = BALDE_TEMPLATE_PRINT_VAR_BLOCK;
+    nodes = g_list_append(nodes, node);
+}
+
+static void
+balde_template_print_fn_arg(const gchar *arg)
+{
+    balde_template_fn_arg_t *a = g_new(balde_template_fn_arg_t, 1);
+    switch (fn_arg_type) {
+        case BALDE_TEMPLATE_FN_ARG_STRING:
+            a->content = g_strdup_printf("\"%s\"", arg);
+            balde_unescape_single_quoted_strings(&(a->content));
+            break;
+        default:
+            a->content = g_strdup(arg);
+    }
+    a->type = fn_arg_type;
+    fn_args = g_slist_append(fn_args, a);
+}
+
+static void
+balde_template_print_fn_id(const gchar *fn_id)
+{
+    fn_name = g_strdup(fn_id);
+}
+
+static void
+balde_template_print_block(void)
+{
+    balde_template_print_fn_call_block_t *block = g_new(balde_template_print_fn_call_block_t, 1);
+    block->name = fn_name;
+    block->args = fn_args;
+    balde_template_block_t *node = g_new(balde_template_block_t, 1);
+    node->block = block;
+    node->type = BALDE_TEMPLATE_PRINT_FN_CALL_BLOCK;
+    nodes = g_list_append(nodes, node);
+    fn_name = NULL;
+    fn_args = NULL;
+}
+
+%}
+
+page = import | include | if | else | if_end | print_call | content | anything
+    { g_error("Syntax error near: %s", yytext); }
+
+
+# Useful rules
+eol = '\n' | '\r\n' | '\r'
+eof = !.
+- = [\t ]*
+id = [a-zA-Z][a-zA-Z0-9_]*
+unq_str1 = < ( '\\' '"' | !'"' . )* >
+unq_str2 = < ( '\\' '\'' | !'\'' . )* >
+str = '"' unq_str1 '"' | '\'' unq_str2 '\''
+int = sign? [0-9]+
+float = sign? [0-9]+ '.' [0-9]+
+sign = '+' | '-'
+bool = 'TRUE' | 'FALSE'
+null = 'NULL'
+
+anything = < ( !eol . )* > eol
+
+# Whitespace cleaner
+clean_whitespace_open = '-'             { balde_template_clean_whitespace_prev(); }
+clean_whitespace_close = '-'            { balde_template_clean_whitespace_next(); }
+
+# Imports
+import_open = '{%' clean_whitespace_open? -
+import_close = - clean_whitespace_close? '%}'
+import = import_open 'import' ' '+ str import_close
+    { balde_template_import_block(yytext); }
+
+# Includes
+include_open = '{%' clean_whitespace_open? -
+include_close = - clean_whitespace_close? '%}'
+include = include_open 'include' ' '+ str include_close
+    { balde_template_include_block(yytext); }
+
+# Conditionals
+if_open = '{%' clean_whitespace_open? -
+if_close = - clean_whitespace_close? '%}'
+if = if_open 'if' ' '+ < id > if_close  { balde_template_if_block(yytext); }
+else = if_open 'else' if_close          { balde_template_else_block(); }
+if_end = if_open 'endif' if_close       { balde_template_endif_block(); }
+
+# Print calls
+print_open = '{{' -
+print_close = - '}}'
+print_var = < id >             { balde_template_print_var_block(yytext); }
+
+print_fn_arg_var = < id >      { fn_arg_type = BALDE_TEMPLATE_FN_ARG_VAR; }
+print_fn_arg_str = str         { fn_arg_type = BALDE_TEMPLATE_FN_ARG_STRING; }
+print_fn_arg_int = < int >     { fn_arg_type = BALDE_TEMPLATE_FN_ARG_INT; }
+print_fn_arg_float = < float > { fn_arg_type = BALDE_TEMPLATE_FN_ARG_FLOAT; }
+print_fn_arg_bool = < bool >   { fn_arg_type = BALDE_TEMPLATE_FN_ARG_BOOL; }
+print_fn_arg_null = < null >   { fn_arg_type = BALDE_TEMPLATE_FN_ARG_NULL; }
+
+print_fn_arg = ( print_fn_arg_bool | print_fn_arg_null | print_fn_arg_float
+    | print_fn_arg_int | print_fn_arg_var | print_fn_arg_str )
+    { balde_template_print_fn_arg(yytext); }
+print_fn_args = - ( print_fn_arg ( - ',' - print_fn_arg )* - )*
+print_fn_id = < id >
+    { balde_template_print_fn_id(yytext); }
+print_fn = print_fn_id - '(' print_fn_args ')'
+    { balde_template_print_block(); }
+print_call = print_open ( print_fn | print_var ) print_close
+
+# Generic content
+content = < ( !eof !import_open !import_close !include_open !include_close !if_open !if_close !print_open !print_close . )+ >
+    { balde_template_content_block(yytext); }
+
+%%
+
+
+G_LOCK_DEFINE_STATIC(parse);
+
+GList*
+balde_template_parse(const gchar *tmpl)
+{
+    G_LOCK(parse);
+    if_count = 0;
+    charbuf = tmpl;
+    while(yyparse());
+    if (if_count != 0)
+        g_error("Syntax error: You left %d open {" "%% if ... %%" "} blocks.", if_count);
+    GList *rv = nodes;
+    charbuf = NULL;
+    nodes = NULL;
+    G_UNLOCK(parse);
+    return rv;
+}

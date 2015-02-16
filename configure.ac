@@ -27,74 +27,41 @@ AS_IF([test "x$ac_cv_prog_cc_c99" = "xno"], [
   AC_MSG_ERROR([no C99 compiler found, balde requires a C99 compiler.])
 ])
 
+bkp_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -fvisibility=hidden"
+AC_MSG_CHECKING([if ${CC} supports -fvisibility=hidden])
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([char guda;])], [
+  AC_MSG_RESULT([yes])
+], [
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([no -fvisibility=hidden support found in ${CC}, balde requires -fvisibility=hidden])
+])
+CFLAGS="$bkp_CFLAGS"
+
 AC_ARG_ENABLE([fastcgi], AS_HELP_STRING([--disable-fastcgi], [disable fastcgi support]))
 AS_IF([test "x$enable_fastcgi" != "xno"], [
   AC_SEARCH_LIBS([FCGI_Accept], [fcgi], ,
     AC_MSG_ERROR([FCGI_Accept not found. please install the fastcgi developer kit.])
   )
-  AC_DEFINE([ENABLE_FASTCGI], [], [fastcgi support enabled])
+  build_fastcgi=yes
+  AC_DEFINE([BUILD_FASTCGI], [], [fastcgi support enabled])
   FASTCGI="enabled"
 ], [
+  build_fastcgi=no
   FASTCGI="disabled"
 ])
+AM_CONDITIONAL([BUILD_FASTCGI], [test "x$build_fastcgi" = "xyes"])
 
-AC_ARG_ENABLE([webserver], AS_HELP_STRING([--disable-webserver], [disable embedded webserver]))
-AS_IF([test "x$enable_webserver" != "xno"], [
-  build_webserver=yes
-  AC_DEFINE([BUILD_WEBSERVER], [], [embedded webserver enabled])
-  WEBSERVER="enabled"
+AC_ARG_ENABLE([http], AS_HELP_STRING([--disable-http], [disable embedded HTTP webserver]))
+AS_IF([test "x$enable_http" != "xno"], [
+  build_http=yes
+  AC_DEFINE([BUILD_HTTP], [], [embedded HTTP webserver enabled])
+  HTTP="enabled"
 ], [
-  build_webserver=no
-  WEBSERVER="disabled"
+  build_http=no
+  HTTP="disabled"
 ])
-AM_CONDITIONAL([BUILD_WEBSERVER], [test "x$build_webserver" = "xyes"])
-
-AC_ARG_WITH([http-parser],
-  AS_HELP_STRING([--with-http-parser=@<:@internal/system@:>@],
-    [whether to use system http-parser library [default=internal]]))
-use_system_http_parser=no
-AS_IF([test "x$build_webserver" = "xyes"], [
-  AS_IF([test "x$with_http_parser" = "xsystem"], [
-    AC_SEARCH_LIBS([http_parser_init], [http_parser], ,
-      AC_MSG_ERROR([http_parser_init not found. please install http-parser or retry with --with-http-parser=internal])
-    )
-    balde_found_http_parser_headers=no
-    AC_CHECK_HEADERS([http_parser.h], [balde_found_http_parser_headers=yes; break;])
-    AS_IF([test "x$balde_found_http_parser_headers" != "xyes"], [
-      AC_MSG_ERROR([Unable to find http-parser header.])
-    ])
-    AC_CACHE_CHECK([for system http-parser >= 2.3],
-      balde_cv_http_parser_version, [
-        AC_RUN_IFELSE([
-          AC_LANG_SOURCE([[
-#include <http_parser.h>
-
-int main(void) {
-    if (HTTP_PARSER_VERSION_MAJOR == 2 && HTTP_PARSER_VERSION_MINOR >= 3)
-        return 0;
-    return 1;
-}
-          ]])
-        ], [
-          balde_cv_http_parser_version=yes
-        ], [
-          balde_cv_http_parser_version=no
-          AC_MSG_ERROR([http-parser < 2.3. update it or retry with --with-http-parser=internal])
-        ], [
-          balde_cv_http_parser_version=yes
-        ])
-      ]
-    )
-    use_system_http_parser=yes
-    AC_DEFINE([SYSTEM_HTTP_PARSER], [], [build against system http-parser library])
-    WEBSERVER="${WEBSERVER} (system http-parser)"
-  ], [
-    WEBSERVER="${WEBSERVER} (internal http-parser)"
-  ])
-],)
-AM_CONDITIONAL(USE_SYSTEM_HTTP_PARSER, [test "x$use_system_http_parser" = "xyes"])
-
-
+AM_CONDITIONAL([BUILD_HTTP], [test "x$build_http" = "xyes"])
 
 AC_ARG_ENABLE([examples], AS_HELP_STRING([--enable-examples], [build examples]))
 AS_IF([test "x$enable_examples" = "xyes"], [
@@ -172,11 +139,14 @@ AC_SUBST(LEG)
 
 # we need to make sure that shared-mime-info is installed, because we need it
 # for accurate mime-type guess
-GLIB_DEP="glib-2.0 >= 2.34, gio-2.0 >= 2.34, shared-mime-info"
-AC_SUBST(GLIB_DEP)
+GLIB_DEP="glib-2.0 >= 2.35, gio-2.0 >= 2.35, shared-mime-info"
+JSON_GLIB_DEP="json-glib-1.0 >= 0.16.2"
+PC_DEPS="${GLIB_DEP}, ${JSON_GLIB_DEP}"
+AC_SUBST(PC_DEPS)
 
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GLIB], [$GLIB_DEP])
+PKG_CHECK_MODULES([JSON_GLIB], [$JSON_GLIB_DEP])
 
 GLIB_COMPILE_RESOURCES="`$PKG_CONFIG --variable glib_compile_resources gio-2.0`"
 AC_SUBST(GLIB_COMPILE_RESOURCES)
@@ -185,6 +155,7 @@ AC_CONFIG_FILES([
     Makefile
     balde.pc
     Doxyfile
+    tests/utils.c
 ])
 AC_OUTPUT
 
@@ -200,8 +171,8 @@ AS_ECHO("
         ldflags:      ${LDFLAGS}
 
         fastcgi:      ${FASTCGI}
+        http:         ${HTTP}
         examples:     ${EXAMPLES}
-        webserver:    ${WEBSERVER}
 
         doxygen:      ${DOXYGEN}
         valgrind:     ${VALGRIND}
