@@ -109,6 +109,7 @@ noinst_HEADERS = \
 	src/datetime.h \
 	src/exceptions.h \
 	src/fcgi.h \
+	src/info.h \
 	src/httpd.h \
 	src/multipart.h \
 	src/multipart_parser.h \
@@ -160,6 +161,7 @@ libbalde_la_SOURCES = \
 	src/cgi.c \
 	src/datetime.c \
 	src/exceptions.c \
+	src/info.c \
 	src/multipart.c \
 	src/multipart_parser.c \
 	src/requests.c \
@@ -230,6 +232,7 @@ balde_template_gen_LDADD = \
 if BUILD_EXAMPLES
 
 noinst_PROGRAMS += \
+	examples/info \
 	examples/hello \
 	examples/hello-with-cookies \
 	examples/hello-with-form \
@@ -237,6 +240,22 @@ noinst_PROGRAMS += \
 	examples/hello-with-static \
 	examples/hello-with-url_for \
 	examples/hello-with-auth
+
+examples_info_SOURCES = \
+	examples/info.c
+
+examples_info_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/src
+
+examples_info_LDFLAGS = \
+	-no-install
+
+examples_info_LDADD= \
+	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 examples_hello_SOURCES = \
 	examples/hello.c

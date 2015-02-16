@@ -718,4 +718,12 @@ void balde_resources_load(balde_app_t *app, GResource *resources);
 gchar* balde_tmpl_url_for(balde_app_t *app, balde_request_t *request,
     const gchar *endpoint, gboolean external, ...);
 
+
+/**
+ * Register information view to balde application.
+ *
+ */
+void balde_info_register(balde_app_t *app, const gchar *endpoint,
+    const gchar *rule);
+
 #endif /* _BALDE_H */

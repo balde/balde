@@ -73,6 +73,7 @@ Makefile.in
 /tests/utils.c
 
 # examples
+/examples/info
 /examples/hello
 /examples/hello-with-cookies
 /examples/hello-with-static
