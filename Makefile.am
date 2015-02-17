@@ -4,8 +4,10 @@ ACLOCAL_AMFLAGS = -I m4
 
 AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-examples \
-	--enable-webserver \
-	--without-leg
+	--enable-http \
+	--enable-fastcgi \
+	--disable-leg \
+	--disable-valgrind
 
 
 ## File listings
@@ -776,18 +778,20 @@ dist-hook:
 # Helpers: Cleanup of helper files
 
 clean-local:
-	-rm -rf doc/build/
-	-rm -rf valgrind-*.xml
+	-rm -rf $(top_builddir)/doc/build/
+	-rm -rf $(top_builddir)/valgrind-*.xml
 
 
 # Helpers: Documentation
 
 if BUILD_DOCS
-doxygen: clean-local Doxyfile
+doc: clean-local Doxyfile
 	$(DOXYGEN) Doxyfile
 
+docs: doc
+
 if PUBLISH_DOCS
-publish_docs: doxygen
+publish_docs: doc
 	$(GITHUB_PAGES_PUBLISH) --verbose \
 		--cname docs.balde.io \
 		. doc/build/html
