@@ -41,8 +41,9 @@ pushd "${BALDE_BUILD_DIR}" > /dev/null
     --enable-examples \
     --enable-fastcgi \
     --enable-http \
-    --with-leg \
-    --with-valgrind
+    --enable-leg \
+    --enable-valgrind \
+    --disable-doc
 popd > /dev/null
 
 make \
