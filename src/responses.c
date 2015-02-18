@@ -95,13 +95,6 @@ balde_response_set_tmpl_var(balde_response_t *response, const gchar *name,
 }
 
 
-/**
- * \example hello-with-template.c
- *
- * An example with template. It depends on more files. Take a look at
- * it on the balde source code.
- */
-
 BALDE_API const gchar*
 balde_response_get_tmpl_var(balde_response_t *response, const gchar *name)
 {

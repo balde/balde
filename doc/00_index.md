@@ -1,5 +1,5 @@
-balde documentation {#mainpage}
-===================
+Documentation {#mainpage}
+=============
 
 This is *balde*, a microframework for C based on GLib and bad intentions.
 

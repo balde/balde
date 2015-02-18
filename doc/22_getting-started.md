@@ -7,7 +7,7 @@ If you are used to write C applications, it will be quite easy for you to start 
 
 This is the simplest web application that someone can build with balde, a "hello world":
 
-@include hello.c
+@snippet hello.c Hello world
 
 This example is mostly self-explanatory.
 

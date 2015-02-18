@@ -1,5 +1,21 @@
+/*
+ * balde: A microframework for C based on GLib and bad intentions.
+ * Copyright (C) 2013-2015 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ *
+ * This program can be distributed under the terms of the LGPL-2 License.
+ * See the file COPYING.
+ */
+
+/**
+ * \example hello-with-template.c
+ *
+ * An example with template. It depends on more files. Take a look at
+ * it on the balde source code.
+ */
+
 #include <balde.h>
 #include "templates/hello.h"
+
 
 balde_response_t*
 hello(balde_app_t *app, balde_request_t *request)

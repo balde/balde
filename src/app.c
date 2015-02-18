@@ -310,12 +310,6 @@ balde_app_url_forv(balde_app_t *app, balde_request_t *request,
 }
 
 
-/**
- * \example hello.c
- *
- * A hello world!
- */
-
 static gboolean help = FALSE;
 static gboolean version = FALSE;
 static gchar *log_level = NULL;

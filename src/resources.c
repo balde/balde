@@ -83,13 +83,6 @@ balde_resource_free(balde_resource_t *resource)
 }
 
 
-/**
- * \example hello-with-static.c
- *
- * An example with static files.  It depends on more files. Take a look at
- * it on the balde source code.
- */
-
 G_LOCK_DEFINE_STATIC(resources);
 
 BALDE_API void

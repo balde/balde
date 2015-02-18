@@ -1,3 +1,18 @@
+/*
+ * balde: A microframework for C based on GLib and bad intentions.
+ * Copyright (C) 2013-2015 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ *
+ * This program can be distributed under the terms of the LGPL-2 License.
+ * See the file COPYING.
+ */
+
+/**
+ * \example hello.c
+ *
+ * A hello world!
+ */
+
+//! [Hello world]
 #include <balde.h>
 
 
@@ -17,3 +32,4 @@ main(int argc, char **argv)
     balde_app_free(app);
     return 0;
 }
+//! [Hello world]

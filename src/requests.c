@@ -234,13 +234,6 @@ balde_request_get_arg(balde_request_t *request, const gchar *name)
 }
 
 
-/**
- * \example hello-with-form.c
- *
- * An example with HTTP forms. It depends on more files. Take a look at
- * it on the balde source code.
- */
-
 BALDE_API const gchar*
 balde_request_get_form(balde_request_t *request, const gchar *name)
 {
@@ -267,12 +260,6 @@ balde_request_get_view_arg(balde_request_t *request, const gchar *name)
     return g_hash_table_lookup(request->priv->view_args, name);
 }
 
-
-/**
- * \example hello-with-cookies.c
- *
- * An example with HTTP cookies.
- */
 
 BALDE_API const gchar*
 balde_request_get_cookie(balde_request_t *request, const gchar *name)
