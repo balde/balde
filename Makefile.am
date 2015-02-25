@@ -24,16 +24,12 @@ EXTRA_DIST = \
 	artwork/balde-logo.svg \
 	doc/style.css \
 	doc/00_index.md \
-	doc/20_user-guide.md \
-	doc/21_basic-concepts.md \
-	doc/22_getting-started.md \
-	doc/24_application.md \
-	doc/26_http-requests.md \
-	doc/27_http-responses.md \
-	doc/29_template-engine.md \
-	doc/30_static-resources.md \
-	doc/40_api-reference.md \
-	doc/60_additional-notes.md \
+	doc/10_getting-started.md \
+	doc/20_installation.md \
+	doc/30_application-development.md \
+	doc/40_application-structure.md \
+	doc/50_application-cli.md \
+	doc/60_application-deployment.md \
 	doc/70_api-changes.md \
 	src/template/parser-grammar.leg \
 	examples/static-resources.xml \

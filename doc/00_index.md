@@ -25,11 +25,11 @@ User's Guide
 ------------
 
 - @subpage getting-started
-- @subpage application
-- @subpage http-requests
-- @subpage http-responses
-- @subpage template-engine
-- @subpage static-resources
+- @subpage installation
+- @subpage application-development
+- @subpage application-structure
+- @subpage application-cli
+- @subpage application-deployment
 
 
 API Reference
