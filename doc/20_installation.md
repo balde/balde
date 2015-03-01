@@ -57,7 +57,7 @@ With everything configured, the user just needs to run:
 $ make
 @endverbatim
 
-This will build the library and the examples (if requested during the configuration phase).
+This will build the library, binaries and the examples (if requested during the configuration phase).
 
 Examples are built in the ``examples/`` directory.
 
@@ -71,7 +71,7 @@ With the binaries built, the user just needs to run, as root:
 # make install
 @endverbatim
 
-This will install the library and headers to the system. Examples are never installed, as stated before.
+This will install the library, binaries and headers to the system. Examples are never installed, as stated before.
 
 The default installation prefix is ``/usr/local`` for linux users. This can be changed during the configuration phase, passing use the ``--prefix`` option to the ``configure`` script.
 
