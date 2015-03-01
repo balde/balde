@@ -17,7 +17,7 @@ Installing balde
 
 To install balde you must [download it first](https://github.com/balde/balde/releases). Pick the latest release, and download it to your computer. After downloading, extract it with some tool like ``tar``.
 
-To run this example, the only required dependencies are ``GLib >= 2.35``, ``shared-mime-info`` (that is usually installed with ``GLib``), ``GNU Make`` and ``GCC``. Other dependencies and features are listed in the @ref installation section of the documentation.
+To run this example, the only required dependencies are ``GLib >= 2.35``, ``json-glib-1.0 >= 0.16.2``, ``shared-mime-info`` (that is usually installed with ``GLib``), ``GNU Make`` and ``GCC``. Other dependencies and features are listed in the @ref installation section of the documentation.
 
 To install it, from the extracted directory, run:
 
