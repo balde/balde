@@ -16,14 +16,17 @@
 
 
 static gboolean version = FALSE;
-static gchar *name = NULL;
+static gchar *app_name = NULL;
+static gchar *app_version = NULL;
 
 static GOptionEntry entries[] =
 {
     {"version", 0, 0, G_OPTION_ARG_NONE, &version,
         "Show balde's version number and exit.", NULL},
-    {"name", 'n', 0, G_OPTION_ARG_STRING, &name,
+    {"app-name", 'n', 0, G_OPTION_ARG_STRING, &app_name,
         "Application name. (default: current directory name)", "NAME"},
+    {"app-version", 'v', 0, G_OPTION_ARG_STRING, &app_version,
+        "Application version. (default: 0.1)", "VERSION"},
     {NULL}
 };
 
@@ -32,22 +35,30 @@ int
 main(int argc, char **argv)
 {
     setlocale(LC_ALL, "");
+    int rv = EXIT_SUCCESS;
     GError *err = NULL;
     GOptionContext *context = g_option_context_new(
         "- a helper tool to bootstrap your balde application");
     g_option_context_add_main_entries(context, entries, NULL);
     if (!g_option_context_parse(context, &argc, &argv, &err)) {
         g_printerr("Option parsing failed: %s\n", err->message);
-        exit(1);
+        rv = EXIT_FAILURE;
+        goto point1;
     }
-    if (version)
+    if (version) {
         g_printerr("%s\n", PACKAGE_STRING);
+        goto point1;
+    }
 
-    gchar *project_name = balde_quickstart_get_name(name);
+    gchar *project_name = balde_quickstart_get_name(app_name);
 
     g_printerr("%s\n", project_name);
 
-
     g_free(project_name);
-    return 0;
+
+    g_free(app_name);
+    g_free(app_version);
+
+point1:
+    return rv;
 }
