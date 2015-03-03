@@ -50,6 +50,8 @@ main(int argc, char **argv)
         goto point1;
     }
 
+    balde_quickstart_list_project_files();
+
     gchar *project_name = balde_quickstart_get_name(app_name);
 
     g_printerr("%s\n", project_name);

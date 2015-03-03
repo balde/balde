@@ -11,6 +11,13 @@
 
 #include <glib.h>
 
+typedef struct {
+    gchar *name;
+    GBytes *content;
+    gboolean executable;
+} balde_quickstart_file_t;
+
 gchar* balde_quickstart_get_name(const gchar *name);
+GSList* balde_quickstart_list_project_files(void);
 
 #endif /* _BALDE_QUICKSTART_QUICKSTART_H */

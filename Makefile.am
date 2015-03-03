@@ -254,14 +254,14 @@ nodist_libbalde_quickstart_la_SOURCES = \
 	src/quickstart/project.c \
 	src/quickstart/project.h
 
+src/quickstart/quickstart.c: \
+	$(nodist_libbalde_quickstart_la_SOURCES)
+
 src/quickstart/project.c: src/quickstart/project.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/src/quickstart/project $(top_srcdir)/src/quickstart/project.xml)
 	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(top_srcdir)/src/quickstart/project --target $@ $<
 
 src/quickstart/project.h: src/quickstart/project.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/src/quickstart/project $(top_srcdir)/src/quickstart/project.xml)
 	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(top_srcdir)/src/quickstart/project --target $@ $<
-
-src/libbalde_la-quickstart-project.$(OBJEXT): \
-	$(nodist_libbalde_quickstart_la_SOURCES)
 
 libbalde_quickstart_la_CFLAGS = \
 	$(AM_CFLAGS) \
