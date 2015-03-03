@@ -11,13 +11,12 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include <locale.h>
 #include <stdlib.h>
 #include "quickstart.h"
 
 
-static gchar*
-get_name(const gchar *name)
+gchar*
+balde_quickstart_get_name(const gchar *name)
 {
     if (name != NULL)
         return g_strdup(name);
@@ -30,42 +29,4 @@ get_name(const gchar *name)
         return g_strdup("unnamed");
     }
     return dirname;
-}
-
-
-static gboolean version = FALSE;
-static gchar *name = NULL;
-
-static GOptionEntry entries[] =
-{
-    {"version", 0, 0, G_OPTION_ARG_NONE, &version,
-        "Show balde's version number and exit.", NULL},
-    {"name", 'n', 0, G_OPTION_ARG_STRING, &name,
-        "Application name. (default: current directory name)", "NAME"},
-    {NULL}
-};
-
-
-int
-balde_quickstart_main(int argc, char **argv)
-{
-    setlocale(LC_ALL, "");
-    GError *err = NULL;
-    GOptionContext *context = g_option_context_new(
-        "- a helper tool to bootstrap your balde application");
-    g_option_context_add_main_entries(context, entries, NULL);
-    if (!g_option_context_parse(context, &argc, &argv, &err)) {
-        g_printerr("Option parsing failed: %s\n", err->message);
-        exit(1);
-    }
-    if (version)
-        g_printerr("%s\n", PACKAGE_STRING);
-
-    gchar *project_name = get_name(name);
-
-    g_printerr("%s\n", project_name);
-
-
-    g_free(project_name);
-    return 0;
 }

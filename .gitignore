@@ -49,7 +49,7 @@ Makefile.in
 /balde-template-gen
 
 # balde-quickstart
-/bin/balde-quickstart
+/balde-quickstart
 
 # tests
 /tests/check_app

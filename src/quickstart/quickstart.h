@@ -11,6 +11,6 @@
 
 #include <glib.h>
 
-int balde_quickstart_main(int argc, char **argv);
+gchar* balde_quickstart_get_name(const gchar *name);
 
 #endif /* _BALDE_QUICKSTART_QUICKSTART_H */
