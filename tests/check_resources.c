@@ -1,6 +1,6 @@
 /*
  * balde: A microframework for C based on GLib and bad intentions.
- * Copyright (C) 2013-2014 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ * Copyright (C) 2013-2015 Rafael G. Martins <rafael@rafaelmartins.eng.br>
  *
  * This program can be distributed under the terms of the LGPL-2 License.
  * See the file COPYING.
@@ -11,11 +11,11 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include <balde/app.h>
-#include <balde/app-private.h>
-#include <balde/resources.h>
-#include <balde/resources-private.h>
-#include <balde/wrappers-private.h>
+#include "../src/balde.h"
+#include "../src/app.h"
+#include "../src/resources.h"
+#include "../src/requests.h"
+#include "../src/responses.h"
 #include "resources.h"
 
 
@@ -67,21 +67,21 @@ test_resources_load(void)
 {
     balde_app_t *app = balde_app_init();
     balde_resources_load(app, resources_get_resource());
-    g_assert(app->static_resources != NULL);
-    g_assert(g_slist_length(app->static_resources) == 3);
-    balde_assert_resource(app->static_resources, "/static/lol.css",
+    g_assert(app->priv->static_resources != NULL);
+    g_assert(g_slist_length(app->priv->static_resources) == 3);
+    balde_assert_resource(app->priv->static_resources, "/static/lol.css",
         "body {\n    background-color: #CCC;\n}\n",
         "text/css", "daab60b9178fd56656840a7fb9fc491c",
         "48536785a0d37e65c9ebc6d7ee25119a");
-    balde_assert_resource(app->static_resources->next, "/static/lol.js",
+    balde_assert_resource(app->priv->static_resources->next, "/static/lol.js",
         "function a() {\n    alert('lol');\n}\n",
         "application/javascript", "5338df6146fde6cc4034e3c47972d268",
         "d14c4623de381fa7a3a3f9b509cecbc3");
-    balde_assert_resource(app->static_resources->next->next, "/static/zz.sh",
+    balde_assert_resource(app->priv->static_resources->next->next, "/static/zz.sh",
         "#!/bin/bash\n\nzz() {\n    :\n}\n",
         "application/x-shellscript", "09284640fe6904d369629d7b04dc1387",
         "e3f8e345860a9caf1eb8d57e04308ccb");
-    g_assert(app->static_resources->next->next->next == NULL);
+    g_assert(app->priv->static_resources->next->next->next == NULL);
     balde_app_free(app);
 }
 
@@ -97,17 +97,17 @@ test_make_response_from_static_resource(void)
         request, "/static/lol.css");
     g_assert(response != NULL);
     g_assert_cmpint(response->status_code, ==, 200);
-    g_assert_cmpint(g_hash_table_size(response->headers), ==, 4);
-    GSList *tmp = g_hash_table_lookup(response->headers, "cache-control");
+    g_assert_cmpint(g_hash_table_size(response->priv->headers), ==, 4);
+    GSList *tmp = g_hash_table_lookup(response->priv->headers, "cache-control");
     g_assert_cmpstr(tmp->data, ==, "public, max-age=43200");
-    tmp = g_hash_table_lookup(response->headers, "expires");
+    tmp = g_hash_table_lookup(response->priv->headers, "expires");
     g_assert(g_str_has_suffix(tmp->data, " GMT"));
-    tmp = g_hash_table_lookup(response->headers, "etag");
+    tmp = g_hash_table_lookup(response->priv->headers, "etag");
     g_assert_cmpstr(tmp->data, ==,
         "\"balde-daab60b9178fd56656840a7fb9fc491c-48536785a0d37e65c9ebc6d7ee25119a\"");
-    tmp = g_hash_table_lookup(response->headers, "content-type");
+    tmp = g_hash_table_lookup(response->priv->headers, "content-type");
     g_assert_cmpstr(tmp->data, ==, "text/css");
-    g_assert_cmpstr(response->body->str, ==,
+    g_assert_cmpstr(response->priv->body->str, ==,
         "body {\n"
         "    background-color: #CCC;\n"
         "}\n");
@@ -130,17 +130,17 @@ test_make_response_from_static_resource_304(void)
         request, "/static/lol.css");
     g_assert(response != NULL);
     g_assert_cmpint(response->status_code, ==, 304);
-    g_assert_cmpint(g_hash_table_size(response->headers), ==, 4);
-    GSList *tmp = g_hash_table_lookup(response->headers, "cache-control");
+    g_assert_cmpint(g_hash_table_size(response->priv->headers), ==, 4);
+    GSList *tmp = g_hash_table_lookup(response->priv->headers, "cache-control");
     g_assert_cmpstr(tmp->data, ==, "public, max-age=43200");
-    tmp = g_hash_table_lookup(response->headers, "expires");
+    tmp = g_hash_table_lookup(response->priv->headers, "expires");
     g_assert(g_str_has_suffix(tmp->data, " GMT"));
-    tmp = g_hash_table_lookup(response->headers, "etag");
+    tmp = g_hash_table_lookup(response->priv->headers, "etag");
     g_assert_cmpstr(tmp->data, ==,
         "\"balde-daab60b9178fd56656840a7fb9fc491c-48536785a0d37e65c9ebc6d7ee25119a\"");
-    tmp = g_hash_table_lookup(response->headers, "content-type");
+    tmp = g_hash_table_lookup(response->priv->headers, "content-type");
     g_assert_cmpstr(tmp->data, ==, "text/css");
-    g_assert_cmpstr(response->body->str, ==, "");
+    g_assert_cmpstr(response->priv->body->str, ==, "");
     balde_response_free(response);
     balde_request_free(request);
     balde_app_free(app);

@@ -1,0 +1,49 @@
+/*
+ * balde: A microframework for C based on GLib and bad intentions.
+ * Copyright (C) 2013-2015 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ *
+ * This program can be distributed under the terms of the LGPL-2 License.
+ * See the file COPYING.
+ */
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif /* HAVE_CONFIG_H */
+
+#include <glib.h>
+#include "utils.h"
+
+
+gchar*
+get_template(const gchar *filename)
+{
+    return g_build_filename("@abs_top_srcdir@", "tests", "templates", filename, NULL);
+}
+
+
+gchar*
+get_expected_template(const gchar *filename)
+{
+    gchar *f = get_template(filename);
+    gchar *contents;
+    gsize len;
+    g_file_get_contents(f, &contents, &len, NULL);
+    g_free(f);
+    GString *rv = g_string_new_len(contents, len);
+    g_free(contents);
+    return g_string_free(rv, FALSE);
+}
+
+
+GString*
+get_upload(const gchar *filename)
+{
+    gchar *f = g_build_filename("@abs_top_srcdir@", "tests", "uploads", filename, NULL);
+    gchar *contents;
+    gsize len;
+    g_file_get_contents(f, &contents, &len, NULL);
+    g_free(f);
+    GString *rv = g_string_new_len(contents, len);
+    g_free(contents);
+    return rv;
+}

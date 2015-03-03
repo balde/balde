@@ -8,6 +8,6 @@ balde_template_gen=@bindir@/balde-template-gen
 Name: @PACKAGE@
 Description: A microframework for C based on GLib and bad intentions.
 Version: @VERSION@
-Requires: @GLIB_DEP@
+Requires: @PC_DEPS@
 Libs: -L${libdir} -lbalde
 Cflags: -I${includedir}

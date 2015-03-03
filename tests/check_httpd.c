@@ -1,6 +1,6 @@
 /*
  * balde: A microframework for C based on GLib and bad intentions.
- * Copyright (C) 2013-2014 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ * Copyright (C) 2013-2015 Rafael G. Martins <rafael@rafaelmartins.eng.br>
  *
  * This program can be distributed under the terms of the LGPL-2 License.
  * See the file COPYING.
@@ -12,9 +12,11 @@
 
 #include <glib.h>
 #include <string.h>
-#include <balde/app-private.h>
-#include <balde/exceptions.h>
-#include <balde/httpd-private.h>
+#include "../src/balde.h"
+#include "../src/app.h"
+#include "../src/httpd.h"
+#include "../src/requests.h"
+#include "../src/responses.h"
 
 
 void
@@ -42,8 +44,9 @@ test_httpd_parse_request(void)
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "location"), ==, "/foo");
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "chunda"), ==, "rs");
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "content-length"), ==, "6");
-    g_assert_cmpint(req->content_length, ==, 6);
-    g_assert_cmpstr(req->body, ==, "XD=asd");
+    g_assert_cmpstr(req->body->str, ==, "XD=asd");
+    g_assert_cmpint(req->body->len, ==, 6);
+    g_assert(!req->https);
     g_free(data->request_line);
     g_free(data);
     balde_request_env_free(req);
@@ -76,8 +79,8 @@ test_httpd_parse_request_without_query_string(void)
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "location"), ==, "/foo");
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "chunda"), ==, "rs");
     g_assert_cmpstr(g_hash_table_lookup(req->headers, "content-length"), ==, "6");
-    g_assert_cmpint(req->content_length, ==, 6);
-    g_assert_cmpstr(req->body, ==, "XD=asd");
+    g_assert_cmpstr(req->body->str, ==, "XD=asd");
+    g_assert_cmpint(req->body->len, ==, 6);
     g_free(data->request_line);
     g_free(data);
     balde_request_env_free(req);

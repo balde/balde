@@ -4,8 +4,10 @@ ACLOCAL_AMFLAGS = -I m4
 
 AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-examples \
-	--enable-webserver \
-	--without-leg
+	--enable-http \
+	--enable-fastcgi \
+	--disable-leg \
+	--disable-valgrind
 
 
 ## File listings
@@ -22,14 +24,14 @@ EXTRA_DIST = \
 	artwork/balde-logo.svg \
 	doc/style.css \
 	doc/00_index.md \
-	doc/01_concepts.md \
-	doc/02_getting-started.md \
-	doc/05_application.md \
-	doc/10_requests.md \
-	doc/15_responses.md \
-	doc/20_template-engine.md \
-	doc/25-static-resources.md \
-	libbalde_template/parser-grammar.leg \
+	doc/10_getting-started.md \
+	doc/20_installation.md \
+	doc/30_application-development.md \
+	doc/40_application-structure.md \
+	doc/50_application-cli.md \
+	doc/60_application-deployment.md \
+	doc/70_api-changes.md \
+	src/template/parser-grammar.leg \
 	examples/static-resources.xml \
 	examples/static/foo.js \
 	examples/static/foo.css \
@@ -41,7 +43,47 @@ EXTRA_DIST = \
 	tests/resources.xml \
 	tests/static/lol.css \
 	tests/static/lol.js \
-	tests/static/zz.sh
+	tests/static/zz.sh \
+	tests/templates/base.c \
+	tests/templates/base.html \
+	tests/templates/base2.c \
+	tests/templates/base2.html \
+	tests/templates/base3.c \
+	tests/templates/base3.html \
+	tests/templates/base4.c \
+	tests/templates/base4.html \
+	tests/templates/base5.c \
+	tests/templates/base5.html \
+	tests/templates/base6.c \
+	tests/templates/base6.html \
+	tests/templates/base7.c \
+	tests/templates/base7.html \
+	tests/templates/base8.c \
+	tests/templates/base8.html \
+	tests/templates/body.html \
+	tests/templates/body2.html \
+	tests/templates/foo.c \
+	tests/templates/foo.html \
+	tests/templates/foo2.c \
+	tests/templates/foo2.html \
+	tests/templates/foo3.c \
+	tests/templates/foo3.html \
+	tests/templates/foo4.c \
+	tests/templates/foo4.html \
+	tests/templates/foo5.c \
+	tests/templates/foo5.html \
+	tests/templates/foo6.c \
+	tests/templates/foo6.html \
+	tests/templates/foo7.c \
+	tests/templates/foo7.html \
+	tests/templates/foo8.c \
+	tests/templates/foo8.html \
+	tests/templates/foo9.c \
+	tests/templates/foo9.html \
+	tests/uploads/simple.txt \
+	tests/uploads/without-filename.txt \
+	tests/uploads/without-filetype.txt \
+	tests/uploads/multiple.txt
 
 CLEANFILES = \
 	examples/static-resources.c \
@@ -53,59 +95,64 @@ CLEANFILES = \
 	examples/templates/url_for.c \
 	examples/templates/url_for.h \
 	tests/resources.c \
-	tests/resources.h
+	tests/resources.h \
+	tests/utils.c
 
 BUILT_SOURCES = \
 	.version
 
 include_HEADERS = \
-	include/balde.h
-
-pkginclude_HEADERS = \
-	include/balde/app.h \
-	include/balde/exceptions.h \
-	include/balde/resources.h \
-	include/balde/routing.h \
-	include/balde/template-helpers.h \
-	include/balde/wrappers.h
+	src/balde.h
 
 noinst_HEADERS = \
-	include/balde/app-private.h \
-	include/balde/cgi-private.h \
-	include/balde/datetime-private.h \
-	include/balde/exceptions-private.h \
-	include/balde/fcgi-private.h \
-	include/balde/httpd-private.h \
-	include/balde/resources-private.h \
-	include/balde/routing-private.h \
-	include/balde/wrappers-private.h \
-	include/balde-quickstart/quickstart-private.h \
-	include/balde-template/template-private.h \
-	include/balde-template/parser-private.h
+	src/balde-private.h \
+	src/app.h \
+	src/cgi.h \
+	src/datetime.h \
+	src/exceptions.h \
+	src/fcgi.h \
+	src/httpd.h \
+	src/multipart.h \
+	src/multipart_parser.h \
+	src/requests.h \
+	src/resources.h \
+	src/responses.h \
+	src/routing.h \
+	src/sessions.h \
+	src/template/template.h \
+	src/template/parser.h \
+	src/quickstart/quickstart.h \
+	src/utils.h \
+	tests/utils.h
 
 lib_LTLIBRARIES = \
-	libbalde/libbalde.la
+	libbalde.la
 
 noinst_LTLIBRARIES = \
-	libbalde_quickstart/libbalde_quickstart.la \
-	libbalde_template/libbalde_template.la
+	libbalde_template.la \
+	libbalde_quickstart.la
 
 bin_PROGRAMS = \
-	bin/balde-quickstart \
-	bin/balde-template-gen
+	balde-template-gen \
+	balde-quickstart
 
 noinst_PROGRAMS =
 
 check_PROGRAMS = \
 	tests/check_app \
+	tests/check_cgi \
 	tests/check_datetime \
 	tests/check_exceptions \
+	tests/check_multipart \
+	tests/check_requests \
 	tests/check_resources \
+	tests/check_responses \
 	tests/check_routing \
+	tests/check_sessions \
 	tests/check_stdin \
 	tests/check_template \
 	tests/check_template_helpers \
-	tests/check_wrappers
+	tests/check_utils
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = balde.pc
@@ -113,95 +160,98 @@ pkgconfig_DATA = balde.pc
 
 ## Build rules: libbalde
 
-libbalde_libbalde_la_SOURCES = \
-	libbalde/app.c \
-	libbalde/cgi.c \
-	libbalde/datetime.c \
-	libbalde/exceptions.c \
-	libbalde/resources.c \
-	libbalde/routing.c \
-	libbalde/template-helpers.c \
-	libbalde/wrappers.c
+libbalde_la_SOURCES = \
+	src/app.c \
+	src/cgi.c \
+	src/datetime.c \
+	src/exceptions.c \
+	src/multipart.c \
+	src/multipart_parser.c \
+	src/requests.c \
+	src/resources.c \
+	src/responses.c \
+	src/routing.c \
+	src/sessions.c \
+	src/template-helpers.c \
+	src/utils.c
 
-libbalde_libbalde_la_CFLAGS = \
+libbalde_la_CFLAGS = \
+	-fvisibility=hidden \
 	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS)
 
-libbalde_libbalde_la_LIBADD = \
+libbalde_la_LIBADD = \
 	$(GLIB_LIBS)
+	$(JSON_GLIB_LIBS)
 
-libbalde_libbalde_la_LDFLAGS = \
+libbalde_la_LDFLAGS = \
 	-version-info $(LIBBALDE_LT_VERSION_INFO)
 
-if BUILD_WEBSERVER
-libbalde_libbalde_la_SOURCES += \
-	libbalde/httpd.c
+if BUILD_HTTP
+libbalde_la_SOURCES += \
+	src/httpd.c
 endif
 
 if BUILD_FASTCGI
-
-libbalde_libbalde_la_SOURCES += \
-	libbalde/fcgi.c
-
+libbalde_la_SOURCES += \
+	src/fcgi.c
 endif
-
-
-## Build rules: balde-quickstart
-
-libbalde_quickstart_libbalde_quickstart_la_SOURCES = \
-	libbalde_quickstart/quickstart.c
-
-libbalde_quickstart_libbalde_quickstart_la_CFLAGS = \
-	$(AM_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
-
-libbalde_quickstart_libbalde_quickstart_la_LIBADD = \
-	$(GLIB_LIBS)
-
-bin_balde_quickstart_SOURCES = \
-	bin/balde-quickstart.c
-
-bin_balde_quickstart_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
-
-bin_balde_quickstart_LDADD = \
-	$(GLIB_LIBS) \
-	libbalde_quickstart/libbalde_quickstart.la
 
 
 ## Build rules: balde-template-gen
 
-libbalde_template_libbalde_template_la_SOURCES = \
-	libbalde_template/template.c \
-	libbalde_template/parser.c \
-	libbalde_template/parser-grammar.c
+libbalde_template_la_SOURCES = \
+	src/template/template.c \
+	src/template/parser.c \
+	src/template/parser-grammar.c
 
-libbalde_template_libbalde_template_la_CFLAGS = \
+libbalde_template_la_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/src/template
 
-libbalde_template_libbalde_template_la_LIBADD = \
+libbalde_template_la_LIBADD = \
 	$(GLIB_LIBS)
 
 if USE_LEG
-libbalde_template/parser-grammar.c: libbalde_template/parser-grammar.leg
+src/template/parser-grammar.c: src/template/parser-grammar.leg
 	$(AM_V_GEN)$(LEG) -o $@ $<
 endif
 
-bin_balde_template_gen_SOURCES = \
-	bin/balde-template-gen.c
+balde_template_gen_SOURCES = \
+	src/template/balde-template-gen.c
 
-bin_balde_template_gen_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+balde_template_gen_CFLAGS = \
+	$(GLIB_CFLAGS)
 
-bin_balde_template_gen_LDADD = \
+balde_template_gen_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde_template/libbalde_template.la
+	libbalde_template.la
+
+
+## Build rules: balde-quickstart
+
+libbalde_quickstart_la_SOURCES = \
+	src/quickstart/quickstart.c
+
+libbalde_quickstart_la_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	-I$(top_srcdir)/src/quickstart
+
+libbalde_quickstart_la_LIBADD = \
+	$(GLIB_LIBS)
+
+balde_quickstart_SOURCES = \
+	src/quickstart/balde-quickstart.c
+
+balde_quickstart_CFLAGS = \
+	$(GLIB_CFLAGS)
+
+balde_quickstart_LDADD = \
+	$(GLIB_LIBS) \
+	libbalde_quickstart.la
 
 
 ## Build rules: examples
@@ -222,28 +272,32 @@ examples_hello_SOURCES = \
 
 examples_hello_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/src
 
 examples_hello_LDFLAGS = \
 	-no-install
 
 examples_hello_LDADD= \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 examples_hello_with_cookies_SOURCES = \
 	examples/hello-with-cookies.c
 
 examples_hello_with_cookies_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/src
 
 examples_hello_with_cookies_LDFLAGS = \
 	-no-install
 
 examples_hello_with_cookies_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 examples_hello_with_form_SOURCES = \
 	examples/hello-with-form.c
@@ -259,7 +313,8 @@ examples/examples_hello_with_form-hello-with-form.$(OBJEXT): \
 
 examples_hello_with_form_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include \
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/src \
 	-I$(top_builddir)/examples
 
 examples_hello_with_form_LDFLAGS = \
@@ -267,7 +322,8 @@ examples_hello_with_form_LDFLAGS = \
 
 examples_hello_with_form_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 examples_hello_with_template_SOURCES = \
 	examples/hello-with-template.c
@@ -281,7 +337,8 @@ examples/examples_hello_with_template-hello-with-template.$(OBJEXT): \
 
 examples_hello_with_template_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include \
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/src \
 	-I$(top_builddir)/examples
 
 examples_hello_with_template_LDFLAGS = \
@@ -289,7 +346,8 @@ examples_hello_with_template_LDFLAGS = \
 
 examples_hello_with_template_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 examples_hello_with_static_SOURCES = \
 	examples/hello-with-static.c
@@ -303,7 +361,8 @@ examples/examples_hello_with_static-hello-with-static.$(OBJEXT): \
 
 examples_hello_with_static_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include \
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/src \
 	-I$(top_builddir)/examples
 
 examples_hello_with_static_LDFLAGS = \
@@ -311,7 +370,8 @@ examples_hello_with_static_LDFLAGS = \
 
 examples_hello_with_static_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 examples_hello_with_url_for_SOURCES = \
 	examples/hello-with-url_for.c
@@ -325,7 +385,8 @@ examples/examples_hello_with_url_for-hello-with-url_for.$(OBJEXT): \
 
 examples_hello_with_url_for_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include \
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/src \
 	-I$(top_builddir)/examples
 
 examples_hello_with_url_for_LDFLAGS = \
@@ -333,21 +394,24 @@ examples_hello_with_url_for_LDFLAGS = \
 
 examples_hello_with_url_for_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 examples_hello_with_auth_SOURCES = \
 	examples/hello-with-auth.c
 
 examples_hello_with_auth_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/src
 
 examples_hello_with_auth_LDFLAGS = \
 	-no-install
 
 examples_hello_with_auth_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 endif
 
@@ -357,34 +421,36 @@ examples/%-resources.c: examples/%-resources.xml $(shell $(GLIB_COMPILE_RESOURCE
 examples/%-resources.h: examples/%-resources.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/examples/static $(top_srcdir)/examples/static-resources.xml)
 	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(top_srcdir)/examples/static --target $@ $<
 
-examples/templates/%.c: examples/templates/%.html bin/balde-template-gen
-	$(AM_V_GEN)bin/balde-template-gen $< $@
+examples/templates/%.c: examples/templates/%.html balde-template-gen
+	$(AM_V_GEN)./balde-template-gen $< $@
 
-examples/templates/%.h: examples/templates/%.html bin/balde-template-gen
-	$(AM_V_GEN)bin/balde-template-gen $< $@
+examples/templates/%.h: examples/templates/%.html balde-template-gen
+	$(AM_V_GEN)./balde-template-gen $< $@
 
 
 ## Build rules: tests
 
-if BUILD_WEBSERVER
+if BUILD_HTTP
 
 check_PROGRAMS += \
 	tests/check_httpd
 
 tests_check_httpd_SOURCES = \
 	tests/check_httpd.c \
-	tests/mock_datetime2.c
+	tests/mock_httpd.c
 
 tests_check_httpd_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS)
 
 tests_check_httpd_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_httpd_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 endif
 
@@ -398,14 +464,16 @@ tests_check_fcgi_SOURCES = \
 
 tests_check_fcgi_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS)
 
 tests_check_fcgi_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_fcgi_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 endif
 
@@ -414,42 +482,88 @@ tests_check_app_SOURCES = \
 
 tests_check_app_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS)
 
 tests_check_app_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_app_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
+
+tests_check_cgi_SOURCES = \
+	tests/check_cgi.c
+
+tests_check_cgi_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS)
+
+tests_check_cgi_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_cgi_LDADD = \
+	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 tests_check_datetime_SOURCES = \
 	tests/check_datetime.c
 
 tests_check_datetime_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS)
 
 tests_check_datetime_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_datetime_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 tests_check_exceptions_SOURCES = \
 	tests/check_exceptions.c
 
 tests_check_exceptions_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS)
 
 tests_check_exceptions_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_exceptions_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
+
+tests_check_multipart_SOURCES = \
+	tests/check_multipart.c \
+	tests/utils.c
+
+tests_check_multipart_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/tests
+
+tests_check_multipart_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_multipart_LDADD = \
+	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
+
+tests/tests_check_multipart-check_multipart.$(OBJEXT): \
+	tests/uploads/simple.txt \
+	tests/uploads/without-filename.txt \
+	tests/uploads/without-filetype.txt \
+	tests/uploads/multiple.txt
 
 tests_check_resources_SOURCES = \
 	tests/check_resources.c
@@ -461,88 +575,175 @@ tests/tests_check_resources-check_resources.$(OBJEXT): tests/resources.c tests/r
 
 tests_check_resources_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include \
+	$(JSON_GLIB_CFLAGS) \
 	-I$(top_builddir)/tests
 
 tests_check_resources_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_resources_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 tests_check_routing_SOURCES = \
 	tests/check_routing.c
 
 tests_check_routing_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS)
 
 tests_check_routing_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_routing_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
+
+tests_check_sessions_SOURCES = \
+	tests/check_sessions.c \
+	tests/mock_sessions.c
+
+tests_check_sessions_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS)
+
+tests_check_sessions_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_sessions_LDADD = \
+	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 tests_check_stdin_SOURCES = \
 	tests/check_stdin.c \
-	tests/mock_getc.c
+	tests/mock_stdin.c
 
 tests_check_stdin_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS)
 
 tests_check_stdin_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_stdin_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 tests_check_template_SOURCES = \
-	tests/check_template.c
+	tests/check_template.c \
+	tests/utils.c
 
 tests_check_template_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/tests
 
 tests_check_template_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_template_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la \
-	libbalde_template/libbalde_template.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la \
+	libbalde_template.la
+
+tests/tests_check_template-check_template.$(OBJEXT): \
+	tests/templates/base.html \
+	tests/templates/base2.html \
+	tests/templates/base3.html \
+	tests/templates/base4.html \
+	tests/templates/base5.html \
+	tests/templates/base6.html \
+	tests/templates/base7.html \
+	tests/templates/base8.html \
+	tests/templates/body.html \
+	tests/templates/body2.html \
+	tests/templates/foo.html \
+	tests/templates/foo2.html \
+	tests/templates/foo3.html \
+	tests/templates/foo4.html \
+	tests/templates/foo5.html \
+	tests/templates/foo6.html \
+	tests/templates/foo7.html \
+	tests/templates/foo8.html \
+	tests/templates/foo9.html
 
 tests_check_template_helpers_SOURCES = \
 	tests/check_template_helpers.c
 
 tests_check_template_helpers_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS)
 
 tests_check_template_helpers_LDFLAGS = \
+	-static \
 	-no-install
 
 tests_check_template_helpers_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
-tests_check_wrappers_SOURCES = \
-	tests/check_wrappers.c \
-	tests/mock_datetime.c
+tests_check_utils_SOURCES = \
+	tests/check_utils.c \
+	tests/mock_utils.c
 
-tests_check_wrappers_CFLAGS = \
+tests_check_utils_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/include
+	$(JSON_GLIB_CFLAGS)
 
-tests_check_wrappers_LDFLAGS = \
+tests_check_utils_LDFLAGS = \
+	-static \
 	-no-install
 
-tests_check_wrappers_LDADD = \
+tests_check_utils_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde/libbalde.la
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
+
+tests_check_requests_SOURCES = \
+	tests/check_requests.c \
+	tests/utils.c
+
+tests_check_requests_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/tests
+
+tests_check_requests_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_requests_LDADD = \
+	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
+
+tests_check_responses_SOURCES = \
+	tests/check_responses.c \
+	tests/mock_responses.c
+
+tests_check_responses_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS)
+
+tests_check_responses_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_responses_LDADD = \
+	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
 
 tests/resources.c: tests/resources.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/tests/static $(top_srcdir)/tests/resources.xml)
 	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(top_srcdir)/tests/static --target $@ $<
@@ -594,23 +795,26 @@ endif
 
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
+	rm -f $(distdir)/tests/utils.c
 
 
 # Helpers: Cleanup of helper files
 
 clean-local:
-	-rm -rf doc/build/
-	-rm -rf valgrind-*.xml
+	-rm -rf $(top_builddir)/doc/build/
+	-rm -rf $(top_builddir)/valgrind-*.xml
 
 
 # Helpers: Documentation
 
 if BUILD_DOCS
-doxygen: clean-local Doxyfile
+doc: clean-local Doxyfile
 	$(DOXYGEN) Doxyfile
 
+docs: doc
+
 if PUBLISH_DOCS
-publish_docs: doxygen
+publish_docs: doc
 	$(GITHUB_PAGES_PUBLISH) --verbose \
 		--cname docs.balde.io \
 		. doc/build/html

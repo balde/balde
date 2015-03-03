@@ -1,0 +1,13 @@
+-----------------------------12056991879709948637505812
+Content-Disposition: form-data; name="name"
+
+chunda
+-----------------------------12056991879709948637505812
+Content-Disposition: form-data; name="bola"; filename="foo.txt"
+Content-Type: text/plain
+
+This is a random file!!!!
+
+:D
+
+-----------------------------12056991879709948637505812--

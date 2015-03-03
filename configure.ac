@@ -27,6 +27,17 @@ AS_IF([test "x$ac_cv_prog_cc_c99" = "xno"], [
   AC_MSG_ERROR([no C99 compiler found, balde requires a C99 compiler.])
 ])
 
+bkp_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -fvisibility=hidden"
+AC_MSG_CHECKING([if ${CC} supports -fvisibility=hidden])
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([char guda;])], [
+  AC_MSG_RESULT([yes])
+], [
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([no -fvisibility=hidden support found in ${CC}, balde requires -fvisibility=hidden])
+])
+CFLAGS="$bkp_CFLAGS"
+
 AC_ARG_ENABLE([fastcgi], AS_HELP_STRING([--disable-fastcgi], [disable fastcgi support]))
 AS_IF([test "x$enable_fastcgi" != "xno"], [
   AC_SEARCH_LIBS([FCGI_Accept], [fcgi], ,
@@ -41,16 +52,16 @@ AS_IF([test "x$enable_fastcgi" != "xno"], [
 ])
 AM_CONDITIONAL([BUILD_FASTCGI], [test "x$build_fastcgi" = "xyes"])
 
-AC_ARG_ENABLE([webserver], AS_HELP_STRING([--disable-webserver], [disable embedded webserver]))
-AS_IF([test "x$enable_webserver" != "xno"], [
-  build_webserver=yes
-  AC_DEFINE([BUILD_WEBSERVER], [], [embedded webserver enabled])
-  WEBSERVER="enabled"
+AC_ARG_ENABLE([http], AS_HELP_STRING([--disable-http], [disable embedded HTTP webserver]))
+AS_IF([test "x$enable_http" != "xno"], [
+  build_http=yes
+  AC_DEFINE([BUILD_HTTP], [], [embedded HTTP webserver enabled])
+  HTTP="enabled"
 ], [
-  build_webserver=no
-  WEBSERVER="disabled"
+  build_http=no
+  HTTP="disabled"
 ])
-AM_CONDITIONAL([BUILD_WEBSERVER], [test "x$build_webserver" = "xyes"])
+AM_CONDITIONAL([BUILD_HTTP], [test "x$build_http" = "xyes"])
 
 AC_ARG_ENABLE([examples], AS_HELP_STRING([--enable-examples], [build examples]))
 AS_IF([test "x$enable_examples" = "xyes"], [
@@ -62,9 +73,9 @@ AS_IF([test "x$enable_examples" = "xyes"], [
 ])
 AM_CONDITIONAL([BUILD_EXAMPLES], [test "x$build_examples" = "xyes"])
 
-AC_ARG_WITH([doxygen], AS_HELP_STRING([--without-doxygen],
-            [ignore presence of doxygen and disable documentation build]))
-AS_IF([test "x$with_doxygen" != "xno"], [
+AC_ARG_ENABLE([doc], AS_HELP_STRING([--disable-doc],
+              [ignore presence of doxygen and disable documentation build]))
+AS_IF([test "x$enable_doc" != "xno"], [
   AC_PATH_PROG([doxygen], [doxygen])
   AS_IF([test "x$ac_cv_path_doxygen" = "x"], [
     have_doxygen=no
@@ -74,7 +85,7 @@ AS_IF([test "x$with_doxygen" != "xno"], [
   AC_PATH_PROG([github_pages_publish], [github-pages-publish])
 ])
 AS_IF([test "x$have_doxygen" = "xyes"], , [
-  AS_IF([test "x$with_doxygen" = "xyes"], [
+  AS_IF([test "x$enable_doc" = "xyes"], [
     AC_MSG_ERROR([doxygen requested but not found])
   ])
 ])
@@ -88,9 +99,9 @@ GITHUB_PAGES_PUBLISH="$ac_cv_path_github_pages_publish"
 AC_SUBST(DOXYGEN)
 AC_SUBST(GITHUB_PAGES_PUBLISH)
 
-AC_ARG_WITH([valgrind], AS_HELP_STRING([--without-valgrind],
-            [ignore presence of valgrind]))
-AS_IF([test "x$with_valgrind" != "xno"], [
+AC_ARG_ENABLE([valgrind], AS_HELP_STRING([--disable-valgrind],
+              [ignore presence of valgrind]))
+AS_IF([test "x$enable_valgrind" != "xno"], [
   AC_PATH_PROG([valgrind], [valgrind])
   AS_IF([test "x$ac_cv_path_valgrind" = "x"], [
     have_valgrind=no
@@ -99,7 +110,7 @@ AS_IF([test "x$with_valgrind" != "xno"], [
   ])
 ])
 AS_IF([test "x$have_valgrind" = "xyes"], , [
-  AS_IF([test "x$with_valgrind" = "xyes"], [
+  AS_IF([test "x$enable_valgrind" = "xyes"], [
     AC_MSG_ERROR([valgrind requested but not found])
   ])
 ])
@@ -107,9 +118,9 @@ AM_CONDITIONAL([USE_VALGRIND], [test "x$have_valgrind" = "xyes"])
 VALGRIND="$ac_cv_path_valgrind"
 AC_SUBST(VALGRIND)
 
-AC_ARG_WITH([leg], AS_HELP_STRING([--without-leg],
-            [ignore presence of peg/leg and disable template parser grammar regeneration]))
-AS_IF([test "x$with_leg" != "xno"], [
+AC_ARG_ENABLE([leg], AS_HELP_STRING([--disable-leg],
+              [ignore presence of peg/leg and disable template parser grammar regeneration]))
+AS_IF([test "x$enable_leg" != "xno"], [
   AC_PATH_PROG([leg], [leg])
   AS_IF([test "x$ac_cv_path_leg" = "x"], [
     have_leg=no
@@ -118,7 +129,7 @@ AS_IF([test "x$with_leg" != "xno"], [
   ])
 ])
 AS_IF([test "x$have_leg" = "xyes"], , [
-  AS_IF([test "x$with_leg" = "xyes"], [
+  AS_IF([test "x$enable_leg" = "xyes"], [
     AC_MSG_ERROR([peg/leg requested but not found])
   ])
 ])
@@ -128,11 +139,14 @@ AC_SUBST(LEG)
 
 # we need to make sure that shared-mime-info is installed, because we need it
 # for accurate mime-type guess
-GLIB_DEP="glib-2.0 >= 2.34, gio-2.0 >= 2.34, shared-mime-info"
-AC_SUBST(GLIB_DEP)
+GLIB_DEP="glib-2.0 >= 2.35, gio-2.0 >= 2.35, shared-mime-info"
+JSON_GLIB_DEP="json-glib-1.0 >= 0.16.2"
+PC_DEPS="${GLIB_DEP}, ${JSON_GLIB_DEP}"
+AC_SUBST(PC_DEPS)
 
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GLIB], [$GLIB_DEP])
+PKG_CHECK_MODULES([JSON_GLIB], [$JSON_GLIB_DEP])
 
 GLIB_COMPILE_RESOURCES="`$PKG_CONFIG --variable glib_compile_resources gio-2.0`"
 AC_SUBST(GLIB_COMPILE_RESOURCES)
@@ -141,6 +155,7 @@ AC_CONFIG_FILES([
     Makefile
     balde.pc
     Doxyfile
+    tests/utils.c
 ])
 AC_OUTPUT
 
@@ -156,8 +171,8 @@ AS_ECHO("
         ldflags:      ${LDFLAGS}
 
         fastcgi:      ${FASTCGI}
+        http:         ${HTTP}
         examples:     ${EXAMPLES}
-        webserver:    ${WEBSERVER}
 
         doxygen:      ${DOXYGEN}
         valgrind:     ${VALGRIND}

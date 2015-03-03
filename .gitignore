@@ -46,28 +46,34 @@ Makefile.in
 /m4/*.m4
 
 # balde-template-gen
-/bin/balde-template-gen
+/balde-template-gen
 
 # balde-quickstart
 /bin/balde-quickstart
 
 # tests
 /tests/check_app
+/tests/check_cgi
 /tests/check_exceptions
 /tests/check_datetime
 /tests/check_fcgi
 /tests/check_httpd
+/tests/check_requests
 /tests/check_resources
+/tests/check_responses
 /tests/check_routing
+/tests/check_sessions
 /tests/check_stdin
 /tests/check_template
 /tests/check_template_helpers
-/tests/check_wrappers
+/tests/check_utils
+/tests/check_multipart
 /tests/*.log
 /tests/*.trs
 /tests/valgrind-*.xml
 /tests/resources.c
 /tests/resources.h
+/tests/utils.c
 
 # examples
 /examples/hello
@@ -83,7 +89,7 @@ Makefile.in
 /examples/templates/*.h
 
 # leg generated source
-/libbalde_template/parser-grammar.c
+/src/template/parser-grammar.c
 
 # tarballs
 balde-*.tar.*
