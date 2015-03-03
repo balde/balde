@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+    <gresource prefix="">
+        <file>autogen.sh.tmpl</file>
+        <file>build-aux/.keep.tmpl</file>
+        <file>configure.ac.tmpl</file>
+        <file>m4/.keep.tmpl</file>
+        <file>Makefile.am.tmpl</file>
+        <file>src/foo.c.tmpl</file>
+        <file>src/foo.h.tmpl</file>
+        <file>src/main.c.tmpl</file>
+        <file>src/static/screen.css.tmpl</file>
+        <file>src/static/resources.xml.tmpl</file>
+        <file>src/templates/base.html.tmpl</file>
+        <file>tests/check_foo.c.tmpl</file>
+    </gresource>
+</gresources>

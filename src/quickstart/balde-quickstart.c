@@ -23,9 +23,9 @@ static GOptionEntry entries[] =
 {
     {"version", 0, 0, G_OPTION_ARG_NONE, &version,
         "Show balde's version number and exit.", NULL},
-    {"app-name", 'n', 0, G_OPTION_ARG_STRING, &app_name,
+    {"app-name", 0, 0, G_OPTION_ARG_STRING, &app_name,
         "Application name. (default: current directory name)", "NAME"},
-    {"app-version", 'v', 0, G_OPTION_ARG_STRING, &app_version,
+    {"app-version", 0, 0, G_OPTION_ARG_STRING, &app_version,
         "Application version. (default: 0.1)", "VERSION"},
     {NULL}
 };

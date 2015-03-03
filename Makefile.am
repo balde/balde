@@ -32,6 +32,19 @@ EXTRA_DIST = \
 	doc/60_application-deployment.md \
 	doc/70_api-changes.md \
 	src/template/parser-grammar.leg \
+	src/quickstart/project.xml \
+	src/quickstart/project/Makefile.am.tmpl \
+	src/quickstart/project/autogen.sh.tmpl \
+	src/quickstart/project/build-aux/.keep.tmpl \
+	src/quickstart/project/configure.ac.tmpl \
+	src/quickstart/project/m4/.keep.tmpl \
+	src/quickstart/project/src/foo.c.tmpl \
+	src/quickstart/project/src/foo.h.tmpl \
+	src/quickstart/project/src/main.c.tmpl \
+	src/quickstart/project/src/static/resources.xml.tmpl \
+	src/quickstart/project/src/static/screen.css.tmpl \
+	src/quickstart/project/src/templates/base.html.tmpl \
+	src/quickstart/project/tests/check_foo.c.tmpl \
 	examples/static-resources.xml \
 	examples/static/foo.js \
 	examples/static/foo.css \
@@ -94,6 +107,8 @@ CLEANFILES = \
 	examples/templates/form.h \
 	examples/templates/url_for.c \
 	examples/templates/url_for.h \
+	src/quickstart/project.c \
+	src/quickstart/project.h \
 	tests/resources.c \
 	tests/resources.h \
 	tests/utils.c
@@ -235,9 +250,23 @@ balde_template_gen_LDADD = \
 libbalde_quickstart_la_SOURCES = \
 	src/quickstart/quickstart.c
 
+nodist_libbalde_quickstart_la_SOURCES = \
+	src/quickstart/project.c \
+	src/quickstart/project.h
+
+src/quickstart/project.c: src/quickstart/project.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/src/quickstart/project $(top_srcdir)/src/quickstart/project.xml)
+	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(top_srcdir)/src/quickstart/project --target $@ $<
+
+src/quickstart/project.h: src/quickstart/project.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/src/quickstart/project $(top_srcdir)/src/quickstart/project.xml)
+	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(top_srcdir)/src/quickstart/project --target $@ $<
+
+src/libbalde_la-quickstart-project.$(OBJEXT): \
+	$(nodist_libbalde_quickstart_la_SOURCES)
+
 libbalde_quickstart_la_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS) \
+	-I$(top_builddir)/src/quickstart \
 	-I$(top_srcdir)/src/quickstart
 
 libbalde_quickstart_la_LIBADD = \

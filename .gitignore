@@ -50,6 +50,8 @@ Makefile.in
 
 # balde-quickstart
 /balde-quickstart
+/src/quickstart/project.c
+/src/quickstart/project.h
 
 # tests
 /tests/check_app
