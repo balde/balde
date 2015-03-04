@@ -151,6 +151,8 @@ PKG_CHECK_MODULES([JSON_GLIB], [$JSON_GLIB_DEP])
 GLIB_COMPILE_RESOURCES="`$PKG_CONFIG --variable glib_compile_resources gio-2.0`"
 AC_SUBST(GLIB_COMPILE_RESOURCES)
 
+AC_CHECK_HEADERS([sys/types.h sys/stat.h])
+
 AC_CONFIG_FILES([
     Makefile
     balde.pc

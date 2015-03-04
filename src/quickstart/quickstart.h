@@ -13,11 +13,13 @@
 
 typedef struct {
     gchar *name;
-    GBytes *content;
+    GString *content;
     gboolean executable;
 } balde_quickstart_file_t;
 
 gchar* balde_quickstart_get_name(const gchar *name);
 GSList* balde_quickstart_list_project_files(void);
+gboolean balde_quickstart_check_files(GSList *files, const gchar *dir);
+void balde_quickstart_write_project(GSList *files, const gchar *dir);
 
 #endif /* _BALDE_QUICKSTART_QUICKSTART_H */
