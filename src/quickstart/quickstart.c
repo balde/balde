@@ -12,11 +12,11 @@
 
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
-#endif
+#endif /* HAVE_SYS_STAT_H */
 
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
-#endif
+#endif /* HAVE_SYS_TYPES_H */
 
 #include <glib.h>
 #include <gio/gio.h>
