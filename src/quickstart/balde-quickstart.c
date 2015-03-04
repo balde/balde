@@ -17,6 +17,7 @@
 
 
 static gboolean version = FALSE;
+static gchar *app_dir = NULL;
 static gchar *app_name = NULL;
 static gchar *app_version = NULL;
 
@@ -24,6 +25,9 @@ static GOptionEntry entries[] =
 {
     {"version", 0, 0, G_OPTION_ARG_NONE, &version,
         "Show balde's version number and exit.", NULL},
+    {"app-dir", 0, 0, G_OPTION_ARG_FILENAME, &app_dir,
+        "Application directory, where files will be created. (default: current "
+        "directory)", "DIR"},
     {"app-name", 0, 0, G_OPTION_ARG_STRING, &app_name,
         "Application name. (default: current directory name)", "NAME"},
     {"app-version", 0, 0, G_OPTION_ARG_STRING, &app_version,
@@ -51,20 +55,39 @@ main(int argc, char **argv)
         goto point1;
     }
 
+    // get project files from binary
     GSList *files = balde_quickstart_list_project_files(project_get_resource());
-    g_printerr("asd: %d\n", balde_quickstart_check_files(files, "/"));
-    balde_quickstart_write_project(files, "bola");
 
+    if (app_dir == NULL)
+        app_dir = g_get_current_dir();
 
-    gchar *project_name = balde_quickstart_get_name(app_name);
+    if (!balde_quickstart_check_files(files, app_dir)) {
+        g_printerr(
+            "error: some files in the output directory (%s) would be overwritten.\n",
+            app_dir);
+        g_printerr(
+            "       if you really want to use this directory, clean it up and "
+            "run this program again.\n");
+        goto point2;
+    }
 
-    g_printerr("%s\n", project_name);
+    if (app_name == NULL)
+        app_name = balde_quickstart_get_name();
 
-    g_free(project_name);
+    if (app_version == NULL)
+        app_version = g_strdup("0.1");
 
+    balde_quickstart_write_project(files, app_dir, app_name, app_version);
+
+point2:
+    g_free(app_dir);
     g_free(app_name);
     g_free(app_version);
 
+    balde_quickstart_free_files(files);
+
 point1:
+    g_option_context_free(context);
+
     return rv;
 }

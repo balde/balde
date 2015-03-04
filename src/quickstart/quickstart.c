@@ -24,11 +24,8 @@
 
 
 gchar*
-balde_quickstart_get_name(const gchar *name)
+balde_quickstart_get_name(void)
 {
-    if (name != NULL)
-        return g_strdup(name);
-
     gchar *cwd = g_get_current_dir();
     gchar *dirname = g_path_get_basename(cwd);
     g_free(cwd);
@@ -69,6 +66,7 @@ list_project_files(GResource *resource, const gchar *path, GSList **files)
             }
             balde_quickstart_file_t *f = g_new(balde_quickstart_file_t, 1);
             filename = g_match_info_fetch(match, 1);
+            g_match_info_free(match);
             f->name = fix_filename(filename);
             g_free(filename);
             f->executable = FALSE;
@@ -96,6 +94,22 @@ balde_quickstart_list_project_files(GResource *resource)
     GSList *files = NULL;
     list_project_files(resource, "/", &files);
     return files;
+}
+
+
+static void
+free_file(balde_quickstart_file_t *f)
+{
+    g_free(f->name);
+    g_string_free(f->content, TRUE);
+    g_free(f);
+}
+
+
+void
+balde_quickstart_free_files(GSList *l)
+{
+    g_slist_free_full(l, (GDestroyNotify) free_file);
 }
 
 
@@ -139,13 +153,32 @@ get_file_mode(gboolean executable)
 #endif
 
 
+static void
+replace_tmpl_var(GString **s, const gchar *name, const gchar *value)
+{
+    gchar *regex = g_strdup_printf("\\{\\{%s\\}\\}", name);
+    GRegex *re = g_regex_new(regex, 0, 0, NULL);
+    gchar *replaced = g_regex_replace_literal(re, (*s)->str, (*s)->len, 0,
+        value, 0, NULL);
+    g_string_free(*s, TRUE);
+    *s = g_string_new(replaced);
+    g_free(replaced);
+    g_regex_unref(re);
+    g_free(regex);
+}
+
+
 void
-balde_quickstart_write_project(GSList *files, const gchar *dir)
+balde_quickstart_write_project(GSList *files, const gchar *dir,
+    const gchar *app_name, const gchar *app_version)
 {
     gchar *dirname;
     gchar *filename;
     for (GSList *tmp = files; tmp != NULL; tmp = g_slist_next(tmp)) {
         balde_quickstart_file_t *f = tmp->data;
+        replace_tmpl_var(&(f->content), "APP_NAME", app_name);
+        replace_tmpl_var(&(f->content), "APP_VERSION", app_version);
+        replace_tmpl_var(&(f->content), "VERSION", PACKAGE_VERSION);
         filename = g_build_filename(dir, f->name, NULL);
         dirname = g_path_get_dirname(filename);
         if (g_mkdir_with_parents(dirname, get_mode()))
