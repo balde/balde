@@ -10,6 +10,7 @@
 #define _BALDE_QUICKSTART_QUICKSTART_H
 
 #include <glib.h>
+#include <gio/gio.h>
 
 typedef struct {
     gchar *name;
@@ -18,7 +19,7 @@ typedef struct {
 } balde_quickstart_file_t;
 
 gchar* balde_quickstart_get_name(const gchar *name);
-GSList* balde_quickstart_list_project_files(void);
+GSList* balde_quickstart_list_project_files(GResource *resource);
 gboolean balde_quickstart_check_files(GSList *files, const gchar *dir);
 void balde_quickstart_write_project(GSList *files, const gchar *dir);
 

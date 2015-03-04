@@ -21,7 +21,6 @@
 #include <glib.h>
 #include <gio/gio.h>
 #include "quickstart.h"
-#include "project.h"
 
 
 gchar*
@@ -92,10 +91,10 @@ clean:
 
 
 GSList*
-balde_quickstart_list_project_files(void)
+balde_quickstart_list_project_files(GResource *resource)
 {
     GSList *files = NULL;
-    list_project_files(project_get_resource(), "/", &files);
+    list_project_files(resource, "/", &files);
     return files;
 }
 

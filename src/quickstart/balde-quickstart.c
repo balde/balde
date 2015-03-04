@@ -13,6 +13,7 @@
 #include <locale.h>
 #include <stdlib.h>
 #include "quickstart.h"
+#include "project.h"
 
 
 static gboolean version = FALSE;
@@ -50,7 +51,7 @@ main(int argc, char **argv)
         goto point1;
     }
 
-    GSList *files = balde_quickstart_list_project_files();
+    GSList *files = balde_quickstart_list_project_files(project_get_resource());
     g_printerr("asd: %d\n", balde_quickstart_check_files(files, "/"));
     balde_quickstart_write_project(files, "bola");
 

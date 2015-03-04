@@ -254,7 +254,7 @@ nodist_libbalde_quickstart_la_SOURCES = \
 	src/quickstart/project.c \
 	src/quickstart/project.h
 
-src/quickstart/quickstart.c: \
+src/quickstart/balde_quickstart-balde-quickstart.$(OBJEXT): \
 	$(nodist_libbalde_quickstart_la_SOURCES)
 
 src/quickstart/project.c: src/quickstart/project.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/src/quickstart/project $(top_srcdir)/src/quickstart/project.xml)
