@@ -132,9 +132,10 @@ get_mode(void)
 static mode_t
 get_file_mode(gboolean executable)
 {
+    mode_t mask = (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
     if (executable)
-        return get_mode();
-    return (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH) & get_mode();
+        mask |= (S_IXUSR | S_IXGRP | S_IXOTH);
+    return mask & get_mode();
 }
 #endif
 
