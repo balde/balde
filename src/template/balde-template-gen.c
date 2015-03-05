@@ -72,5 +72,6 @@ point2:
     g_free(source);
     g_free(template_name);
 point1:
+    g_option_context_free(context);
     return rv;
 }
