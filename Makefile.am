@@ -160,6 +160,7 @@ check_PROGRAMS = \
 	tests/check_datetime \
 	tests/check_exceptions \
 	tests/check_multipart \
+	tests/check_quickstart \
 	tests/check_requests \
 	tests/check_resources \
 	tests/check_responses \
@@ -594,6 +595,23 @@ tests/tests_check_multipart-check_multipart.$(OBJEXT): \
 	tests/uploads/without-filename.txt \
 	tests/uploads/without-filetype.txt \
 	tests/uploads/multiple.txt
+
+tests_check_quickstart_SOURCES = \
+	tests/check_quickstart.c
+
+tests_check_quickstart_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS)
+
+tests_check_quickstart_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_quickstart_LDADD = \
+	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
+	libbalde.la \
+	libbalde_quickstart.la
 
 tests_check_resources_SOURCES = \
 	tests/check_resources.c

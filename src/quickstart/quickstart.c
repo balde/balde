@@ -26,6 +26,8 @@
 gchar*
 balde_quickstart_get_app_name(const gchar *dir)
 {
+    if (dir == NULL)
+        return g_strdup("unnamed");
     gchar *dirname = g_path_get_basename(dir);
     if (g_strcmp0(dirname, ".") == 0 || g_strcmp0(dirname, "/") == 0) {
         g_free(dirname);
@@ -38,6 +40,8 @@ balde_quickstart_get_app_name(const gchar *dir)
 gchar*
 balde_quickstart_fix_app_name(const gchar *app_name, gchar replace)
 {
+    if (app_name == NULL)
+        return NULL;
     gchar *app_name_ = g_strdup(app_name);
     for (guint i = 0; app_name_[i] != '\0'; i++) {
         if (g_ascii_isalpha(app_name_[i])) {
