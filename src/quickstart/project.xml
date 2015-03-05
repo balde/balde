@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
     <gresource prefix="">
+        <file>.gitignore.tmpl</file>
         <file>autogen.sh.tmpl</file>
         <file>build-aux/.keep.tmpl</file>
         <file>configure.ac.tmpl</file>

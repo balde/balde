@@ -24,11 +24,9 @@
 
 
 gchar*
-balde_quickstart_get_name(void)
+balde_quickstart_get_app_name(const gchar *dir)
 {
-    gchar *cwd = g_get_current_dir();
-    gchar *dirname = g_path_get_basename(cwd);
-    g_free(cwd);
+    gchar *dirname = g_path_get_basename(dir);
     if (g_strcmp0(dirname, ".") == 0 || g_strcmp0(dirname, "/") == 0) {
         g_free(dirname);
         return g_strdup("unnamed");

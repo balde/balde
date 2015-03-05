@@ -6,7 +6,7 @@ EXTRA_DIST = \
 	autogen.sh \
 	src/templates/base.html \
 	src/static/resources.xml \
-	src/static/screen.css \
+	src/static/screen.css
 
 CLEANFILES =
 
@@ -17,7 +17,7 @@ noinst_HEADERS = \
 	src/foo.h
 
 bin_PROGRAMS = \
-	foo
+	app
 
 check_PROGRAMS = \
 	tests/check_foo
@@ -53,23 +53,23 @@ src/static/resources.h: src/static/resources.xml $(shell $(GLIB_COMPILE_RESOURCE
 
 ## Build rules: binary
 
-foo_SOURCES = \
+app_SOURCES = \
 	src/main.c
 
-nodist_foo_SOURCES = \
+nodist_app_SOURCES = \
 	src/templates/base.c \
 	src/templates/base.h \
 	src/static/resources.c \
 	src/static/resources.h
 
-src/foo-main.$(OBJEXT): $(nodist_foo_SOURCES)
+src/app-main.$(OBJEXT): $(nodist_app_SOURCES)
 
-foo_CFLAGS = \
+app_CFLAGS = \
 	$(BALDE_CFLAGS) \
 	-I$(top_builddir)/src \
 	-I$(top_srcdir)/src
 
-foo_LDADD = \
+app_LDADD = \
 	libfoo.la \
 	$(BALDE_LIBS)
 

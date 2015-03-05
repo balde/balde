@@ -72,7 +72,7 @@ main(int argc, char **argv)
     }
 
     if (app_name == NULL)
-        app_name = balde_quickstart_get_name();
+        app_name = balde_quickstart_get_app_name(app_dir);
 
     if (app_version == NULL)
         app_version = g_strdup("0.1");

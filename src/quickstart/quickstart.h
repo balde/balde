@@ -18,7 +18,7 @@ typedef struct {
     gboolean executable;
 } balde_quickstart_file_t;
 
-gchar* balde_quickstart_get_name(void);
+gchar* balde_quickstart_get_app_name(const gchar *dir);
 GSList* balde_quickstart_list_project_files(GResource *resource);
 void balde_quickstart_free_files(GSList *l);
 gboolean balde_quickstart_check_files(GSList *files, const gchar *dir);

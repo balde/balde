@@ -33,6 +33,7 @@ EXTRA_DIST = \
 	doc/70_api-changes.md \
 	src/template/parser-grammar.leg \
 	src/quickstart/project.xml \
+	src/quickstart/project/.gitignore.tmpl \
 	src/quickstart/project/Makefile.am.tmpl \
 	src/quickstart/project/autogen.sh.tmpl \
 	src/quickstart/project/build-aux/.keep.tmpl \

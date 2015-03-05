@@ -1,9 +1,13 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif /* HAVE_CONFIG_H */
+
 #include <glib.h>
-#include "number.h"
+#include "foo.h"
 
 
 gint
-number_get_value(void)
+foo_get_number(void)
 {
     return 42;
 }
