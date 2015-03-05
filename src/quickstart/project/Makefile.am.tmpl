@@ -17,7 +17,7 @@ noinst_HEADERS = \
 	src/foo.h
 
 bin_PROGRAMS = \
-	app
+	{{APP_BINARY_NAME}}
 
 check_PROGRAMS = \
 	tests/check_foo
@@ -53,23 +53,23 @@ src/static/resources.h: src/static/resources.xml $(shell $(GLIB_COMPILE_RESOURCE
 
 ## Build rules: binary
 
-app_SOURCES = \
+{{APP_SAFE_NAME}}_SOURCES = \
 	src/main.c
 
-nodist_app_SOURCES = \
+nodist_{{APP_SAFE_NAME}}_SOURCES = \
 	src/templates/base.c \
 	src/templates/base.h \
 	src/static/resources.c \
 	src/static/resources.h
 
-src/app-main.$(OBJEXT): $(nodist_app_SOURCES)
+src/{{APP_SAFE_NAME}}-main.$(OBJEXT): $(nodist_{{APP_SAFE_NAME}}_SOURCES)
 
-app_CFLAGS = \
+{{APP_SAFE_NAME}}_CFLAGS = \
 	$(BALDE_CFLAGS) \
 	-I$(top_builddir)/src \
 	-I$(top_srcdir)/src
 
-app_LDADD = \
+{{APP_SAFE_NAME}}_LDADD = \
 	libfoo.la \
 	$(BALDE_LIBS)
 

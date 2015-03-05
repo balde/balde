@@ -35,6 +35,22 @@ balde_quickstart_get_app_name(const gchar *dir)
 }
 
 
+gchar*
+balde_quickstart_fix_app_name(const gchar *app_name, gchar replace)
+{
+    gchar *app_name_ = g_strdup(app_name);
+    for (guint i = 0; app_name_[i] != '\0'; i++) {
+        if (g_ascii_isalpha(app_name_[i])) {
+            app_name_[i] = g_ascii_tolower(app_name_[i]);
+        }
+        else {
+            app_name_[i] = replace;
+        }
+    }
+    return app_name_;
+}
+
+
 static gchar*
 fix_filename(const gchar *filename)
 {
@@ -172,10 +188,17 @@ balde_quickstart_write_project(GSList *files, const gchar *dir,
 {
     gchar *dirname;
     gchar *filename;
+    gchar *tmp2;
     for (GSList *tmp = files; tmp != NULL; tmp = g_slist_next(tmp)) {
         balde_quickstart_file_t *f = tmp->data;
         replace_tmpl_var(&(f->content), "APP_NAME", app_name);
         replace_tmpl_var(&(f->content), "APP_VERSION", app_version);
+        tmp2 = balde_quickstart_fix_app_name(app_name, '-');
+        replace_tmpl_var(&(f->content), "APP_BINARY_NAME", tmp2);
+        g_free(tmp2);
+        tmp2 = balde_quickstart_fix_app_name(app_name, '_');
+        replace_tmpl_var(&(f->content), "APP_SAFE_NAME", tmp2);
+        g_free(tmp2);
         replace_tmpl_var(&(f->content), "VERSION", PACKAGE_VERSION);
         filename = g_build_filename(dir, f->name, NULL);
         dirname = g_path_get_dirname(filename);
