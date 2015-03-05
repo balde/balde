@@ -268,7 +268,6 @@ src/quickstart/project.h: src/quickstart/project.xml $(shell $(GLIB_COMPILE_RESO
 libbalde_quickstart_la_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS) \
-	-I$(top_builddir)/src/quickstart \
 	-I$(top_srcdir)/src/quickstart
 
 libbalde_quickstart_la_LIBADD = \
@@ -278,7 +277,8 @@ balde_quickstart_SOURCES = \
 	src/quickstart/balde-quickstart.c
 
 balde_quickstart_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	-I$(top_builddir)/src/quickstart
 
 balde_quickstart_LDADD = \
 	$(GLIB_LIBS) \
