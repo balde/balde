@@ -17,7 +17,6 @@
 
 
 static gboolean version = FALSE;
-static gchar *app_dir = NULL;
 static gchar *app_name = NULL;
 static gchar *app_version = NULL;
 
@@ -25,11 +24,8 @@ static GOptionEntry entries[] =
 {
     {"version", 0, 0, G_OPTION_ARG_NONE, &version,
         "Show balde's version number and exit.", NULL},
-    {"app-dir", 0, 0, G_OPTION_ARG_FILENAME, &app_dir,
-        "Application directory, where files will be created. (default: current "
-        "directory)", "DIR"},
     {"app-name", 0, 0, G_OPTION_ARG_STRING, &app_name,
-        "Application name. (default: current directory name)", "NAME"},
+        "Application name. (default: application directory basename)", "NAME"},
     {"app-version", 0, 0, G_OPTION_ARG_STRING, &app_version,
         "Application version. (default: 0.1)", "VERSION"},
     {NULL}
@@ -43,7 +39,7 @@ main(int argc, char **argv)
     int rv = EXIT_SUCCESS;
     GError *err = NULL;
     GOptionContext *context = g_option_context_new(
-        "- a helper tool to bootstrap your balde application");
+        "APP_DIR - a helper tool to bootstrap your balde application");
     g_option_context_add_main_entries(context, entries, NULL);
     if (!g_option_context_parse(context, &argc, &argv, &err)) {
         g_printerr("Option parsing failed: %s\n", err->message);
@@ -54,12 +50,18 @@ main(int argc, char **argv)
         g_printerr("%s\n", PACKAGE_STRING);
         goto point1;
     }
+    if (argc != 2) {
+        gchar *help = g_option_context_get_help(context, FALSE, NULL);
+        g_printerr("%s", help);
+        g_free(help);
+        rv = EXIT_FAILURE;
+        goto point1;
+    }
 
     // get project files from binary
     GSList *files = balde_quickstart_list_project_files(project_get_resource());
 
-    if (app_dir == NULL)
-        app_dir = g_get_current_dir();
+    gchar *app_dir = argv[1];
 
     if (!balde_quickstart_check_files(files, app_dir)) {
         g_printerr(
@@ -80,7 +82,6 @@ main(int argc, char **argv)
     balde_quickstart_write_project(files, app_dir, app_name, app_version);
 
 point2:
-    g_free(app_dir);
     g_free(app_name);
     g_free(app_version);
 
