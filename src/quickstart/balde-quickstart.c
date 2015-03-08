@@ -19,6 +19,7 @@
 static gboolean version = FALSE;
 static gchar *app_name = NULL;
 static gchar *app_version = NULL;
+static gboolean force = FALSE;
 
 static GOptionEntry entries[] =
 {
@@ -27,7 +28,9 @@ static GOptionEntry entries[] =
     {"app-name", 0, 0, G_OPTION_ARG_STRING, &app_name,
         "Application name. (default: application directory basename)", "NAME"},
     {"app-version", 0, 0, G_OPTION_ARG_STRING, &app_version,
-        "Application version. (default: 0.1)", "VERSION"},
+        "Application version. (default: 0)", "VERSION"},
+    {"force", 0, 0, G_OPTION_ARG_NONE, &force,
+        "Force overwriting of existing files in application directory.", NULL},
     {NULL}
 };
 
@@ -63,21 +66,30 @@ main(int argc, char **argv)
 
     gchar *app_dir = argv[1];
 
-    if (!balde_quickstart_check_files(files, app_dir)) {
-        g_printerr(
-            "error: some files in the output directory (%s) would be overwritten.\n",
-            app_dir);
-        g_printerr(
-            "       if you really want to use this directory, clean it up and "
-            "run this program again.\n");
-        goto point2;
+    if (!force) {
+
+        gchar **collisions = balde_quickstart_check_files(files, app_dir);
+
+        if (collisions != NULL) {
+            g_printerr(
+                "error: some files in the output directory would be overwritten:\n\n");
+            gchar *tmp_collisions = g_strjoinv("\n\t", collisions);
+            g_printerr(
+                "\t%s\n\n", tmp_collisions);
+            g_free(tmp_collisions);
+            g_printerr(
+                "if you really want to overwrite these files, run this program "
+                "again adding --force option.\n");
+            g_strfreev(collisions);
+            goto point2;
+        }
     }
 
     if (app_name == NULL)
         app_name = balde_quickstart_get_app_name(app_dir);
 
     if (app_version == NULL)
-        app_version = g_strdup("0.1");
+        app_version = g_strdup("0");
 
     balde_quickstart_write_project(files, app_dir, app_name, app_version);
 

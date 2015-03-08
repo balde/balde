@@ -131,18 +131,29 @@ balde_quickstart_free_files(GSList *l)
 }
 
 
-gboolean
+gchar**
 balde_quickstart_check_files(GSList *files, const gchar *dir)
 {
+    GSList *l = NULL;
+    gchar **rv = NULL;
     for (GSList *tmp = files; tmp != NULL; tmp = g_slist_next(tmp)) {
         balde_quickstart_file_t *f = tmp->data;
         gchar *filename = g_build_filename(dir, f->name, NULL);
-        gboolean t = g_file_test(filename, G_FILE_TEST_EXISTS);
-        g_free(filename);
-        if (t)
-            return FALSE;
+        if (g_file_test(filename, G_FILE_TEST_EXISTS))
+            l = g_slist_append(l, filename);
+        else
+            g_free(filename);
     }
-    return TRUE;
+    if (l != NULL) {
+        rv = g_new(gchar*, g_slist_length(l) + 1);
+        guint i = 0;
+        for (GSList *tmp = l; tmp != NULL; tmp = g_slist_next(tmp), i++) {
+            rv[i] = (gchar*) tmp->data;
+        }
+        rv[i] = NULL;
+    }
+    g_slist_free(l);
+    return rv;
 }
 
 
