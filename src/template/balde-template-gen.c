@@ -16,10 +16,13 @@
 #include "template.h"
 
 static gboolean version = FALSE;
+static gboolean generate_dependencies = FALSE;
 static GOptionEntry entries[] =
 {
     {"version", 0, 0, G_OPTION_ARG_NONE, &version,
         "Show balde's version number and exit.", NULL},
+    {"generate-dependencies", 0, 0, G_OPTION_ARG_NONE, &generate_dependencies,
+        "Generate dependency list, suitable for Makefile rules.", NULL},
     {NULL}
 };
 
@@ -31,7 +34,7 @@ main(int argc, char **argv)
     int rv = EXIT_SUCCESS;
     GError *err = NULL;
     GOptionContext *context = g_option_context_new(
-        "TEMPLATE GENERATED-FILE - balde template source code generator");
+        "TEMPLATE [GENERATED-FILE] - balde template source code generator");
     g_option_context_add_main_entries(context, entries, NULL);
     if (!g_option_context_parse(context, &argc, &argv, &err)) {
         g_printerr("Option parsing failed: %s\n", err->message);
@@ -43,6 +46,12 @@ main(int argc, char **argv)
         g_printerr("%s\n", PACKAGE_STRING);
         goto point1;
     }
+    if (argc >= 2 && generate_dependencies) {
+        gchar *dependencies = balde_template_generate_dependencies(argv[1]);
+        g_print("%s\n", dependencies);
+        g_free(dependencies);
+        goto point1;
+    }
     if (argc != 3) {
         gchar *help = g_option_context_get_help(context, FALSE, NULL);
         g_printerr("%s", help);
@@ -50,8 +59,8 @@ main(int argc, char **argv)
         rv = EXIT_FAILURE;
         goto point1;
     }
-    gchar *template_name = balde_template_get_name(argv[2]);
     gchar *source = NULL;
+    gchar *template_name = balde_template_get_name(argv[2]);
     if (g_str_has_suffix(argv[2], ".c")) {
         source = balde_template_generate_source(template_name, argv[1]);
     }
@@ -68,6 +77,7 @@ main(int argc, char **argv)
         rv = EXIT_FAILURE;
         goto point2;  // duh!
     }
+
 point2:
     g_free(source);
     g_free(template_name);

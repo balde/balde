@@ -358,6 +358,34 @@ test_template_generate_header(void)
 
 
 void
+test_template_generate_dependencies(void)
+{
+    gchar *tmpl = get_template("foo.html");
+    gchar *rv = balde_template_generate_dependencies(tmpl);
+    g_assert_cmpstr(rv, ==, tmpl);
+    g_free(tmpl);
+    g_free(rv);
+}
+
+
+void
+test_template_generate_dependencies_with_include(void)
+{
+    gchar *tmpl = get_template("base2.html");
+    gchar *rv = balde_template_generate_dependencies(tmpl);
+    gchar *dir = g_path_get_dirname(tmpl);
+    gchar *include = g_build_filename(dir, "body2.html", NULL);
+    g_free(dir);
+    gchar *dependencies = g_strdup_printf("%s %s", tmpl, include);
+    g_free(include);
+    g_free(tmpl);
+    g_assert_cmpstr(rv, ==, dependencies);
+    g_free(dependencies);
+    g_free(rv);
+}
+
+
+void
 test_template_get_name(void)
 {
     gchar *rv = balde_template_get_name("bola.guda.ação.html");
@@ -454,6 +482,10 @@ main(int argc, char** argv)
         test_template_generate_source_with_if_and_ws_cleaner);
     g_test_add_func("/template/generate_header",
         test_template_generate_header);
+    g_test_add_func("/template/generate_dependencies",
+        test_template_generate_dependencies);
+    g_test_add_func("/template/generate_dependencies_with_include",
+        test_template_generate_dependencies_with_include);
     g_test_add_func("/template/get_name", test_template_get_name);
     g_test_add_func("/template/parse", test_template_parse);
     return g_test_run();

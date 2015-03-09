@@ -23,6 +23,7 @@ balde_template_build_state(const gchar *filename, balde_template_state_t **state
     if (*state == NULL) {
         *state = g_new(balde_template_state_t, 1);
         (*state)->includes = NULL;
+        (*state)->imports = NULL;
         (*state)->body = g_string_new("");
         (*state)->indent = 4;
         (*state)->declare_tmp = FALSE;
@@ -41,15 +42,15 @@ balde_template_build_state(const gchar *filename, balde_template_state_t **state
         balde_template_block_t *node = tmp->data;
         switch (node->type) {
             case BALDE_TEMPLATE_IMPORT_BLOCK:
-                (*state)->includes = g_slist_append((*state)->includes,
+                (*state)->imports = g_slist_append((*state)->imports,
                     g_strdup(((balde_template_import_block_t*) node->block)->import));
                 break;
             case BALDE_TEMPLATE_INCLUDE_BLOCK:
                 tmp_str = g_build_filename(dirname,
                     ((balde_template_include_block_t*) node->block)->include,
                     NULL);
+                (*state)->includes = g_slist_append((*state)->includes, tmp_str);
                 balde_template_build_state(tmp_str, state);
-                g_free(tmp_str);
                 break;
             case BALDE_TEMPLATE_CONTENT_BLOCK:
                 tmp_str = g_strescape(((balde_template_content_block_t*) node->block)->content, "");
@@ -134,6 +135,7 @@ balde_template_free_state(balde_template_state_t *state)
     if (state == NULL)
         return;
     g_slist_free_full(state->includes, g_free);
+    g_slist_free_full(state->imports, g_free);
     g_string_free(state->body, TRUE);
     g_free(state);
 }
@@ -151,7 +153,7 @@ balde_template_generate_source(const gchar *template_name, const gchar *file_nam
         "#include <balde.h>\n"
         "#include <glib.h>\n");
 
-    for (GSList *tmp = state->includes; tmp != NULL; tmp = g_slist_next(tmp))
+    for (GSList *tmp = state->imports; tmp != NULL; tmp = g_slist_next(tmp))
         g_string_append_printf(rv, "#include <%s>\n", (gchar*) tmp->data);
 
     g_string_append_printf(rv,
@@ -209,6 +211,29 @@ balde_template_generate_header(const gchar *template_name)
         "balde_response_t *response);\n"
         "\n"
         "#endif\n", template_name, template_name, template_name, template_name);
+}
+
+
+gchar*
+balde_template_generate_dependencies(const gchar *file_name)
+{
+    balde_template_state_t *state = NULL;
+    balde_template_build_state(file_name, &state);
+
+    gchar **dependencies = g_new(gchar*, g_slist_length(state->includes) + 2);
+    dependencies[0] = g_strdup(file_name);
+
+    guint i = 1;
+    for (GSList *tmp = state->includes; tmp != NULL; tmp = g_slist_next(tmp))
+        dependencies[i++] = g_strdup((gchar*) tmp->data);
+    dependencies[i] = NULL;
+
+    gchar *str = g_strjoinv(" ", dependencies);
+
+    g_strfreev(dependencies);
+    balde_template_free_state(state);
+
+    return str;
 }
 
 
