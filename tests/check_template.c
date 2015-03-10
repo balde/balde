@@ -11,8 +11,8 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <glib.h>
-#include "../src/template/template.h"
-#include "../src/template/parser.h"
+#include "../src/theme/template.h"
+#include "../src/theme/parser.h"
 #include "utils.h"
 
 
