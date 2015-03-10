@@ -92,7 +92,7 @@ Makefile.in
 /examples/templates/*.h
 
 # leg generated source
-/src/template/parser-grammar.c
+/src/theme/parser-grammar.c
 
 # tarballs
 balde-*.tar.*

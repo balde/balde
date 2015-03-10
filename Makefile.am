@@ -31,7 +31,7 @@ EXTRA_DIST = \
 	doc/50_application-cli.md \
 	doc/60_application-deployment.md \
 	doc/70_api-changes.md \
-	src/template/parser-grammar.leg \
+	src/theme/parser-grammar.leg \
 	src/quickstart/project.xml \
 	src/quickstart/project/.gitignore.tmpl \
 	src/quickstart/project/Makefile.am.tmpl \
@@ -135,8 +135,8 @@ noinst_HEADERS = \
 	src/responses.h \
 	src/routing.h \
 	src/sessions.h \
-	src/template/template.h \
-	src/template/parser.h \
+	src/theme/template.h \
+	src/theme/parser.h \
 	src/quickstart/quickstart.h \
 	src/utils.h \
 	tests/utils.h
@@ -219,25 +219,25 @@ endif
 ## Build rules: balde-template-gen
 
 libbalde_template_la_SOURCES = \
-	src/template/template.c \
-	src/template/parser.c \
-	src/template/parser-grammar.c
+	src/theme/template.c \
+	src/theme/parser.c \
+	src/theme/parser-grammar.c
 
 libbalde_template_la_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/src/template
+	-I$(top_srcdir)/src/theme
 
 libbalde_template_la_LIBADD = \
 	$(GLIB_LIBS)
 
 if USE_LEG
-src/template/parser-grammar.c: src/template/parser-grammar.leg
+src/theme/parser-grammar.c: src/theme/parser-grammar.leg
 	$(AM_V_GEN)$(LEG) -o $@ $<
 endif
 
 balde_template_gen_SOURCES = \
-	src/template/balde-template-gen.c
+	src/theme/balde-template-gen.c
 
 balde_template_gen_CFLAGS = \
 	$(GLIB_CFLAGS)
