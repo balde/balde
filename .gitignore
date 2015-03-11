@@ -48,6 +48,9 @@ Makefile.in
 # balde-template-gen
 /balde-template-gen
 
+# balde-theme-gen
+/balde-theme-gen
+
 # balde-quickstart
 /balde-quickstart
 /src/quickstart/project.c
@@ -66,6 +69,7 @@ Makefile.in
 /tests/check_responses
 /tests/check_routing
 /tests/check_sessions
+/tests/check_static
 /tests/check_stdin
 /tests/check_template
 /tests/check_template_helpers
@@ -92,7 +96,7 @@ Makefile.in
 /examples/templates/*.h
 
 # leg generated source
-/src/theme/parser-grammar.c
+/src/template/parser-grammar.c
 
 # tarballs
 balde-*.tar.*

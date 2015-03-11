@@ -31,7 +31,7 @@ EXTRA_DIST = \
 	doc/50_application-cli.md \
 	doc/60_application-deployment.md \
 	doc/70_api-changes.md \
-	src/theme/parser-grammar.leg \
+	src/template/parser-grammar.leg \
 	src/quickstart/project.xml \
 	src/quickstart/project/.gitignore.tmpl \
 	src/quickstart/project/Makefile.am.tmpl \
@@ -135,8 +135,9 @@ noinst_HEADERS = \
 	src/responses.h \
 	src/routing.h \
 	src/sessions.h \
-	src/theme/template.h \
-	src/theme/parser.h \
+	src/template/template.h \
+	src/template/parser.h \
+	src/theme/static.h \
 	src/quickstart/quickstart.h \
 	src/utils.h \
 	tests/utils.h
@@ -146,10 +147,12 @@ lib_LTLIBRARIES = \
 
 noinst_LTLIBRARIES = \
 	libbalde_template.la \
+	libbalde_theme.la \
 	libbalde_quickstart.la
 
 bin_PROGRAMS = \
 	balde-template-gen \
+	balde-theme-gen \
 	balde-quickstart
 
 noinst_PROGRAMS =
@@ -166,6 +169,7 @@ check_PROGRAMS = \
 	tests/check_responses \
 	tests/check_routing \
 	tests/check_sessions \
+	tests/check_static \
 	tests/check_stdin \
 	tests/check_template \
 	tests/check_template_helpers \
@@ -219,25 +223,25 @@ endif
 ## Build rules: balde-template-gen
 
 libbalde_template_la_SOURCES = \
-	src/theme/template.c \
-	src/theme/parser.c \
-	src/theme/parser-grammar.c
+	src/template/template.c \
+	src/template/parser.c \
+	src/template/parser-grammar.c
 
 libbalde_template_la_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS) \
-	-I$(top_srcdir)/src/theme
+	-I$(top_srcdir)/src/template
 
 libbalde_template_la_LIBADD = \
 	$(GLIB_LIBS)
 
 if USE_LEG
-src/theme/parser-grammar.c: src/theme/parser-grammar.leg
+src/template/parser-grammar.c: src/template/parser-grammar.leg
 	$(AM_V_GEN)$(LEG) -o $@ $<
 endif
 
 balde_template_gen_SOURCES = \
-	src/theme/balde-template-gen.c
+	src/template/balde-template-gen.c
 
 balde_template_gen_CFLAGS = \
 	$(GLIB_CFLAGS)
@@ -245,6 +249,34 @@ balde_template_gen_CFLAGS = \
 balde_template_gen_LDADD = \
 	$(GLIB_LIBS) \
 	libbalde_template.la
+
+
+## Build rules: balde-theme-gen
+
+libbalde_theme_la_SOURCES = \
+	src/theme/static.c
+
+libbalde_theme_la_CFLAGS = \
+	$(AM_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	-I$(top_srcdir)/src/template \
+	-I$(top_srcdir)/src/theme
+
+libbalde_theme_la_LIBADD = \
+	$(GLIB_LIBS)
+
+balde_theme_gen_SOURCES = \
+	src/theme/balde-theme-gen.c
+
+balde_theme_gen_CFLAGS = \
+	-I$(top_srcdir)/src/template \
+	-I$(top_srcdir)/src/theme \
+	$(GLIB_CFLAGS)
+
+balde_theme_gen_LDADD = \
+	$(GLIB_LIBS) \
+	libbalde_template.la \
+	libbalde_theme.la
 
 
 ## Build rules: balde-quickstart
@@ -667,6 +699,25 @@ tests_check_sessions_LDADD = \
 	$(GLIB_LIBS) \
 	$(JSON_GLIB_LIBS) \
 	libbalde.la
+
+tests_check_static_SOURCES = \
+	tests/check_static.c \
+	tests/utils.c
+
+tests_check_static_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/tests
+
+tests_check_static_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_static_LDADD = \
+	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
+	libbalde.la \
+	libbalde_theme.la
 
 tests_check_stdin_SOURCES = \
 	tests/check_stdin.c \

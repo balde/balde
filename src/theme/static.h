@@ -6,12 +6,12 @@
  * See the file COPYING.
  */
 
-#ifndef _BALDE_TESTS_UTILS_H
-#define _BALDE_TESTS_UTILS_H
+#ifndef _BALDE_THEME_STATIC_H
+#define _BALDE_THEME_STATIC_H
 
-gchar* get_template(const gchar *filename);
-gchar* get_expected_template(const gchar *filename);
-GString* get_upload(const gchar *filename);
-gchar* get_static_dir(void);
+#include <glib.h>
 
-#endif
+gchar* balde_static_generate_resource_xml(gchar **files);
+GBytes* balde_static_get_resource_data(const gchar *sourcedir, gchar **files);
+
+#endif /* _BALDE_THEME_STATIC_H */

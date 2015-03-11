@@ -47,3 +47,10 @@ get_upload(const gchar *filename)
     g_free(contents);
     return rv;
 }
+
+
+gchar*
+get_static_dir(void)
+{
+    return g_build_filename("@abs_top_srcdir@", "tests", "static", NULL);
+}
