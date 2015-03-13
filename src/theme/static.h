@@ -13,5 +13,6 @@
 
 gchar* balde_static_generate_resource_xml(gchar **files);
 GBytes* balde_static_get_resource_data(const gchar *sourcedir, gchar **files);
+gchar* balde_static_render_resource_data(GBytes *d);
 
 #endif /* _BALDE_THEME_STATIC_H */

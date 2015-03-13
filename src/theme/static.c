@@ -40,6 +40,8 @@ balde_static_generate_resource_xml(gchar **files)
 GBytes*
 balde_static_get_resource_data(const gchar *sourcedir, gchar **files)
 {
+    if (sourcedir == NULL || files == NULL)
+        return NULL;
     GBytes *rv = NULL;
     gchar *gcr = g_find_program_in_path(GLIB_COMPILE_RESOURCES);
     if (gcr == NULL) {
@@ -119,4 +121,20 @@ point2:
 point1:
     g_free(gcr);
     return rv;
+}
+
+
+gchar*
+balde_static_render_resource_data(GBytes *d)
+{
+    gsize size;
+    const guint8 *data = g_bytes_get_data(d, &size);
+    GString *rv = g_string_new("{");
+    for (guint i = 0; i < size; i++) {
+        g_string_append_printf(rv, "0x%2.2x", (int) data[i]);
+        if (i != size - 1)
+            g_string_append(rv, ", ");
+    }
+    g_string_append(rv, "}");
+    return g_string_free(rv, FALSE);
 }

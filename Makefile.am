@@ -137,6 +137,7 @@ noinst_HEADERS = \
 	src/sessions.h \
 	src/template/template.h \
 	src/template/parser.h \
+	src/theme/config.h \
 	src/theme/static.h \
 	src/quickstart/quickstart.h \
 	src/utils.h \
@@ -254,15 +255,18 @@ balde_template_gen_LDADD = \
 ## Build rules: balde-theme-gen
 
 libbalde_theme_la_SOURCES = \
+	src/theme/config.c \
 	src/theme/static.c
 
 libbalde_theme_la_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/src/template \
 	-I$(top_srcdir)/src/theme
 
 libbalde_theme_la_LIBADD = \
+	$(JSON_GLIB_LIBS) \
 	$(GLIB_LIBS)
 
 balde_theme_gen_SOURCES = \

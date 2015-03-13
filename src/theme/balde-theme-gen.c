@@ -14,16 +14,24 @@
 #include <locale.h>
 #include <stdlib.h>
 #include "template.h"
+#include "config.h"
 #include "static.h"
 
 static gboolean version = FALSE;
-static gboolean generate_dependencies = FALSE;
+static gboolean dependencies = FALSE;
+static gchar *sourcedir = NULL;
+static gchar *target = NULL;
 static GOptionEntry entries[] =
 {
     {"version", 0, 0, G_OPTION_ARG_NONE, &version,
         "Show balde's version number and exit.", NULL},
-    {"generate-dependencies", 0, 0, G_OPTION_ARG_NONE, &generate_dependencies,
+    {"dependencies", 0, 0, G_OPTION_ARG_NONE, &dependencies,
         "Generate dependency list, suitable for Makefile rules.", NULL},
+    {"sourcedir", 0, 0, G_OPTION_ARG_STRING, &sourcedir,
+        "The directory where files are to be read from (default to current directory)",
+        "DIRECTORY"},
+    {"target", 0, 0, G_OPTION_ARG_STRING, &target,
+        "Name of the output file.", "FILE"},
     {NULL}
 };
 
@@ -35,7 +43,7 @@ main(int argc, char **argv)
     int rv = EXIT_SUCCESS;
     GError *err = NULL;
     GOptionContext *context = g_option_context_new(
-        "TEMPLATE [GENERATED-FILE] - balde template source code generator");
+        "JSON_FILE - balde theme source code generator");
     g_option_context_add_main_entries(context, entries, NULL);
     if (!g_option_context_parse(context, &argc, &argv, &err)) {
         g_printerr("Option parsing failed: %s\n", err->message);
@@ -43,31 +51,48 @@ main(int argc, char **argv)
         rv = EXIT_FAILURE;
         goto point1;
     }
-
-
-balde_static_get_resource_data("/home/rafael/dev/git/bluster/src/static", NULL);
-
-
-
-
     if (version) {
         g_printerr("%s\n", PACKAGE_STRING);
         goto point1;
     }
-    if (argc >= 2 && generate_dependencies) {
-        gchar *dependencies = balde_template_generate_dependencies(argv[1]);
-        g_print("%s\n", dependencies);
-        g_free(dependencies);
-        goto point1;
-    }
-    if (argc != 3) {
-        gchar *help = g_option_context_get_help(context, FALSE, NULL);
-        g_printerr("%s", help);
-        g_free(help);
+    if (argc != 2) {
+        g_printerr("Error: You should give exactly one JSON file name.\n");
         rv = EXIT_FAILURE;
         goto point1;
     }
-    gchar *source = NULL;
+    if (dependencies && (target != NULL)) {
+        g_printerr("Error: --dependencies and --target are mutually exclusive.\n");
+        rv = EXIT_FAILURE;
+        goto point1;
+    }
+
+    balde_theme_config_t *config = balde_theme_config_read(argv[1]);
+    if (config == NULL)
+        goto point1;
+
+    if (sourcedir == NULL)
+        sourcedir = g_strdup("");
+
+    if (dependencies) {
+        for (guint i = 0; config->templates[i] != NULL; i++) {
+            gchar *f = g_build_filename(sourcedir, config->templates[i], NULL);
+            g_print("%s\n", f);
+            g_free(f);
+        }
+        for (guint i = 0; config->static_resources[i] != NULL; i++) {
+            gchar *f = g_build_filename(sourcedir, config->static_resources[i], NULL);
+            g_print("%s\n", f);
+            g_free(f);
+        }
+        goto point1;
+    }
+
+    GBytes *s = balde_static_get_resource_data(sourcedir, config->static_resources);
+
+    g_printerr("bola: %s\n", balde_static_render_resource_data(s));
+
+
+    /*gchar *source = NULL;
     gchar *template_name = balde_template_get_name(argv[2]);
     if (g_str_has_suffix(argv[2], ".c")) {
         source = balde_template_generate_source(template_name, argv[1]);
@@ -84,12 +109,13 @@ balde_static_get_resource_data("/home/rafael/dev/git/bluster/src/static", NULL);
         g_printerr("Failed to write file: %s\n", argv[2]);
         rv = EXIT_FAILURE;
         goto point2;  // duh!
-    }
+    }*/
 
 point2:
-    g_free(source);
-    g_free(template_name);
+    //g_free(source);
+    //g_free(template_name);
 point1:
+    g_free(target);
     g_option_context_free(context);
     return rv;
 }

@@ -92,6 +92,18 @@ test_static_get_resource_data(void)
 }
 
 
+void
+test_static_render_resource_data(void)
+{
+    const guint8 t[5] = "bola";
+    GBytes *b = g_bytes_new(t, 5);
+    gchar *tmp = balde_static_render_resource_data(b);
+    g_assert_cmpstr(tmp, ==, "{0x62, 0x6f, 0x6c, 0x61, 0x00}");
+    g_free(tmp);
+    g_bytes_unref(b);
+}
+
+
 int
 main(int argc, char** argv)
 {
@@ -100,5 +112,7 @@ main(int argc, char** argv)
         test_static_generate_resource_xml);
     g_test_add_func("/static/get_resource_data",
         test_static_get_resource_data);
+    g_test_add_func("/static/render_resource_data",
+        test_static_render_resource_data);
     return g_test_run();
 }
