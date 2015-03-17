@@ -21,6 +21,8 @@ typedef struct {
 
 void balde_template_build_state(const gchar *filename, balde_template_state_t **state);
 void balde_template_free_state(balde_template_state_t *state);
+void balde_template_generate_str_function(const gchar *function_name, GString *s,
+    balde_template_state_t *state);
 gchar* balde_template_generate_source(const gchar *template_name, const gchar *file_name);
 gchar* balde_template_generate_header(const gchar *template_name);
 gchar* balde_template_generate_dependencies(const gchar *file_name);

@@ -141,6 +141,29 @@ balde_template_free_state(balde_template_state_t *state)
 }
 
 
+void
+balde_template_generate_str_function(const gchar *function_name, GString *s,
+    balde_template_state_t *state)
+{
+    g_string_append_printf(s,
+        "gchar*\n"
+        "%s(balde_app_t *app, balde_request_t *request, "
+        "balde_response_t *response)\n"
+        "{\n"
+        "    GString *rv = g_string_new(\"\");\n",
+        function_name);
+
+    if (state->declare_tmp)
+        g_string_append(s, "    gchar *tmp;\n");
+
+    g_string_append_len(s, state->body->str, state->body->len);
+
+    g_string_append(s,
+        "    return g_string_free(rv, FALSE);\n"
+        "}\n");
+}
+
+
 gchar*
 balde_template_generate_source(const gchar *template_name, const gchar *file_name)
 {
@@ -162,22 +185,13 @@ balde_template_generate_source(const gchar *template_name, const gchar *file_nam
         "balde_request_t *request, balde_response_t *response);\n"
         "extern void balde_template_%s(balde_app_t *app, balde_request_t *request, "
         "balde_response_t *response);\n"
-        "\n"
-        "gchar*\n"
-        "balde_str_template_%s(balde_app_t *app, balde_request_t *request, "
-        "balde_response_t *response)\n"
-        "{\n"
-        "    GString *rv = g_string_new(\"\");\n",
-        template_name, template_name, template_name);
+        "\n", template_name, template_name);
 
-    if (state->declare_tmp)
-        g_string_append(rv, "    gchar *tmp;\n");
-
-    g_string_append_len(rv, state->body->str, state->body->len);
+    gchar *function_name = g_strdup_printf("balde_str_template_%s", template_name);
+    balde_template_generate_str_function(function_name, rv, state);
+    g_free(function_name);
 
     g_string_append_printf(rv,
-        "    return g_string_free(rv, FALSE);\n"
-        "}\n"
         "\n"
         "void\n"
         "balde_template_%s(balde_app_t *app, balde_request_t *request, "

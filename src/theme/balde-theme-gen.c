@@ -16,6 +16,7 @@
 #include "template.h"
 #include "config.h"
 #include "static.h"
+#include "theme.h"
 
 static gboolean version = FALSE;
 static gboolean dependencies = FALSE;
@@ -87,9 +88,10 @@ main(int argc, char **argv)
         goto point1;
     }
 
-    GBytes *s = balde_static_get_resource_data(sourcedir, config->static_resources);
+    GBytes *s = balde_theme_static_get_resource_data(sourcedir, config->static_resources);
+    balde_theme_generate_source(sourcedir, config);
 
-    g_printerr("bola: %s\n", balde_static_render_resource_data(s));
+    g_printerr("bola: %s\n", balde_theme_static_render_resource_data(s));
 
 
     /*gchar *source = NULL;
@@ -111,7 +113,7 @@ main(int argc, char **argv)
         goto point2;  // duh!
     }*/
 
-point2:
+//point2:
     //g_free(source);
     //g_free(template_name);
 point1:

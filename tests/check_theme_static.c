@@ -17,7 +17,7 @@
 
 
 void
-test_static_generate_resource_xml(void)
+test_theme_static_generate_resource_xml(void)
 {
     gchar *files[4];
     guint i = 0;
@@ -25,7 +25,7 @@ test_static_generate_resource_xml(void)
     files[i++] = "guda.jpg";
     files[i++] = "chaves.png";
     files[i++] = NULL;
-    gchar *xml = balde_static_generate_resource_xml(files);
+    gchar *xml = balde_theme_static_generate_resource_xml(files);
     g_assert_cmpstr(xml, ==,
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
         "<gresources>\n"
@@ -40,7 +40,7 @@ test_static_generate_resource_xml(void)
 
 
 void
-test_static_get_resource_data(void)
+test_theme_static_get_resource_data(void)
 {
     gchar *files[4];
     guint i = 0;
@@ -49,7 +49,7 @@ test_static_get_resource_data(void)
     files[i++] = "zz.sh";
     files[i++] = NULL;
     gchar *static_dir = get_static_dir();
-    GBytes *data = balde_static_get_resource_data(static_dir, files);
+    GBytes *data = balde_theme_static_get_resource_data(static_dir, files);
     g_free(static_dir);
 
     GResource *res = g_resource_new_from_data(data, NULL);
@@ -93,11 +93,11 @@ test_static_get_resource_data(void)
 
 
 void
-test_static_render_resource_data(void)
+test_theme_static_render_resource_data(void)
 {
     const guint8 t[5] = "bola";
     GBytes *b = g_bytes_new(t, 5);
-    gchar *tmp = balde_static_render_resource_data(b);
+    gchar *tmp = balde_theme_static_render_resource_data(b);
     g_assert_cmpstr(tmp, ==, "{0x62, 0x6f, 0x6c, 0x61, 0x00}");
     g_free(tmp);
     g_bytes_unref(b);
@@ -108,11 +108,11 @@ int
 main(int argc, char** argv)
 {
     g_test_init(&argc, &argv, NULL);
-    g_test_add_func("/static/generate_resource_xml",
-        test_static_generate_resource_xml);
-    g_test_add_func("/static/get_resource_data",
-        test_static_get_resource_data);
-    g_test_add_func("/static/render_resource_data",
-        test_static_render_resource_data);
+    g_test_add_func("/theme_static/generate_resource_xml",
+        test_theme_static_generate_resource_xml);
+    g_test_add_func("/theme_static/get_resource_data",
+        test_theme_static_get_resource_data);
+    g_test_add_func("/theme_static/render_resource_data",
+        test_theme_static_render_resource_data);
     return g_test_run();
 }

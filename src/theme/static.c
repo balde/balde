@@ -19,7 +19,7 @@
 
 
 gchar*
-balde_static_generate_resource_xml(gchar **files)
+balde_theme_static_generate_resource_xml(gchar **files)
 {
     GString *rv = g_string_new(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -38,7 +38,7 @@ balde_static_generate_resource_xml(gchar **files)
 
 
 GBytes*
-balde_static_get_resource_data(const gchar *sourcedir, gchar **files)
+balde_theme_static_get_resource_data(const gchar *sourcedir, gchar **files)
 {
     if (sourcedir == NULL || files == NULL)
         return NULL;
@@ -65,7 +65,7 @@ balde_static_get_resource_data(const gchar *sourcedir, gchar **files)
     }
     close(fd);
 
-    gchar *xml = balde_static_generate_resource_xml(files);
+    gchar *xml = balde_theme_static_generate_resource_xml(files);
     if (!g_file_set_contents(tmp_file2, xml, -1, NULL)) {
         g_printerr("Failed to write to temporary file: %s\n", tmp_file2);
         g_free(xml);
@@ -125,7 +125,7 @@ point1:
 
 
 gchar*
-balde_static_render_resource_data(GBytes *d)
+balde_theme_static_render_resource_data(GBytes *d)
 {
     gsize size;
     const guint8 *data = g_bytes_get_data(d, &size);

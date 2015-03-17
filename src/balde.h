@@ -280,6 +280,16 @@ typedef struct {
 
 
 /**
+ * balde theme context
+ *
+ * This struct is private, and used by balde-theme-gen. Users should not need
+ * to use it.
+ *
+ */
+typedef struct _balde_theme_private_t balde_theme_t;
+
+
+/**
  * View type definition
  *
  * Each view should accept the application context and the request context,
@@ -295,6 +305,16 @@ typedef balde_response_t* (*balde_view_func_t) (balde_app_t*, balde_request_t*);
  *
  */
 typedef void (*balde_before_request_func_t) (balde_app_t*, balde_request_t*);
+
+/**
+ * Template type definition
+ *
+ * This is private, and should not be touched by users.
+ *
+ */
+typedef gchar* (*balde_template_func_t) (balde_app_t*, balde_request_t*,
+    balde_response_t*);
+
 
 /**
  * Initializes the application context

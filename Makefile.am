@@ -135,10 +135,12 @@ noinst_HEADERS = \
 	src/responses.h \
 	src/routing.h \
 	src/sessions.h \
+	src/themes.h \
 	src/template/template.h \
 	src/template/parser.h \
 	src/theme/config.h \
 	src/theme/static.h \
+	src/theme/theme.h \
 	src/quickstart/quickstart.h \
 	src/utils.h \
 	tests/utils.h
@@ -170,10 +172,10 @@ check_PROGRAMS = \
 	tests/check_responses \
 	tests/check_routing \
 	tests/check_sessions \
-	tests/check_static \
 	tests/check_stdin \
 	tests/check_template \
 	tests/check_template_helpers \
+	tests/check_theme_static \
 	tests/check_utils
 
 pkgconfigdir = $(libdir)/pkgconfig
@@ -195,6 +197,7 @@ libbalde_la_SOURCES = \
 	src/routing.c \
 	src/sessions.c \
 	src/template-helpers.c \
+	src/themes.c \
 	src/utils.c
 
 libbalde_la_CFLAGS = \
@@ -256,7 +259,8 @@ balde_template_gen_LDADD = \
 
 libbalde_theme_la_SOURCES = \
 	src/theme/config.c \
-	src/theme/static.c
+	src/theme/static.c \
+	src/theme/theme.c
 
 libbalde_theme_la_CFLAGS = \
 	$(AM_CFLAGS) \
@@ -267,7 +271,8 @@ libbalde_theme_la_CFLAGS = \
 
 libbalde_theme_la_LIBADD = \
 	$(JSON_GLIB_LIBS) \
-	$(GLIB_LIBS)
+	$(GLIB_LIBS) \
+	libbalde_template.la
 
 balde_theme_gen_SOURCES = \
 	src/theme/balde-theme-gen.c
@@ -279,7 +284,6 @@ balde_theme_gen_CFLAGS = \
 
 balde_theme_gen_LDADD = \
 	$(GLIB_LIBS) \
-	libbalde_template.la \
 	libbalde_theme.la
 
 
@@ -704,25 +708,6 @@ tests_check_sessions_LDADD = \
 	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
-tests_check_static_SOURCES = \
-	tests/check_static.c \
-	tests/utils.c
-
-tests_check_static_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS) \
-	-I$(top_srcdir)/tests
-
-tests_check_static_LDFLAGS = \
-	-static \
-	-no-install
-
-tests_check_static_LDADD = \
-	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
-	libbalde.la \
-	libbalde_theme.la
-
 tests_check_stdin_SOURCES = \
 	tests/check_stdin.c \
 	tests/mock_stdin.c
@@ -795,6 +780,25 @@ tests_check_template_helpers_LDADD = \
 	$(GLIB_LIBS) \
 	$(JSON_GLIB_LIBS) \
 	libbalde.la
+
+tests_check_theme_static_SOURCES = \
+	tests/check_theme_static.c \
+	tests/utils.c
+
+tests_check_theme_static_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS) \
+	-I$(top_srcdir)/tests
+
+tests_check_theme_static_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_theme_static_LDADD = \
+	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
+	libbalde.la \
+	libbalde_theme.la
 
 tests_check_utils_SOURCES = \
 	tests/check_utils.c \

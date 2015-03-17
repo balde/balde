@@ -14,6 +14,7 @@
 typedef struct {
     gchar **templates;
     gchar **static_resources;
+    gchar **includes;
 } balde_theme_config_t;
 
 balde_theme_config_t* balde_theme_config_read(const gchar *filepath);

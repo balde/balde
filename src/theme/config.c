@@ -64,6 +64,7 @@ balde_theme_config_read(const gchar *filepath)
     rv = g_new(balde_theme_config_t, 1);
     rv->templates = get_array(reader, "templates");
     rv->static_resources = get_array(reader, "static");
+    rv->includes = get_array(reader, "includes");
 
     g_object_unref(reader);
 point1:
