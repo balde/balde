@@ -446,10 +446,10 @@ examples_hello_with_auth_LDADD = \
 
 endif
 
-examples/%-resources.c: examples/%-resources.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/examples/static $(top_srcdir)/examples/static-resources.xml)
+examples/static-resources.c: examples/static-resources.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/examples/static $(top_srcdir)/examples/static-resources.xml)
 	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(top_srcdir)/examples/static --target $@ $<
 
-examples/%-resources.h: examples/%-resources.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/examples/static $(top_srcdir)/examples/static-resources.xml)
+examples/static-resources.h: examples/static-resources.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/examples/static $(top_srcdir)/examples/static-resources.xml)
 	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --generate --sourcedir $(top_srcdir)/examples/static --target $@ $<
 
 examples/templates/%.c: examples/templates/%.html balde-template-gen
