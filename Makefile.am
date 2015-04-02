@@ -199,7 +199,7 @@ libbalde_la_CFLAGS = \
 	$(JSON_GLIB_CFLAGS)
 
 libbalde_la_LIBADD = \
-	$(GLIB_LIBS)
+	$(GLIB_LIBS) \
 	$(JSON_GLIB_LIBS)
 
 libbalde_la_LDFLAGS = \
