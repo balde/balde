@@ -32,7 +32,9 @@ balde_url_match(const gchar *path, const balde_url_rule_match_t *rule,
     *matches = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     for (guint i = 0; rule->args[i] != NULL; i++) {
         gchar *value = g_match_info_fetch_named(info, rule->args[i]);
-        g_hash_table_insert(*matches, g_strdup(rule->args[i]), value);
+        gchar *escaped_value = balde_urldecode(value);
+        g_free(value);
+        g_hash_table_insert(*matches, g_strdup(rule->args[i]), escaped_value);
     }
 point1:
     g_match_info_free(info);

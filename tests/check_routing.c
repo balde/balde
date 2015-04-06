@@ -117,6 +117,20 @@ test_url_match_with_empty_path(void)
 
 
 void
+test_url_match_with_path_with_space(void)
+{
+    GHashTable *matches = NULL;
+    balde_url_rule_match_t *m = balde_parse_url_rule("/test/<lol>", NULL);
+    gboolean match = balde_url_match("/test/guda%20bola", m, &matches);
+    g_assert(match);
+    g_assert(g_hash_table_size(matches) == 1);
+    g_assert_cmpstr(g_hash_table_lookup(matches, "lol"), ==, "guda bola");
+    balde_free_url_rule_match(m);
+    g_hash_table_destroy(matches);
+}
+
+
+void
 test_url_match_without_trailing_slash(void)
 {
     GHashTable *matches = NULL;
@@ -221,6 +235,21 @@ test_url_rule_with_path(void)
         &matches);
     g_assert_cmpstr(endpoint, ==, "path");
     g_assert_cmpstr(g_hash_table_lookup(matches, "p"), ==, "bola/arcoiro");
+    g_free(endpoint);
+    g_hash_table_destroy(matches);
+    free_test_views(views);
+}
+
+
+void
+test_url_rule_with_path_with_space(void)
+{
+    GSList *views = get_test_views();
+    GHashTable *matches = NULL;
+    gchar* endpoint = balde_dispatch_from_path(views, "/user/joao%20guda/",
+        &matches);
+    g_assert_cmpstr(endpoint, ==, "user");
+    g_assert_cmpstr(g_hash_table_lookup(matches, "username"), ==, "joao guda");
     g_free(endpoint);
     g_hash_table_destroy(matches);
     free_test_views(views);
@@ -425,6 +454,8 @@ main(int argc, char** argv)
         test_url_match_with_null_path);
     g_test_add_func("/routing/url_match_with_empty_path",
         test_url_match_with_empty_path);
+    g_test_add_func("/routing/url_match_with_path_with_space",
+        test_url_match_with_path_with_space);
     g_test_add_func("/routing/url_match_without_trailing_slash",
         test_url_match_without_trailing_slash);
     g_test_add_func("/routing/url_match_without_trailing_slash_with_variable",
@@ -435,6 +466,8 @@ main(int argc, char** argv)
     g_test_add_func("/routing/url_no_match", test_url_no_match);
     g_test_add_func("/routing/url_no_match2", test_url_no_match2);
     g_test_add_func("/routing/url_rule_with_path", test_url_rule_with_path);
+    g_test_add_func("/routing/url_rule_with_path_with_space",
+        test_url_rule_with_path_with_space);
     g_test_add_func("/routing/url_rule", test_url_rule);
     g_test_add_func("/routing/url_rule_not_found",
         test_url_rule_not_found);
