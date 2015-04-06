@@ -312,7 +312,8 @@ balde_request_env_free(balde_request_env_t *request)
     g_free(request->request_method);
     g_free(request->query_string);
     g_hash_table_destroy(request->headers);
-    g_string_free(request->body, TRUE);
+    if (request->body != NULL)
+        g_string_free(request->body, TRUE);
     g_free(request);
 }
 

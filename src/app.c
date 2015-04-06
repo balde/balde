@@ -531,6 +531,11 @@ balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
         if (status_code != NULL)
             *status_code = error_response->status_code;
         balde_response_free(error_response);
+
+        // free env, because it should be free'd by main loop and will not be
+        // used anymore.
+        balde_request_env_free(env);
+
         return rv;
     }
 
