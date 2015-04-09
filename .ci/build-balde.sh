@@ -48,4 +48,4 @@ popd > /dev/null
 
 make \
     -j"$(($(cat /proc/cpuinfo | grep processor | wc -l)+1))" \
-    -C "${BALDE_BUILD_DIR}" valgrind
+    -C "${BALDE_BUILD_DIR}" check-valgrind
