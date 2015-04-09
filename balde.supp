@@ -1,0 +1,99 @@
+{
+   g_type_register_static_1
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:realloc
+   ...
+   fun:g_type_register_static
+}
+
+{
+   g_type_register_static_2
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:realloc
+   fun:g_realloc
+   ...
+   fun:g_type_register_static
+}
+
+{
+   g_type_register_fundamental_1
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:realloc
+   fun:g_realloc
+   ...
+   fun:g_type_register_fundamental
+}
+
+{
+   g_type_register_fundamental_2
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:g_malloc0
+   ...
+   fun:g_type_register_fundamental
+}
+
+{
+   type_node_fundamental_new_W
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:g_malloc0
+   ...
+   fun:type_node_fundamental_new_W
+}
+
+{
+   type_data_make_W
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:g_malloc0
+   ...
+   fun:type_data_make_W
+}
+
+{
+   g_closure_new_simple
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:g_malloc0
+   fun:g_closure_new_simple
+}
+
+{
+   g_closure_new_simple
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:g_malloc0
+   ...
+   fun:json_generator_class_intern_init
+}
+
+{
+   g_closure_new_simple
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:g_malloc0
+   ...
+   fun:g_data_input_stream_class_intern_init
+}
+
+{
+   g_closure_new_simple
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:g_malloc0
+   ...
+   fun:g_filter_input_stream_class_intern_init
+}

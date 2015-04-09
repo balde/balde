@@ -15,12 +15,14 @@ LIBBALDE_REVISION=0
 LIBBALDE_LT_VERSION_INFO="$LIBBALDE_CURRENT:$LIBBALDE_REVISION:$LIBBALDE_AGE"
 AC_SUBST(LIBBALDE_LT_VERSION_INFO)
 
-AM_INIT_AUTOMAKE([1.13 foreign dist-bzip2 dist-xz subdir-objects serial-tests])
+AM_INIT_AUTOMAKE([1.13 foreign dist-bzip2 dist-xz subdir-objects])
 AC_CONFIG_HEADERS([config.h])
 AM_SILENT_RULES([yes])
 AM_MAINTAINER_MODE([enable])
 
 LT_INIT
+
+AX_VALGRIND_CHECK
 
 AC_PROG_CC_C99
 AS_IF([test "x$ac_cv_prog_cc_c99" = "xno"], [
@@ -98,25 +100,6 @@ GITHUB_PAGES_PUBLISH="$ac_cv_path_github_pages_publish"
 
 AC_SUBST(DOXYGEN)
 AC_SUBST(GITHUB_PAGES_PUBLISH)
-
-AC_ARG_ENABLE([valgrind], AS_HELP_STRING([--disable-valgrind],
-              [ignore presence of valgrind]))
-AS_IF([test "x$enable_valgrind" != "xno"], [
-  AC_PATH_PROG([valgrind], [valgrind])
-  AS_IF([test "x$ac_cv_path_valgrind" = "x"], [
-    have_valgrind=no
-  ], [
-    have_valgrind=yes
-  ])
-])
-AS_IF([test "x$have_valgrind" = "xyes"], , [
-  AS_IF([test "x$enable_valgrind" = "xyes"], [
-    AC_MSG_ERROR([valgrind requested but not found])
-  ])
-])
-AM_CONDITIONAL([USE_VALGRIND], [test "x$have_valgrind" = "xyes"])
-VALGRIND="$ac_cv_path_valgrind"
-AC_SUBST(VALGRIND)
 
 AC_ARG_ENABLE([leg], AS_HELP_STRING([--disable-leg],
               [ignore presence of peg/leg and disable template parser grammar regeneration]))

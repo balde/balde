@@ -32,6 +32,7 @@ Makefile.in
 /stamp-h1
 .dirstamp
 /balde.pc
+/test-*.log
 
 # git-version-gen
 /build-aux/*
@@ -44,6 +45,7 @@ Makefile.in
 
 # installed .m4 files
 /m4/*.m4
+!/m4/ax_*.m4
 
 # balde-template-gen
 /balde-template-gen
