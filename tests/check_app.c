@@ -137,9 +137,8 @@ test_app_get_user_data(void)
     balde_app_t *app = balde_app_init();
     app->priv->user_data = GINT_TO_POINTER(10);
     g_assert_cmpint(GPOINTER_TO_INT(balde_app_get_user_data(app)), ==, 10);
-    gpointer foo = balde_app_get_user_data(app);
-    foo = GINT_TO_POINTER(20);
-    g_assert_cmpint(GPOINTER_TO_INT(balde_app_get_user_data(app)), ==, 10);
+    app->priv->user_data = GINT_TO_POINTER(20);
+    g_assert_cmpint(GPOINTER_TO_INT(balde_app_get_user_data(app)), ==, 20);
     balde_app_free(app);
 }
 
