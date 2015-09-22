@@ -65,6 +65,7 @@ Makefile.in
 /tests/check_resources
 /tests/check_responses
 /tests/check_routing
+/tests/check_scgi
 /tests/check_sessions
 /tests/check_stdin
 /tests/check_template

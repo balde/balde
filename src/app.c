@@ -23,6 +23,7 @@
 #include "routing.h"
 #include "requests.h"
 #include "responses.h"
+#include "scgi.h"
 
 #ifdef BUILD_HTTP
 #include "httpd.h"
@@ -322,6 +323,8 @@ static gboolean runserver = FALSE;
 static gboolean runfcgi = FALSE;
 #endif
 
+static gboolean runscgi = FALSE;
+
 static GOptionEntry entries[] =
 {
     {"help", 'h', 0, G_OPTION_ARG_NONE, &help,
@@ -341,6 +344,9 @@ static GOptionEntry entries[] =
     {"runfcgi", 'f', 0, G_OPTION_ARG_NONE, &runfcgi,
         "Listen to FastCGI socket.", NULL},
 #endif
+
+    {"runscgi", 'c', 0, G_OPTION_ARG_NONE, &runscgi, "Listen to SCGI socket.",
+        NULL},
 
     {NULL}
 };
@@ -402,6 +408,22 @@ static GOptionEntry entries_fcgi[] =
 #endif
 
 
+static gchar *scgi_host = NULL;
+static gint16 scgi_port = 9000;
+static guint64 scgi_max_threads = 10;
+
+static GOptionEntry entries_scgi[] =
+{
+    {"scgi-host", 0, 0, G_OPTION_ARG_STRING, &scgi_host,
+        "Embedded SCGI server host. (default: 127.0.0.1)", "HOST"},
+    {"scgi-port", 0, 0, G_OPTION_ARG_INT, &scgi_port,
+        "Embedded SCGI server port. (default: 9000)", "PORT"},
+    {"scgi-max-threads", 0, 0, G_OPTION_ARG_INT, &scgi_max_threads,
+        "Embedded SCGI server max threads. (default: 10)", "THREADS"},
+    {NULL}
+};
+
+
 BALDE_API void
 balde_app_run(balde_app_t *app, gint argc, gchar **argv)
 {
@@ -424,6 +446,11 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
     g_option_context_add_group(context, fcgi_group);
 #endif
 
+    GOptionGroup *scgi_group = g_option_group_new("scgi", "SCGI Options:",
+        "Show SCGI help options", NULL, NULL);
+    g_option_group_add_entries(scgi_group, entries_scgi);
+    g_option_context_add_group(context, scgi_group);
+
     g_option_context_set_help_enabled(context, FALSE);
 
     if (!g_option_context_parse(context, &argc, &argv, &err)) {
@@ -437,13 +464,17 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
         GINT_TO_POINTER(balde_get_log_level_flag_from_string(log_level)));
 
 #ifdef BUILD_HTTP
+    if (runserver && runscgi) {
+        g_printerr("ERROR: --runserver conflicts with --runscgi\n");
+        goto clean;
+    }
 #ifdef BUILD_FASTCGI
     if (runserver && runfcgi) {
         g_printerr("ERROR: --runserver conflicts with --runfcgi\n");
         goto clean;
     }
     if (http_host != NULL && (fcgi_host != NULL || fcgi_socket || fcgi_socket_mode > 0)) {
-        g_printerr("ERROR: most --host-* arguments are incompatible with most "
+        g_printerr("ERROR: most --http-* arguments are incompatible with most "
             "--fcgi-* arguments\n");
         goto clean;
     }
@@ -459,6 +490,9 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
     if (fcgi_host != NULL || fcgi_socket || fcgi_socket_mode > 0)
         runfcgi = TRUE;
 #endif
+
+    if (scgi_host != NULL)
+        runscgi = TRUE;
 
     if (help) {
         gchar *help_str = g_option_context_get_help(context, FALSE, NULL);
@@ -489,6 +523,8 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
     }
 #endif
 
+    else if (runscgi)
+        balde_scgi_run(app, scgi_host, scgi_port, scgi_max_threads);
     else if (g_getenv("REQUEST_METHOD") != NULL)
         balde_cgi_run(app);
     else {
@@ -509,6 +545,7 @@ clean:
     g_free(fcgi_socket);
 #endif
 
+    g_free(scgi_host);
     g_free(log_level);
 }
 

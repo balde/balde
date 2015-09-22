@@ -134,6 +134,7 @@ noinst_HEADERS = \
 	src/resources.h \
 	src/responses.h \
 	src/routing.h \
+	src/scgi.h \
 	src/sessions.h \
 	src/template/template.h \
 	src/template/parser.h \
@@ -165,6 +166,7 @@ check_PROGRAMS = \
 	tests/check_resources \
 	tests/check_responses \
 	tests/check_routing \
+	tests/check_scgi \
 	tests/check_sessions \
 	tests/check_stdin \
 	tests/check_template \
@@ -188,6 +190,7 @@ libbalde_la_SOURCES = \
 	src/resources.c \
 	src/responses.c \
 	src/routing.c \
+	src/scgi.c \
 	src/sessions.c \
 	src/template-helpers.c \
 	src/utils.c
@@ -647,6 +650,22 @@ tests_check_routing_LDFLAGS = \
 	-no-install
 
 tests_check_routing_LDADD = \
+	$(GLIB_LIBS) \
+	$(JSON_GLIB_LIBS) \
+	libbalde.la
+
+tests_check_scgi_SOURCES = \
+	tests/check_scgi.c
+
+tests_check_scgi_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(JSON_GLIB_CFLAGS)
+
+tests_check_scgi_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_scgi_LDADD = \
 	$(GLIB_LIBS) \
 	$(JSON_GLIB_LIBS) \
 	libbalde.la
