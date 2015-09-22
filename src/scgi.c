@@ -154,22 +154,39 @@ balde_scgi_parse_request(balde_app_t *app, GInputStream *istream)
     GHashTable *headers = g_hash_table_new_full(g_str_hash, g_str_equal,
         g_free, g_free);
 
+    g_hash_table_foreach(env, (GHFunc) balde_filter_headers, headers);
+
+    guint64 content_length = 0;
     gchar *clen_str = g_hash_table_lookup(env, "CONTENT_LENGTH");
+
     if (clen_str != NULL) {
-        g_hash_table_insert(headers, g_strdup("content-length"),
+        g_hash_table_replace(headers, g_strdup("content-length"),
             g_strdup(clen_str));
-        guint64 clen = balde_cgi_parse_content_length(clen_str);
-        if (clen > 0) {
-            body = g_string_new("");
-            for (guint64 i = 0; i < clen; i++)
-                g_string_append_c(body,
-                    g_data_input_stream_read_byte(data, NULL, NULL));
+        content_length = balde_cgi_parse_content_length(clen_str);
+    }
+
+    gchar *ctype_str = g_hash_table_lookup(env, "CONTENT_TYPE");
+    if (ctype_str != NULL)
+        g_hash_table_replace(headers, g_strdup("content-type"),
+            g_strdup(ctype_str));
+
+    if (content_length > 0) {
+        gchar body_[1024];
+        gssize real_content_length = 0;
+        gssize size;
+        gssize to_read = sizeof(body_);
+        body = g_string_new(NULL);
+        while (real_content_length < content_length) {
+            if (content_length - real_content_length < to_read)
+                to_read = content_length - real_content_length;
+            size = g_input_stream_read(G_INPUT_STREAM(data), body_, to_read,
+                NULL, NULL);
+            g_string_append_len(body, body_, size);
+            real_content_length += size;
         }
     }
 
     g_object_unref(data);
-
-    g_hash_table_foreach(env, (GHFunc) balde_filter_headers, headers);
 
     balde_request_env_t *req_env = g_new(balde_request_env_t, 1);
     req_env->server_name = g_strdup(g_hash_table_lookup(env, "SERVER_NAME"));
