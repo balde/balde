@@ -10,8 +10,9 @@
 #define _BALDE_SCGI_PRIVATE_H
 
 #include <glib.h>
+#include <gio/gio.h>
 
-#include "app.h"
+#include "balde.h"
 
 balde_request_env_t* balde_scgi_parse_request(balde_app_t *app,
     GInputStream *istream);
