@@ -5,7 +5,6 @@ ACLOCAL_AMFLAGS = -I m4
 AM_DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-examples \
 	--enable-http \
-	--enable-fastcgi \
 	--disable-leg \
 	--disable-valgrind
 
@@ -126,7 +125,6 @@ noinst_HEADERS = \
 	src/cgi.h \
 	src/datetime.h \
 	src/exceptions.h \
-	src/fcgi.h \
 	src/httpd.h \
 	src/multipart.h \
 	src/multipart_parser.h \
@@ -211,11 +209,6 @@ libbalde_la_LDFLAGS = \
 if BUILD_HTTP
 libbalde_la_SOURCES += \
 	src/httpd.c
-endif
-
-if BUILD_FASTCGI
-libbalde_la_SOURCES += \
-	src/fcgi.c
 endif
 
 
@@ -482,29 +475,6 @@ tests_check_httpd_LDFLAGS = \
 	-no-install
 
 tests_check_httpd_LDADD = \
-	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
-	libbalde.la
-
-endif
-
-if BUILD_FASTCGI
-
-check_PROGRAMS += \
-	tests/check_fcgi
-
-tests_check_fcgi_SOURCES = \
-	tests/check_fcgi.c
-
-tests_check_fcgi_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
-
-tests_check_fcgi_LDFLAGS = \
-	-static \
-	-no-install
-
-tests_check_fcgi_LDADD = \
 	$(GLIB_LIBS) \
 	$(JSON_GLIB_LIBS) \
 	libbalde.la

@@ -29,11 +29,6 @@
 #include "httpd.h"
 #endif
 
-#ifdef BUILD_FASTCGI
-#include <fcgiapp.h>
-#include "fcgi.h"
-#endif
-
 
 static GLogLevelFlags
 balde_get_log_level_flag_from_string(const gchar *level)
@@ -319,10 +314,6 @@ static gchar *log_level = NULL;
 static gboolean runserver = FALSE;
 #endif
 
-#ifdef BUILD_FASTCGI
-static gboolean runfcgi = FALSE;
-#endif
-
 static gboolean runscgi = FALSE;
 
 static GOptionEntry entries[] =
@@ -338,11 +329,6 @@ static GOptionEntry entries[] =
 #ifdef BUILD_HTTP
     {"runserver", 's', 0, G_OPTION_ARG_NONE, &runserver,
         "Run embedded HTTP server. NOT production ready!", NULL},
-#endif
-
-#ifdef BUILD_FASTCGI
-    {"runfcgi", 'f', 0, G_OPTION_ARG_NONE, &runfcgi,
-        "Listen to FastCGI socket.", NULL},
 #endif
 
     {"runscgi", 'c', 0, G_OPTION_ARG_NONE, &runscgi, "Listen to SCGI socket.",
@@ -365,44 +351,6 @@ static GOptionEntry entries_http[] =
         "Embedded HTTP server port. (default: 8080)", "PORT"},
     {"http-max-threads", 0, 0, G_OPTION_ARG_INT, &http_max_threads,
         "Embedded HTTP server max threads. (default: 10)", "THREADS"},
-    {NULL}
-};
-#endif
-
-#ifdef BUILD_FASTCGI
-static gchar *fcgi_host = NULL;
-static gint16 fcgi_port = 1026;
-static gchar *fcgi_socket = NULL;
-static gint fcgi_socket_mode = -1;
-static guint64 fcgi_max_threads = 1;
-static gint fcgi_backlog = 1024;
-
-
-static gboolean
-balde_socket_mode_func(const gchar *option_name, const gchar *value,
-    gpointer data, GError **error)
-{
-    if (value != NULL)
-        fcgi_socket_mode = strtol(value, NULL, 8);
-    return TRUE;
-}
-
-
-static GOptionEntry entries_fcgi[] =
-{
-    {"fcgi-host", 0, 0, G_OPTION_ARG_STRING, &fcgi_host,
-        "FastCGI host, conflicts with UNIX socket. (default: 127.0.0.1)", "HOST"},
-    {"fcgi-port", 0, 0, G_OPTION_ARG_INT, &fcgi_port,
-        "FastCGI port, conflicts with UNIX socket. (default: 1026)", "PORT"},
-    {"fcgi-socket", 0,0, G_OPTION_ARG_STRING, &fcgi_socket,
-        "FastCGI UNIX socket path, conflicts with host and port. (default: not set)",
-        "SOCKET"},
-    {"fcgi-socket-mode", 0, 0, G_OPTION_ARG_CALLBACK, balde_socket_mode_func,
-        "FastCGI UNIX socket mode, octal integer. (default: umask)", "MODE"},
-    {"fcgi-max-threads", 0, 0, G_OPTION_ARG_INT, &fcgi_max_threads,
-        "FastCGI max threads. (default: 1)", "THREADS"},
-    {"fcgi-backlog", 0, 0, G_OPTION_ARG_INT, &fcgi_backlog,
-        "FastCGI socket backlog. (default: 1024)", "BACKLOG"},
     {NULL}
 };
 #endif
@@ -439,13 +387,6 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
     g_option_context_add_group(context, http_group);
 #endif
 
-#ifdef BUILD_FASTCGI
-    GOptionGroup *fcgi_group = g_option_group_new("fastcgi", "FastCGI Options:",
-        "Show FastCGI help options", NULL, NULL);
-    g_option_group_add_entries(fcgi_group, entries_fcgi);
-    g_option_context_add_group(context, fcgi_group);
-#endif
-
     GOptionGroup *scgi_group = g_option_group_new("scgi", "SCGI Options:",
         "Show SCGI help options", NULL, NULL);
     g_option_group_add_entries(scgi_group, entries_scgi);
@@ -468,27 +409,11 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
         g_printerr("ERROR: --runserver conflicts with --runscgi\n");
         goto clean;
     }
-#ifdef BUILD_FASTCGI
-    if (runserver && runfcgi) {
-        g_printerr("ERROR: --runserver conflicts with --runfcgi\n");
-        goto clean;
-    }
-    if (http_host != NULL && (fcgi_host != NULL || fcgi_socket || fcgi_socket_mode > 0)) {
-        g_printerr("ERROR: most --http-* arguments are incompatible with most "
-            "--fcgi-* arguments\n");
-        goto clean;
-    }
-#endif
 #endif
 
 #ifdef BUILD_HTTP
     if (http_host != NULL)
         runserver = TRUE;
-#endif
-
-#ifdef BUILD_FASTCGI
-    if (fcgi_host != NULL || fcgi_socket || fcgi_socket_mode > 0)
-        runfcgi = TRUE;
 #endif
 
     if (scgi_host != NULL)
@@ -508,21 +433,6 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
         balde_httpd_run(app, http_host, http_port, http_max_threads);
 #endif
 
-#ifdef BUILD_FASTCGI
-    else if (runfcgi || !FCGX_IsCGI()) {
-        if (fcgi_socket != NULL && fcgi_host != NULL) {
-            g_printerr("ERROR: --fcgi-socket conflicts with --fcgi-host\n");
-            goto clean;
-        }
-        const gchar *threads_str = g_getenv("BALDE_FASTCGI_THREADS");
-        guint64 threads = fcgi_max_threads;
-        if (threads_str != NULL && threads_str[0] != '\0')
-            threads = g_ascii_strtoull(threads_str, NULL, 10);
-        balde_fcgi_run(app, fcgi_host, fcgi_port, fcgi_socket, fcgi_socket_mode,
-            threads, fcgi_backlog, runfcgi);
-    }
-#endif
-
     else if (runscgi)
         balde_scgi_run(app, scgi_host, scgi_port, scgi_max_threads);
     else if (g_getenv("REQUEST_METHOD") != NULL)
@@ -538,11 +448,6 @@ clean:
 
 #ifdef BUILD_HTTP
     g_free(http_host);
-#endif
-
-#ifdef BUILD_FASTCGI
-    g_free(fcgi_host);
-    g_free(fcgi_socket);
 #endif
 
     g_free(scgi_host);

@@ -58,7 +58,6 @@ Makefile.in
 /tests/check_cgi
 /tests/check_exceptions
 /tests/check_datetime
-/tests/check_fcgi
 /tests/check_httpd
 /tests/check_quickstart
 /tests/check_requests
