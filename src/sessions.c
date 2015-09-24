@@ -13,7 +13,6 @@
 #include <glib.h>
 #include <stdlib.h>
 #include <string.h>
-#include <json-glib/json-glib.h>
 #include "balde.h"
 #include "balde-private.h"
 #include "utils.h"
@@ -22,85 +21,79 @@
 #include "responses.h"
 
 
+/*
+ * our serialization protocol is quite simple, as we just allow strings as
+ * key/value in our session hash table.
+ *
+ * key1\0value1\0key2\0value2\0...\0keyX\0valueX\0
+ *
+ */
+
 static void
 balde_session_serialize_hash_table_item(gchar* key, gchar* value,
-    JsonBuilder *builder)
+    GString *str)
 {
-    json_builder_set_member_name(builder, key);
-    json_builder_add_string_value(builder, value);
+    g_string_append_printf(str, "%s%c%s%c", key, 0, value, 0);
 }
 
 
 gchar*
 balde_session_serialize(GHashTable *session)
 {
-    JsonBuilder *builder = json_builder_new();
-    json_builder_begin_object(builder);
+    GString *str = g_string_new(NULL);
     g_hash_table_foreach(session,
-        (GHFunc) balde_session_serialize_hash_table_item, builder);
-    json_builder_end_object(builder);
-    JsonGenerator *gen = json_generator_new();
-    JsonNode *root = json_builder_get_root(builder);
-    json_generator_set_root(gen, root);
-    gsize len;
-    guchar *str = (guchar*) json_generator_to_data(gen, &len);
-    json_node_free(root);
-    g_object_unref(gen);
-    g_object_unref(builder);
-    gchar *rv = balde_base64_encode(str, len);
-    g_free(str);
+        (GHFunc) balde_session_serialize_hash_table_item, str);
+    gchar *rv = balde_base64_encode((guchar*) str->str, str->len);
+    g_string_free(str, TRUE);
     return rv;
 }
 
 
-static void
-balde_session_unserialize_hash_table_item(JsonObject *object,
-    const gchar *member_name, JsonNode *member_node, GHashTable **session)
-{
-    if (*session == NULL)
-        return;
-    gchar *member_value;
-    switch (JSON_NODE_TYPE(member_node)) {
-        case JSON_NODE_NULL:
-            member_value = NULL;
-            break;
-        case JSON_NODE_VALUE:
-            member_value = json_node_dup_string(member_node);
-            if (member_value == NULL) {
-                // ooooops... value isn't a string!
-                g_hash_table_destroy(*session);
-                *session = NULL;
-                return;
-            }
-            break;
-        default:
-            return;
-    }
-    g_hash_table_insert(*session, g_strdup(member_name), member_value);
-}
+typedef enum {
+    UNSERIALIZER_KEY = 1,
+    UNSERIALIZER_VALUE,
+} balde_session_unserializer_state_t;
 
 
 GHashTable*
 balde_session_unserialize(const gchar* text)
 {
-    GHashTable *session = NULL;
-    JsonParser *parser = json_parser_new();
+    GHashTable *session = g_hash_table_new_full(g_str_hash, g_str_equal,
+        g_free, g_free);
     gsize len;
-    gchar* json = (gchar*) balde_base64_decode(text, &len);
-    if (!json_parser_load_from_data(parser, json, len, NULL))
-        goto point1;
-    JsonNode *root = json_parser_get_root(parser);
-    if (JSON_NODE_TYPE(root) != JSON_NODE_OBJECT)
-        goto point1;
-    JsonObject *obj = json_node_get_object(root);
-    if (obj == NULL)
-        goto point1;
-    session = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    json_object_foreach_member(obj,
-        (JsonObjectForeach) balde_session_unserialize_hash_table_item, &session);
-point1:
-    g_object_unref(parser);
-    g_free(json);
+    gchar *str = (gchar*) balde_base64_decode(text, &len);
+
+    gsize start = 0;
+    gchar *key = NULL;
+
+    balde_session_unserializer_state_t state = UNSERIALIZER_KEY;
+
+    for (gsize i = 0; i < len; i++) {
+        gchar c = str[i];
+
+        switch (state) {
+            case UNSERIALIZER_KEY:
+                if (c != '\0')
+                    break;
+                key = g_strndup(str + start, i - start);
+                state = UNSERIALIZER_VALUE;
+                start = i + 1;
+                break;
+
+            case UNSERIALIZER_VALUE:
+                if (c != '\0')
+                    break;
+                g_hash_table_replace(session, key,
+                    g_strndup(str + start, i - start));
+                key = NULL;
+                state = UNSERIALIZER_KEY;
+                start = i + 1;
+                break;
+        }
+    }
+
+    g_free(key);
+    g_free(str);
     return session;
 }
 

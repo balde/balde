@@ -12,9 +12,7 @@ Dependencies
 - ``GNU Make`` - http://www.gnu.org/software/make/
 - ``GCC`` or ``clang`` - https://gcc.gnu.org/ - http://clang.llvm.org/
 - ``GLib >= 2.35`` - https://developer.gnome.org/glib/
-- ``JSON-GLib >= 0.16.2`` - https://developer.gnome.org/json-glib/
 - ``shared-mime-info`` - http://freedesktop.org/wiki/Software/shared-mime-info/
-- ``FastCGI Development Toolkit``, if FastCGI support is enabled - http://www.fastcgi.com/
 
 
 Download

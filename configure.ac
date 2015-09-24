@@ -126,13 +126,11 @@ AC_SUBST(LEG)
 # we need to make sure that shared-mime-info is installed, because we need it
 # for accurate mime-type guess
 GLIB_DEP="glib-2.0 >= 2.35, gio-2.0 >= 2.35, shared-mime-info"
-JSON_GLIB_DEP="json-glib-1.0 >= 0.16.2"
-PC_DEPS="${GLIB_DEP}, ${JSON_GLIB_DEP}"
+PC_DEPS="${GLIB_DEP}"
 AC_SUBST(PC_DEPS)
 
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GLIB], [$GLIB_DEP])
-PKG_CHECK_MODULES([JSON_GLIB], [$JSON_GLIB_DEP])
 
 GLIB_COMPILE_RESOURCES="`$PKG_CONFIG --variable glib_compile_resources gio-2.0`"
 AC_SUBST(GLIB_COMPILE_RESOURCES)

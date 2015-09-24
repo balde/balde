@@ -196,12 +196,10 @@ libbalde_la_SOURCES = \
 libbalde_la_CFLAGS = \
 	-fvisibility=hidden \
 	$(AM_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 libbalde_la_LIBADD = \
-	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS)
+	$(GLIB_LIBS)
 
 libbalde_la_LDFLAGS = \
 	-version-info $(LIBBALDE_LT_VERSION_INFO)
@@ -299,7 +297,6 @@ examples_hello_SOURCES = \
 
 examples_hello_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/src
 
 examples_hello_LDFLAGS = \
@@ -307,7 +304,6 @@ examples_hello_LDFLAGS = \
 
 examples_hello_LDADD= \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 examples_hello_with_cookies_SOURCES = \
@@ -315,7 +311,6 @@ examples_hello_with_cookies_SOURCES = \
 
 examples_hello_with_cookies_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/src
 
 examples_hello_with_cookies_LDFLAGS = \
@@ -323,7 +318,6 @@ examples_hello_with_cookies_LDFLAGS = \
 
 examples_hello_with_cookies_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 examples_hello_with_form_SOURCES = \
@@ -340,7 +334,6 @@ examples/examples_hello_with_form-hello-with-form.$(OBJEXT): \
 
 examples_hello_with_form_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/src \
 	-I$(top_builddir)/examples
 
@@ -349,7 +342,6 @@ examples_hello_with_form_LDFLAGS = \
 
 examples_hello_with_form_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 examples_hello_with_template_SOURCES = \
@@ -364,7 +356,6 @@ examples/examples_hello_with_template-hello-with-template.$(OBJEXT): \
 
 examples_hello_with_template_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/src \
 	-I$(top_builddir)/examples
 
@@ -373,7 +364,6 @@ examples_hello_with_template_LDFLAGS = \
 
 examples_hello_with_template_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 examples_hello_with_static_SOURCES = \
@@ -388,7 +378,6 @@ examples/examples_hello_with_static-hello-with-static.$(OBJEXT): \
 
 examples_hello_with_static_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/src \
 	-I$(top_builddir)/examples
 
@@ -397,7 +386,6 @@ examples_hello_with_static_LDFLAGS = \
 
 examples_hello_with_static_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 examples_hello_with_url_for_SOURCES = \
@@ -412,7 +400,6 @@ examples/examples_hello_with_url_for-hello-with-url_for.$(OBJEXT): \
 
 examples_hello_with_url_for_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/src \
 	-I$(top_builddir)/examples
 
@@ -421,7 +408,6 @@ examples_hello_with_url_for_LDFLAGS = \
 
 examples_hello_with_url_for_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 examples_hello_with_auth_SOURCES = \
@@ -429,7 +415,6 @@ examples_hello_with_auth_SOURCES = \
 
 examples_hello_with_auth_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/src
 
 examples_hello_with_auth_LDFLAGS = \
@@ -437,7 +422,6 @@ examples_hello_with_auth_LDFLAGS = \
 
 examples_hello_with_auth_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 endif
@@ -467,8 +451,7 @@ tests_check_httpd_SOURCES = \
 	tests/mock_httpd.c
 
 tests_check_httpd_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 tests_check_httpd_LDFLAGS = \
 	-static \
@@ -476,7 +459,6 @@ tests_check_httpd_LDFLAGS = \
 
 tests_check_httpd_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 endif
@@ -485,8 +467,7 @@ tests_check_app_SOURCES = \
 	tests/check_app.c
 
 tests_check_app_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 tests_check_app_LDFLAGS = \
 	-static \
@@ -494,15 +475,13 @@ tests_check_app_LDFLAGS = \
 
 tests_check_app_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests_check_cgi_SOURCES = \
 	tests/check_cgi.c
 
 tests_check_cgi_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 tests_check_cgi_LDFLAGS = \
 	-static \
@@ -510,15 +489,13 @@ tests_check_cgi_LDFLAGS = \
 
 tests_check_cgi_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests_check_datetime_SOURCES = \
 	tests/check_datetime.c
 
 tests_check_datetime_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 tests_check_datetime_LDFLAGS = \
 	-static \
@@ -526,15 +503,13 @@ tests_check_datetime_LDFLAGS = \
 
 tests_check_datetime_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests_check_exceptions_SOURCES = \
 	tests/check_exceptions.c
 
 tests_check_exceptions_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 tests_check_exceptions_LDFLAGS = \
 	-static \
@@ -542,7 +517,6 @@ tests_check_exceptions_LDFLAGS = \
 
 tests_check_exceptions_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests_check_multipart_SOURCES = \
@@ -551,7 +525,6 @@ tests_check_multipart_SOURCES = \
 
 tests_check_multipart_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/tests
 
 tests_check_multipart_LDFLAGS = \
@@ -560,7 +533,6 @@ tests_check_multipart_LDFLAGS = \
 
 tests_check_multipart_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests/tests_check_multipart-check_multipart.$(OBJEXT): \
@@ -573,8 +545,7 @@ tests_check_quickstart_SOURCES = \
 	tests/check_quickstart.c
 
 tests_check_quickstart_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 tests_check_quickstart_LDFLAGS = \
 	-static \
@@ -582,7 +553,6 @@ tests_check_quickstart_LDFLAGS = \
 
 tests_check_quickstart_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la \
 	libbalde_quickstart.la
 
@@ -596,7 +566,6 @@ tests/tests_check_resources-check_resources.$(OBJEXT): tests/resources.c tests/r
 
 tests_check_resources_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS) \
 	-I$(top_builddir)/tests
 
 tests_check_resources_LDFLAGS = \
@@ -605,15 +574,13 @@ tests_check_resources_LDFLAGS = \
 
 tests_check_resources_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests_check_routing_SOURCES = \
 	tests/check_routing.c
 
 tests_check_routing_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 tests_check_routing_LDFLAGS = \
 	-static \
@@ -621,15 +588,13 @@ tests_check_routing_LDFLAGS = \
 
 tests_check_routing_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests_check_scgi_SOURCES = \
 	tests/check_scgi.c
 
 tests_check_scgi_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 tests_check_scgi_LDFLAGS = \
 	-static \
@@ -637,7 +602,6 @@ tests_check_scgi_LDFLAGS = \
 
 tests_check_scgi_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests_check_sessions_SOURCES = \
@@ -645,8 +609,7 @@ tests_check_sessions_SOURCES = \
 	tests/mock_sessions.c
 
 tests_check_sessions_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 tests_check_sessions_LDFLAGS = \
 	-static \
@@ -654,7 +617,6 @@ tests_check_sessions_LDFLAGS = \
 
 tests_check_sessions_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests_check_stdin_SOURCES = \
@@ -662,8 +624,7 @@ tests_check_stdin_SOURCES = \
 	tests/mock_stdin.c
 
 tests_check_stdin_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 tests_check_stdin_LDFLAGS = \
 	-static \
@@ -671,7 +632,6 @@ tests_check_stdin_LDFLAGS = \
 
 tests_check_stdin_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests_check_template_SOURCES = \
@@ -680,7 +640,6 @@ tests_check_template_SOURCES = \
 
 tests_check_template_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/tests
 
 tests_check_template_LDFLAGS = \
@@ -689,7 +648,6 @@ tests_check_template_LDFLAGS = \
 
 tests_check_template_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la \
 	libbalde_template.la
 
@@ -718,8 +676,7 @@ tests_check_template_helpers_SOURCES = \
 	tests/check_template_helpers.c
 
 tests_check_template_helpers_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 tests_check_template_helpers_LDFLAGS = \
 	-static \
@@ -727,7 +684,6 @@ tests_check_template_helpers_LDFLAGS = \
 
 tests_check_template_helpers_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests_check_utils_SOURCES = \
@@ -735,8 +691,7 @@ tests_check_utils_SOURCES = \
 	tests/mock_utils.c
 
 tests_check_utils_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 tests_check_utils_LDFLAGS = \
 	-static \
@@ -744,7 +699,6 @@ tests_check_utils_LDFLAGS = \
 
 tests_check_utils_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests_check_requests_SOURCES = \
@@ -753,7 +707,6 @@ tests_check_requests_SOURCES = \
 
 tests_check_requests_CFLAGS = \
 	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS) \
 	-I$(top_srcdir)/tests
 
 tests_check_requests_LDFLAGS = \
@@ -762,7 +715,6 @@ tests_check_requests_LDFLAGS = \
 
 tests_check_requests_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests_check_responses_SOURCES = \
@@ -770,8 +722,7 @@ tests_check_responses_SOURCES = \
 	tests/mock_responses.c
 
 tests_check_responses_CFLAGS = \
-	$(GLIB_CFLAGS) \
-	$(JSON_GLIB_CFLAGS)
+	$(GLIB_CFLAGS)
 
 tests_check_responses_LDFLAGS = \
 	-static \
@@ -779,7 +730,6 @@ tests_check_responses_LDFLAGS = \
 
 tests_check_responses_LDADD = \
 	$(GLIB_LIBS) \
-	$(JSON_GLIB_LIBS) \
 	libbalde.la
 
 tests/resources.c: tests/resources.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/tests/static $(top_srcdir)/tests/resources.xml)
