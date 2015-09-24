@@ -75,7 +75,7 @@ balde_session_unserialize(const gchar* text)
             case UNSERIALIZER_KEY:
                 if (c != '\0')
                     break;
-                key = g_strndup(str + start, i - start);
+                key = g_strdup(str + start);
                 state = UNSERIALIZER_VALUE;
                 start = i + 1;
                 break;
@@ -83,8 +83,7 @@ balde_session_unserialize(const gchar* text)
             case UNSERIALIZER_VALUE:
                 if (c != '\0')
                     break;
-                g_hash_table_replace(session, key,
-                    g_strndup(str + start, i - start));
+                g_hash_table_replace(session, key, g_strdup(str + start));
                 key = NULL;
                 state = UNSERIALIZER_KEY;
                 start = i + 1;
