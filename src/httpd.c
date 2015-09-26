@@ -203,6 +203,8 @@ balde_httpd_run(balde_app_t *app, const gchar *host, gint16 port,
 {
     GError *error = NULL;
     const gchar *final_host = host != NULL ? host : "127.0.0.1";
+    g_printerr("!!! WARNING !!! - Use this HTTP server only for development, "
+        "it is NOT production-ready!\n\n");
     g_printerr(" * Running on http://%s:%d/ (threads: %d)\n", final_host, port,
         max_threads);
     GSocketService *service = g_threaded_socket_service_new(max_threads);
