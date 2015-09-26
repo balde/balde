@@ -158,6 +158,7 @@ check_PROGRAMS = \
 	tests/check_cgi \
 	tests/check_datetime \
 	tests/check_exceptions \
+	tests/check_httpd \
 	tests/check_multipart \
 	tests/check_quickstart \
 	tests/check_requests \
@@ -182,6 +183,7 @@ libbalde_la_SOURCES = \
 	src/cgi.c \
 	src/datetime.c \
 	src/exceptions.c \
+	src/httpd.c \
 	src/multipart.c \
 	src/multipart_parser.c \
 	src/requests.c \
@@ -203,11 +205,6 @@ libbalde_la_LIBADD = \
 
 libbalde_la_LDFLAGS = \
 	-version-info $(LIBBALDE_LT_VERSION_INFO)
-
-if BUILD_HTTP
-libbalde_la_SOURCES += \
-	src/httpd.c
-endif
 
 
 ## Build rules: balde-template-gen
@@ -441,28 +438,6 @@ examples/templates/%.h: examples/templates/%.html balde-template-gen
 
 ## Build rules: tests
 
-if BUILD_HTTP
-
-check_PROGRAMS += \
-	tests/check_httpd
-
-tests_check_httpd_SOURCES = \
-	tests/check_httpd.c \
-	tests/mock_httpd.c
-
-tests_check_httpd_CFLAGS = \
-	$(GLIB_CFLAGS)
-
-tests_check_httpd_LDFLAGS = \
-	-static \
-	-no-install
-
-tests_check_httpd_LDADD = \
-	$(GLIB_LIBS) \
-	libbalde.la
-
-endif
-
 tests_check_app_SOURCES = \
 	tests/check_app.c
 
@@ -516,6 +491,21 @@ tests_check_exceptions_LDFLAGS = \
 	-no-install
 
 tests_check_exceptions_LDADD = \
+	$(GLIB_LIBS) \
+	libbalde.la
+
+tests_check_httpd_SOURCES = \
+	tests/check_httpd.c \
+	tests/mock_httpd.c
+
+tests_check_httpd_CFLAGS = \
+	$(GLIB_CFLAGS)
+
+tests_check_httpd_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_httpd_LDADD = \
 	$(GLIB_LIBS) \
 	libbalde.la
 

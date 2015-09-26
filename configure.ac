@@ -38,17 +38,6 @@ AC_COMPILE_IFELSE([AC_LANG_SOURCE([char guda;])], [
 ])
 CFLAGS="$bkp_CFLAGS"
 
-AC_ARG_ENABLE([http], AS_HELP_STRING([--disable-http], [disable embedded HTTP webserver]))
-AS_IF([test "x$enable_http" != "xno"], [
-  build_http=yes
-  AC_DEFINE([BUILD_HTTP], [], [embedded HTTP webserver enabled])
-  HTTP="enabled"
-], [
-  build_http=no
-  HTTP="disabled"
-])
-AM_CONDITIONAL([BUILD_HTTP], [test "x$build_http" = "xyes"])
-
 AC_ARG_ENABLE([examples], AS_HELP_STRING([--enable-examples], [build examples]))
 AS_IF([test "x$enable_examples" = "xyes"], [
   build_examples=yes
@@ -156,7 +145,6 @@ AS_ECHO("
         cflags:       ${CFLAGS}
         ldflags:      ${LDFLAGS}
 
-        http:         ${HTTP}
         examples:     ${EXAMPLES}
 
         doxygen:      ${DOXYGEN}
