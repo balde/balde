@@ -191,11 +191,28 @@ balde_scgi_parse_request(balde_app_t *app, GInputStream *istream)
     balde_request_env_t *req_env = g_new(balde_request_env_t, 1);
     req_env->server_name = g_strdup(g_hash_table_lookup(env, "SERVER_NAME"));
     req_env->script_name = g_strdup(g_hash_table_lookup(env, "SCRIPT_NAME"));
-    req_env->path_info = g_strdup(g_hash_table_lookup(env, "PATH_INFO"));
-    if (req_env->path_info == NULL)  // this is dumb, but its how nginx works
-        req_env->path_info = g_strdup(g_hash_table_lookup(env, "REQUEST_URI"));
+    gchar *path_info = g_strdup(g_hash_table_lookup(env, "PATH_INFO"));
+    req_env->query_string = NULL;
+    if (path_info == NULL) {  // this is dumb, but its how nginx works
+        path_info = g_strdup(g_hash_table_lookup(env, "REQUEST_URI"));
+
+        gchar **pieces = g_strsplit(path_info, "?", 2);
+        req_env->path_info = g_strdup(pieces[0]);
+        if (pieces[1] != NULL)
+            req_env->query_string = g_strdup(pieces[1]);
+        // FIXME: we could just g_free(pieces) here, and avoid the g_strdup
+        // calls above, but I'm afraid of memory leak due to weird memory
+        // optimizations from glib.
+        g_strfreev(pieces);
+    }
+    else {
+        req_env->path_info = path_info;
+        char *qs = g_hash_table_lookup(env, "QUERY_STRING");
+        if (qs != NULL)
+            req_env->query_string = g_strdup(qs);
+    }
+
     req_env->request_method = g_strdup(g_hash_table_lookup(env, "REQUEST_METHOD"));
-    req_env->query_string = g_strdup(g_hash_table_lookup(env, "QUERY_STRING"));
     req_env->headers = headers;
     req_env->body = body;
     req_env->https = g_hash_table_lookup(env, "HTTPS") != NULL;
