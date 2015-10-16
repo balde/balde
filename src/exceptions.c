@@ -260,6 +260,8 @@ balde_exception_get_description_from_code(const balde_http_exception_code_t code
 BALDE_API void
 balde_abort_set_error(balde_app_t *app, const balde_http_exception_code_t code)
 {
+    if (app->error != NULL)
+        return;
     g_propagate_error(&(app->error),
         g_error_new(balde_http_exception_quark(), code,
             "%s", balde_exception_get_description_from_code(code)));
@@ -270,6 +272,8 @@ BALDE_API void
 balde_abort_set_error_with_description(balde_app_t *app,
     const balde_http_exception_code_t code, const gchar* description)
 {
+    if (app->error != NULL)
+        return;
     g_propagate_error(&(app->error),
         g_error_new(balde_http_exception_quark(), code,
             "%s\n\n%s", balde_exception_get_description_from_code(code),
