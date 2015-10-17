@@ -154,15 +154,17 @@ balde_app_get_config(balde_app_t *app, const gchar *name)
 }
 
 
+G_LOCK_DEFINE_STATIC(user_data);
+
 BALDE_API void
 balde_app_set_user_data(balde_app_t *app, gpointer user_data)
 {
-    BALDE_APP_READ_ONLY(app);
-
     // when setting, if we have a destroy function, try to use it.
     balde_app_free_user_data(app);
 
+    G_LOCK(user_data);
     app->priv->user_data = user_data;
+    G_UNLOCK(user_data);
 }
 
 
@@ -185,8 +187,10 @@ BALDE_API void
 balde_app_free_user_data(balde_app_t *app)
 {
     if (app->priv->user_data_destroy_func != NULL && app->priv->user_data != NULL) {
+        G_LOCK(user_data);
         app->priv->user_data_destroy_func(app->priv->user_data);
         app->priv->user_data = NULL;
+        G_UNLOCK(user_data);
     }
 }
 
