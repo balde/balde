@@ -460,12 +460,12 @@ balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
 
     request = balde_make_request(app, env);
 
-    balde_app_t *app_copy = balde_app_copy(app);
-
     for (GSList *tmp = app->priv->before_requests; tmp != NULL; tmp = g_slist_next(tmp)) {
         balde_before_request_func_t hook_func = tmp->data;
-        hook_func(app_copy, request);
+        hook_func(app, request);
     }
+
+    balde_app_t *app_copy = balde_app_copy(app);
 
     with_body = ! (request->method & BALDE_HTTP_HEAD);
 
