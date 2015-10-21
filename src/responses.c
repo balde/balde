@@ -228,6 +228,13 @@ balde_header_render(const gchar *key, GSList *value, GString *str)
 }
 
 
+gchar*
+balde_response_generate_etag(balde_response_t *response)
+{
+    return g_compute_checksum_for_string(G_CHECKSUM_MD5, response->priv->body->str, response->priv->body->len);
+}
+
+
 GString*
 balde_response_render(balde_response_t *response, const gboolean with_body)
 {
