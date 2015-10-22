@@ -463,6 +463,13 @@ void balde_response_append_body_len(balde_response_t *response,
 
 
 /**
+ * Truncate response's body.
+ *
+ */
+void balde_response_truncate_body(balde_response_t *response);
+
+
+/**
  * Initialize a response context.
  *
  * The nul-terminated string passed as argument is used to initialize the

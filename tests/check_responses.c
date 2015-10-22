@@ -315,6 +315,15 @@ void test_balde_response_add_etag(void)
     etag_value = (gchar *) generated_etag->data;
 
     g_assert_cmpstr("W/\"15929f6ea6e9a8e093b05cf723d1e424\"", ==, etag_value);
+    balde_response_free(res);
+}
+
+
+void test_balde_response_truncate_body(void)
+{
+    balde_response_t *res = balde_make_response("quico");
+    balde_response_truncate_body(res);
+    g_assert_cmpstr("", ==, res->priv->body->str);
 }
 
 
@@ -441,8 +450,11 @@ main(int argc, char** argv)
     g_test_add_func("/responses/set_cookie_with_secure_and_httponly",
         test_response_set_cookie_with_secure_and_httponly);
     g_test_add_func("/responses/delete_cookie", test_response_delete_cookie);
-    g_test_add_func("/responses/generate_etag", test_balde_response_generate_etag);
+    g_test_add_func("/responses/generate_etag",
+        test_balde_response_generate_etag);
     g_test_add_func("/responses/add_etag", test_balde_response_add_etag);
+    g_test_add_func("/responses/truncate_body",
+        test_balde_response_truncate_body);
     g_test_add_func("/responses/render", test_response_render);
     g_test_add_func("/responses/render_with_custom_mime_type",
         test_response_render_with_custom_mime_type);

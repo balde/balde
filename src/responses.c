@@ -42,6 +42,7 @@ balde_response_remove_header(balde_response_t *response, const gchar *name)
     gboolean removed;
     gchar *l_name = g_ascii_strdown(name, -1);
     removed = g_hash_table_remove(response->priv->headers, l_name);
+
     g_free(l_name);
     return removed;
 }
@@ -70,6 +71,13 @@ balde_response_append_body_len(balde_response_t *response, const gchar *content,
     const gssize len)
 {
     g_string_append_len(response->priv->body, content, len);
+}
+
+
+BALDE_API void
+balde_response_truncate_body(balde_response_t *response)
+{
+    g_string_truncate(response->priv->body, 0);
 }
 
 
