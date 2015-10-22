@@ -17,6 +17,7 @@
 #include "datetime.h"
 #include "exceptions.h"
 #include "routing.h"
+#include "requests.h"
 #include "responses.h"
 #include "utils.h"
 
@@ -289,8 +290,25 @@ balde_response_add_etag_header(balde_response_t * response, gboolean weak)
     balde_response_set_header(response, BALDE_RESPONSE_ETAG_HEADER, hash);
 }
 
-    g_string_free(header_contents, TRUE);
-    g_free(hash);
+void
+balde_response_etag_matching(balde_request_t *request,
+    balde_response_t *response)
+
+{
+    gchar *calculated_etag;
+    gboolean weak_etag;
+    const gchar *sent_etag = balde_request_get_header(request,
+        BALDE_REQUEST_ETAG_HEADER);
+    if (sent_etag == NULL)
+        return;
+    weak_etag = g_ascii_strncasecmp(sent_etag, "W/", 2) == 0 ? TRUE : FALSE;
+    calculated_etag = balde_response_generate_etag(response, weak_etag);
+    if (g_ascii_strcasecmp(sent_etag, calculated_etag) == 0) {
+        balde_response_truncate_body(response);
+        // TODO: Should I use the enum for codes?
+        response->status_code = 304;
+    }
+    g_free(calculated_etag);
 }
 
 
