@@ -291,8 +291,10 @@ void test_balde_response_generate_etag(void)
 {
     gchar* hash;
     balde_response_t *res = balde_make_response("quico");
-    hash = balde_response_generate_etag(res);
-    g_assert_cmpstr("15929f6ea6e9a8e093b05cf723d1e424", ==, hash);
+    hash = balde_response_generate_etag(res, FALSE);
+    g_assert_cmpstr("\"15929f6ea6e9a8e093b05cf723d1e424\"", ==, hash);
+    hash = balde_response_generate_etag(res, TRUE);
+    g_assert_cmpstr("W/\"15929f6ea6e9a8e093b05cf723d1e424\"", ==, hash);
     g_free(hash);
     balde_response_free(res);
 }

@@ -28,7 +28,7 @@ void balde_fix_header_name(gchar *name);
 void balde_header_render(const gchar *key, GSList *value, GString *str);
 gboolean balde_response_remove_header(balde_response_t *response,
     const gchar *name);
-gchar* balde_response_generate_etag(balde_response_t *response);
+gchar* balde_response_generate_etag(balde_response_t *response, gboolean weak);
 void balde_response_add_etag_header(balde_response_t * response,
     gboolean weak);
 GString* balde_response_render(balde_response_t *response,
