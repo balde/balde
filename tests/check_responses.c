@@ -321,6 +321,7 @@ void test_balde_response_add_etag(void)
     balde_response_free(res);
 }
 
+
 void test_balde_response_etag_matching(void)
 {
     g_setenv("HTTP_IF_NONE_MATCH", "\"15929f6ea6e9a8e093b05cf723d1e424\"",

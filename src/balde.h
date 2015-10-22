@@ -442,8 +442,8 @@ void balde_response_set_header(balde_response_t *response, const gchar *name,
 /**
  * Get a response header.
  */
-GSList*
-balde_response_get_header(balde_response_t *response, const gchar *name);
+GSList* balde_response_get_header(balde_response_t *response,
+    const gchar *name);
 
 
 /**
