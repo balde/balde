@@ -36,6 +36,28 @@ balde_response_set_header(balde_response_t *response, const gchar *name,
 }
 
 
+BALDE_API gboolean
+balde_response_remove_header(balde_response_t *response, const gchar *name)
+{
+    gboolean removed;
+    gchar *l_name = g_ascii_strdown(name, -1);
+    removed = g_hash_table_remove(response->priv->headers, l_name);
+    g_free(l_name);
+    return removed;
+}
+
+
+BALDE_API GSList*
+balde_response_get_header(balde_response_t *response, const gchar *name)
+{
+    gchar *l_name = g_ascii_strdown(name, -1);
+    GSList *value = g_hash_table_lookup(response->priv->headers, l_name);
+
+    g_free(l_name);
+    return value;
+}
+
+
 BALDE_API void
 balde_response_append_body(balde_response_t *response, const gchar *content)
 {
@@ -232,6 +254,25 @@ gchar*
 balde_response_generate_etag(balde_response_t *response)
 {
     return g_compute_checksum_for_string(G_CHECKSUM_MD5, response->priv->body->str, response->priv->body->len);
+}
+
+
+void
+balde_response_add_etag_header(balde_response_t * response, gboolean weak)
+{
+    GString *header_contents = g_string_new("");
+    if (weak) {
+        g_string_append(header_contents, "W/");
+    }
+    g_string_append(header_contents, "\"");
+    gchar *hash = balde_response_generate_etag(response);
+    g_string_append(header_contents, hash);
+    g_string_append(header_contents, "\"");
+    balde_response_remove_header(response, BALDE_RESPONSE_ETAG_HEADER);
+    balde_response_set_header(response, BALDE_RESPONSE_ETAG_HEADER, header_contents->str);
+
+    g_string_free(header_contents, TRUE);
+    g_free(hash);
 }
 
 
