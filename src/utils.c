@@ -130,3 +130,12 @@ balde_constant_time_compare(const gchar *v1, const gchar *v2)
         rv |= left[i] ^ _v2[i];
     return rv == 0;
 }
+
+
+/*
+ * Function used to compare case-insensitive keys inside a hashtable
+ */
+gboolean balde_header_compare(gconstpointer a, gconstpointer b)
+{
+    return g_ascii_strcasecmp((gchar *) a, (gchar *) b) == 0;
+}

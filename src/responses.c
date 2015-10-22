@@ -18,6 +18,7 @@
 #include "exceptions.h"
 #include "routing.h"
 #include "responses.h"
+#include "utils.h"
 
 
 BALDE_API void
@@ -94,8 +95,8 @@ balde_make_response_from_gstring(GString *content)
     balde_response_t *response = g_new(balde_response_t, 1);
     response->priv = g_new(struct _balde_response_private_t, 1);
     response->status_code = 200;
-    response->priv->headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
-        balde_response_headers_free);
+    response->priv->headers = g_hash_table_new_full(g_str_hash,
+        balde_header_compare, g_free, balde_response_headers_free);
     response->priv->template_ctx = g_hash_table_new_full(g_str_hash, g_str_equal,
         g_free, g_free);
     response->priv->body = content;
@@ -269,13 +270,13 @@ void
 balde_response_add_etag_header(balde_response_t * response, gboolean weak)
 {
     GString *header_contents = g_string_new("");
-    if (weak) {
+    if (weak)
         g_string_append(header_contents, "W/");
-    }
     g_string_append(header_contents, "\"");
     gchar *hash = balde_response_generate_etag(response);
     g_string_append(header_contents, hash);
     g_string_append(header_contents, "\"");
+    /* The etag will always be replaced. */
     balde_response_remove_header(response, BALDE_RESPONSE_ETAG_HEADER);
     balde_response_set_header(response, BALDE_RESPONSE_ETAG_HEADER, header_contents->str);
 

@@ -294,6 +294,7 @@ void test_balde_response_generate_etag(void)
     hash = balde_response_generate_etag(res);
     g_assert_cmpstr("15929f6ea6e9a8e093b05cf723d1e424", ==, hash);
     g_free(hash);
+    balde_response_free(res);
 }
 
 
