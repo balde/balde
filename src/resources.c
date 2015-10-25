@@ -147,18 +147,12 @@ balde_make_response_from_static_resource(balde_app_t *app, balde_request_t *requ
             g_date_time_unref(expires_dt);
             balde_response_set_header(response, "Expires", expires);
             g_free(expires);
+            balde_response_append_body_len(response, resource->content->str,
+                resource->content->len);
 
-            gchar *etag = g_strdup_printf("\"balde-%s-%s\"", resource->hash_name,
-                resource->hash_content);
-            balde_response_set_header(response, "Etag", etag);
-            const gchar *if_none_match = balde_request_get_header(request,
-                "If-None-Match");
-            if (if_none_match != NULL && (g_strcmp0(if_none_match, etag) == 0))
-                response->status_code = 304;
-            else
-                balde_response_append_body_len(response, resource->content->str,
-                    resource->content->len);
-            g_free(etag);
+            balde_response_add_etag_header(response, TRUE);
+            balde_response_etag_matching(request, response);
+
             if (resource->type != NULL)
                 balde_response_set_header(response, "Content-Type", resource->type);
             return response;
