@@ -104,7 +104,7 @@ test_make_response_from_static_resource(void)
     g_assert(g_str_has_suffix(tmp->data, " GMT"));
     tmp = g_hash_table_lookup(response->priv->headers, "etag");
     g_assert_cmpstr(tmp->data, ==,
-        "\"balde-daab60b9178fd56656840a7fb9fc491c-48536785a0d37e65c9ebc6d7ee25119a\"");
+        "W/\"48536785a0d37e65c9ebc6d7ee25119a\"");
     tmp = g_hash_table_lookup(response->priv->headers, "content-type");
     g_assert_cmpstr(tmp->data, ==, "text/css");
     g_assert_cmpstr(response->priv->body->str, ==,
@@ -121,7 +121,7 @@ void
 test_make_response_from_static_resource_304(void)
 {
     g_setenv("HTTP_IF_NONE_MATCH",
-        "\"balde-daab60b9178fd56656840a7fb9fc491c-48536785a0d37e65c9ebc6d7ee25119a\"",
+        "W/\"48536785a0d37e65c9ebc6d7ee25119a\"",
         TRUE);
     balde_app_t *app = balde_app_init();
     balde_resources_load(app, resources_get_resource());
@@ -137,7 +137,7 @@ test_make_response_from_static_resource_304(void)
     g_assert(g_str_has_suffix(tmp->data, " GMT"));
     tmp = g_hash_table_lookup(response->priv->headers, "etag");
     g_assert_cmpstr(tmp->data, ==,
-        "\"balde-daab60b9178fd56656840a7fb9fc491c-48536785a0d37e65c9ebc6d7ee25119a\"");
+        "W/\"48536785a0d37e65c9ebc6d7ee25119a\"");
     tmp = g_hash_table_lookup(response->priv->headers, "content-type");
     g_assert_cmpstr(tmp->data, ==, "text/css");
     g_assert_cmpstr(response->priv->body->str, ==, "");
