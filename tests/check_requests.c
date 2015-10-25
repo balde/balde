@@ -14,6 +14,7 @@
 #include <glib/gstdio.h>
 #include "../src/balde.h"
 #include "../src/app.h"
+#include "../src/utils.h"
 #include "utils.h"
 
 
@@ -170,7 +171,7 @@ test_make_request_with_env(void)
     env->path_info = g_strdup("/");
     env->request_method = g_strdup("GET");
     env->query_string = g_strdup("asd=lol&xd=hehe");
-    env->headers = g_hash_table_new_full(g_str_hash, g_str_equal,
+    env->headers = g_hash_table_new_full(g_str_hash, balde_header_compare,
         g_free, g_free);
     g_hash_table_replace(env->headers, g_strdup("lol-hehe"), g_strdup("12345"));
     g_hash_table_replace(env->headers, g_strdup("xd"), g_strdup("asdf"));
@@ -205,8 +206,8 @@ test_make_request_with_body(void)
     env->path_info = g_strdup("/");
     env->request_method = g_strdup("POST");
     env->query_string = g_strdup("asd=lol&xd=hehe");
-    env->headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
-        g_free);
+    env->headers = g_hash_table_new_full(g_str_hash, balde_header_compare,
+        g_free, g_free);
     g_hash_table_replace(env->headers, g_strdup("content-type"),
         g_strdup(
             "multipart/form-data; boundary=---------------------------"
