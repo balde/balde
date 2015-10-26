@@ -439,6 +439,12 @@ void balde_app_run(balde_app_t *app, gint argc, gchar **argv);
 void balde_response_set_header(balde_response_t *response, const gchar *name,
     const gchar *value);
 
+/**
+ * Get a response header.
+ */
+GSList* balde_response_get_header(balde_response_t *response,
+    const gchar *name);
+
 
 /**
  * Appends a nul-terminated string to the response body.
@@ -454,6 +460,13 @@ void balde_response_append_body(balde_response_t *response,
  */
 void balde_response_append_body_len(balde_response_t *response,
     const gchar *content, const gssize len);
+
+
+/**
+ * Truncate response's body.
+ *
+ */
+void balde_response_truncate_body(balde_response_t *response);
 
 
 /**

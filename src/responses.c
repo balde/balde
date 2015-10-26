@@ -17,7 +17,9 @@
 #include "datetime.h"
 #include "exceptions.h"
 #include "routing.h"
+#include "requests.h"
 #include "responses.h"
+#include "utils.h"
 
 
 BALDE_API void
@@ -36,6 +38,29 @@ balde_response_set_header(balde_response_t *response, const gchar *name,
 }
 
 
+BALDE_API gboolean
+balde_response_remove_header(balde_response_t *response, const gchar *name)
+{
+    gboolean removed;
+    gchar *l_name = g_ascii_strdown(name, -1);
+    removed = g_hash_table_remove(response->priv->headers, l_name);
+
+    g_free(l_name);
+    return removed;
+}
+
+
+BALDE_API GSList*
+balde_response_get_header(balde_response_t *response, const gchar *name)
+{
+    gchar *l_name = g_ascii_strdown(name, -1);
+    GSList *value = g_hash_table_lookup(response->priv->headers, l_name);
+
+    g_free(l_name);
+    return value;
+}
+
+
 BALDE_API void
 balde_response_append_body(balde_response_t *response, const gchar *content)
 {
@@ -48,6 +73,13 @@ balde_response_append_body_len(balde_response_t *response, const gchar *content,
     const gssize len)
 {
     g_string_append_len(response->priv->body, content, len);
+}
+
+
+BALDE_API void
+balde_response_truncate_body(balde_response_t *response)
+{
+    g_string_truncate(response->priv->body, 0);
 }
 
 
@@ -64,8 +96,8 @@ balde_make_response_from_gstring(GString *content)
     balde_response_t *response = g_new(balde_response_t, 1);
     response->priv = g_new(struct _balde_response_private_t, 1);
     response->status_code = 200;
-    response->priv->headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
-        balde_response_headers_free);
+    response->priv->headers = g_hash_table_new_full(g_str_hash,
+        balde_header_compare, g_free, balde_response_headers_free);
     response->priv->template_ctx = g_hash_table_new_full(g_str_hash, g_str_equal,
         g_free, g_free);
     response->priv->body = content;
@@ -225,6 +257,58 @@ balde_header_render(const gchar *key, GSList *value, GString *str)
     for (GSList *tmp = value; tmp != NULL; tmp = g_slist_next(tmp))
         g_string_append_printf(str, "%s: %s\r\n", new_key, (gchar*) tmp->data);
     g_free(new_key);
+}
+
+
+gchar*
+balde_response_generate_etag(balde_response_t *response, gboolean weak)
+{
+    GString *header_contents = g_string_new("");
+    gchar *hash;
+    if (weak)
+        g_string_append(header_contents, "W/");
+    g_string_append(header_contents, "\"");
+
+    g_string_append(header_contents,
+        g_compute_checksum_for_string(G_CHECKSUM_MD5,
+        response->priv->body->str, response->priv->body->len)
+    );
+
+    g_string_append(header_contents, "\"");
+    hash = header_contents->str;
+    g_string_free(header_contents, FALSE);
+    return hash;
+}
+
+
+void
+balde_response_add_etag_header(balde_response_t * response, gboolean weak)
+{
+    gchar *hash = balde_response_generate_etag(response, weak);
+    /* The etag will always be replaced. */
+    balde_response_remove_header(response, BALDE_RESPONSE_ETAG_HEADER);
+    balde_response_set_header(response, BALDE_RESPONSE_ETAG_HEADER, hash);
+}
+
+void
+balde_response_etag_matching(balde_request_t *request,
+    balde_response_t *response)
+
+{
+    gchar *calculated_etag;
+    gboolean weak_etag;
+    const gchar *sent_etag = balde_request_get_header(request,
+        BALDE_REQUEST_ETAG_HEADER);
+    if (sent_etag == NULL)
+        return;
+    weak_etag = g_ascii_strncasecmp(sent_etag, "W/", 2) == 0 ? TRUE : FALSE;
+    calculated_etag = balde_response_generate_etag(response, weak_etag);
+    if (g_ascii_strcasecmp(sent_etag, calculated_etag) == 0) {
+        balde_response_truncate_body(response);
+        // TODO: Should I use the enum for codes?
+        response->status_code = 304;
+    }
+    g_free(calculated_etag);
 }
 
 

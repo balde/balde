@@ -15,6 +15,7 @@
 #include "balde.h"
 #include "app.h"
 #include "cgi.h"
+#include "utils.h"
 
 
 guint64
@@ -50,7 +51,8 @@ GHashTable*
 balde_cgi_request_headers(void)
 {
     gchar **headers = g_listenv();
-    GHashTable *rv = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    GHashTable *rv = g_hash_table_new_full(g_str_hash, balde_header_compare,
+        g_free, g_free);
     for (guint i = 0; headers[i] != NULL; i++) {
         gchar *key = balde_parse_header_name_from_envvar(headers[i]);
         if (key != NULL)

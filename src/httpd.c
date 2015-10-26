@@ -20,6 +20,7 @@
 #include "httpd.h"
 #include "requests.h"
 #include "responses.h"
+#include "utils.h"
 
 
 balde_httpd_parser_data_t*
@@ -41,7 +42,8 @@ balde_httpd_parse_request(balde_app_t *app, GInputStream *istream)
     gchar *key = NULL;
     gchar *value = NULL;
     GString *body = NULL;
-    GHashTable *headers = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+    GHashTable *headers = g_hash_table_new_full(g_str_hash,
+        balde_header_compare, g_free, g_free);
     gchar **pieces = g_strsplit(line, " ", 3);
     g_free(line);
 

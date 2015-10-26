@@ -13,6 +13,8 @@
 #include "balde.h"
 #include "sessions.h"
 
+static const gchar *BALDE_REQUEST_ETAG_HEADER = "If-None-Match";
+
 typedef struct {
     gchar *request_method;
     gchar *server_name;
