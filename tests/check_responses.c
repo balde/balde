@@ -293,6 +293,7 @@ void test_balde_response_generate_etag(void)
     balde_response_t *res = balde_make_response("quico");
     hash = balde_response_generate_etag(res, FALSE);
     g_assert_cmpstr("\"15929f6ea6e9a8e093b05cf723d1e424\"", ==, hash);
+    g_free(hash);
     hash = balde_response_generate_etag(res, TRUE);
     g_assert_cmpstr("W/\"15929f6ea6e9a8e093b05cf723d1e424\"", ==, hash);
     g_free(hash);
@@ -338,6 +339,9 @@ void test_balde_response_etag_matching(void)
     g_assert_cmpstr("", ==, res->priv->body->str);
     g_assert_cmpint(304, ==, res->status_code);
 
+    balde_request_free(req);
+    balde_response_free(res);
+
     g_setenv("HTTP_IF_NONE_MATCH", "W/\"15929f6ea6e9a8e093b05cf723d1e424\"",
         TRUE);
     balde_request_t *req2 = balde_make_request(app, NULL);
@@ -346,12 +350,10 @@ void test_balde_response_etag_matching(void)
     g_assert_cmpstr("", ==, res2->priv->body->str);
     g_assert_cmpint(304, ==, res2->status_code);
 
-    balde_app_free(app);
-    balde_request_free(req);
-    balde_response_free(res);
-
     balde_request_free(req2);
     balde_response_free(res2);
+
+    balde_app_free(app);
 }
 
 
@@ -360,6 +362,7 @@ void test_balde_response_truncate_body(void)
     balde_response_t *res = balde_make_response("quico");
     balde_response_truncate_body(res);
     g_assert_cmpstr("", ==, res->priv->body->str);
+    balde_response_free(res);
 }
 
 
