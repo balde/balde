@@ -749,7 +749,7 @@ valgrind: all
 				--num-callers=20 \
 				--show-possibly-lost=no" &> /dev/stdout | tee valgrind.output
 
-	./build-aux/parse-valgrind-results.sh valgrind.output
+	./build-aux/parse-valgrind-results.sh "${abs_top_srcdir}/valgrind.output"
 
 valgrind-ci: all clean-local
 	$(MAKE) check TESTS_ENVIRONMENT=" \
@@ -767,7 +767,7 @@ valgrind-ci: all clean-local
 				--num-callers=20 \
 				--show-possibly-lost=no" &> /dev/stdout | tee valgrind.output
 
-	./build-aux/parse-valgrind-results.sh valgrind.output
+	./build-aux/parse-valgrind-results.sh "${abs_top_srcdir}/valgrind.output"
 
 endif
 
