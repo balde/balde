@@ -747,9 +747,9 @@ valgrind: all
 				--leak-check=full \
 				--leak-resolution=high \
 				--num-callers=20 \
-				--show-possibly-lost=no" &> /dev/stdout | tee valgrind.output
+				--show-possibly-lost=no" &> /dev/stdout | tee "${top_builddir}/valgrind.output"
 
-	./build-aux/parse-valgrind-results.sh "${abs_top_srcdir}/valgrind.output"
+	"${abs_top_srcdir}/build-aux/parse-valgrind-results.sh" "${top_builddir}/valgrind.output"
 
 valgrind-ci: all clean-local
 	$(MAKE) check TESTS_ENVIRONMENT=" \
@@ -765,9 +765,9 @@ valgrind-ci: all clean-local
 				--leak-check=full \
 				--leak-resolution=high \
 				--num-callers=20 \
-				--show-possibly-lost=no" &> /dev/stdout | tee valgrind.output
+				--show-possibly-lost=no" &> /dev/stdout | tee "${top_builddir}/valgrind.output"
 
-	./build-aux/parse-valgrind-results.sh "${abs_top_srcdir}/valgrind.output"
+			"${abs_top_srcdir}/build-aux/parse-valgrind-results.sh" "${top_builddir}/valgrind.output"
 
 endif
 
@@ -787,6 +787,7 @@ dist-hook:
 clean-local:
 	-rm -rf $(top_builddir)/doc/build/
 	-rm -rf $(top_builddir)/valgrind-*.xml
+	-rm -rf "${top_builddir}/valgrind.output"
 
 
 # Helpers: Documentation
