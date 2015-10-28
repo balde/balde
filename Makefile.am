@@ -746,7 +746,9 @@ valgrind: all
 				--leak-check=full \
 				--leak-resolution=high \
 				--num-callers=20 \
-				--show-possibly-lost=no"
+				--show-possibly-lost=no" &> /dev/stdout | tee valgrind.output
+
+	./build-aux/parse-valgrind-results.sh valgrind.output
 
 valgrind-ci: all clean-local
 	$(MAKE) check TESTS_ENVIRONMENT=" \
@@ -761,7 +763,10 @@ valgrind-ci: all clean-local
 				--leak-check=full \
 				--leak-resolution=high \
 				--num-callers=20 \
-				--show-possibly-lost=no"
+				--show-possibly-lost=no" &> /dev/stdout | tee valgrind.output
+
+	./build-aux/parse-valgrind-results.sh valgrind.output
+
 endif
 
 
