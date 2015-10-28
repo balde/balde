@@ -739,6 +739,7 @@ valgrind: all
 	$(MAKE) check TESTS_ENVIRONMENT=" \
 		G_SLICE=always-malloc \
 		G_DEBUG=gc-friendly \
+		LC_ALL=C \
 		$(LIBTOOL) \
 			--mode=execute \
 			$(VALGRIND) \
@@ -754,6 +755,7 @@ valgrind-ci: all clean-local
 	$(MAKE) check TESTS_ENVIRONMENT=" \
 		G_SLICE=always-malloc \
 		G_DEBUG=gc-friendly \
+		LC_ALL=C \
 		$(LIBTOOL) \
 			--mode=execute \
 			$(VALGRIND) \
