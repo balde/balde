@@ -750,25 +750,6 @@ valgrind: all
 				--show-possibly-lost=no" &> /dev/stdout | tee "${top_builddir}/valgrind.output"
 
 	"${abs_top_srcdir}/build-aux/parse-valgrind-results.sh" "${top_builddir}/valgrind.output"
-
-valgrind-ci: all clean-local
-	$(MAKE) check TESTS_ENVIRONMENT=" \
-		G_SLICE=always-malloc \
-		G_DEBUG=gc-friendly \
-		LC_ALL=C \
-		$(LIBTOOL) \
-			--mode=execute \
-			$(VALGRIND) \
-				--tool=memcheck \
-				--xml=yes \
-				--xml-file=valgrind-%p.xml \
-				--leak-check=full \
-				--leak-resolution=high \
-				--num-callers=20 \
-				--show-possibly-lost=no" &> /dev/stdout | tee "${top_builddir}/valgrind.output"
-
-			"${abs_top_srcdir}/build-aux/parse-valgrind-results.sh" "${top_builddir}/valgrind.output"
-
 endif
 
 
