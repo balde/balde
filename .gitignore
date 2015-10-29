@@ -98,3 +98,5 @@ Makefile.in
 balde-*.tar.*
 
 /build/
+
+/valgrind.output
