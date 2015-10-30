@@ -447,6 +447,19 @@ GSList* balde_response_get_header(balde_response_t *response,
 
 
 /**
+ * Add an etag header to a response.
+ */
+void balde_response_add_etag_header(balde_response_t * response,
+    gboolean weak);
+
+/**
+ * Check if response matches a sent etag header and change reponse to be blank
+ * and change response code to 304 Not Modified.
+ */
+void balde_response_etag_matching(balde_request_t *request,
+    balde_response_t *response);
+
+/**
  * Appends a nul-terminated string to the response body.
  *
  */

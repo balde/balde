@@ -283,7 +283,7 @@ balde_response_generate_etag(balde_response_t *response, gboolean weak)
 }
 
 
-void
+BALDE_API void
 balde_response_add_etag_header(balde_response_t * response, gboolean weak)
 {
     gchar *hash = balde_response_generate_etag(response, weak);
@@ -293,7 +293,7 @@ balde_response_add_etag_header(balde_response_t * response, gboolean weak)
     g_free(hash);
 }
 
-void
+BALDE_API void
 balde_response_etag_matching(balde_request_t *request,
     balde_response_t *response)
 
