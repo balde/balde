@@ -263,22 +263,14 @@ balde_header_render(const gchar *key, GSList *value, GString *str)
 gchar*
 balde_response_generate_etag(balde_response_t *response, gboolean weak)
 {
-    GString *header_contents = g_string_new("");
-    gchar *etag;
     gchar *hash;
-    if (weak)
-        g_string_append(header_contents, "W/");
-    g_string_append(header_contents, "\"");
+    gchar *etag;
 
     hash = g_compute_checksum_for_string(G_CHECKSUM_MD5,
         response->priv->body->str, response->priv->body->len);
 
-    g_string_append(header_contents, hash);
+    etag = g_strdup_printf("%s\"%s\"", weak == TRUE ? "W/" : "", hash);
     g_free(hash);
-
-    g_string_append(header_contents, "\"");
-    etag = g_strdup(header_contents->str);
-    g_string_free(header_contents, TRUE);
     return etag;
 }
 
