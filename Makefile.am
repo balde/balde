@@ -225,6 +225,9 @@ libbalde_template_la_LIBADD = \
 if USE_LEG
 src/template/parser-grammar.c: src/template/parser-grammar.leg
 	$(AM_V_GEN)$(LEG) -o $@ $<
+else
+src/template/parser-grammar.c:
+	$(AM_V_GEN)echo "error: peg/leg not found. failed to build template grammar: $@"; exit 1
 endif
 
 balde_template_gen_SOURCES = \
