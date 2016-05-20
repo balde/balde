@@ -240,20 +240,16 @@ balde_header_render(const gchar *key, GSList *value, GString *str)
 gchar*
 balde_response_generate_etag(balde_response_t *response, gboolean weak)
 {
-    gchar *hash;
-    gchar *etag;
-
-    hash = g_compute_checksum_for_string(G_CHECKSUM_MD5,
+    gchar *hash = g_compute_checksum_for_string(G_CHECKSUM_MD5,
         response->priv->body->str, response->priv->body->len);
-
-    etag = g_strdup_printf("%s\"%s\"", weak == TRUE ? "W/" : "", hash);
+    gchar *etag = g_strdup_printf("%s\"%s\"", weak == TRUE ? "W/" : "", hash);
     g_free(hash);
     return etag;
 }
 
 
 BALDE_API void
-balde_response_add_etag_header(balde_response_t * response, gboolean weak)
+balde_response_add_etag_header(balde_response_t *response, gboolean weak)
 {
     if (g_hash_table_lookup(response->priv->headers, "etag") != NULL)
         return;  // do not override previously set etag
@@ -265,16 +261,13 @@ balde_response_add_etag_header(balde_response_t * response, gboolean weak)
 BALDE_API void
 balde_response_etag_matching(balde_request_t *request,
     balde_response_t *response)
-
 {
-    gchar *calculated_etag;
-    gboolean weak_etag;
     const gchar *sent_etag = balde_request_get_header(request, "if-none-match");
     if (sent_etag == NULL)
         return;
-    weak_etag = g_ascii_strncasecmp(sent_etag, "W/", 2) == 0 ? TRUE : FALSE;
-    calculated_etag = balde_response_generate_etag(response, weak_etag);
-    if (g_ascii_strcasecmp(sent_etag, calculated_etag) == 0) {
+    gboolean weak_etag = g_str_has_prefix(sent_etag, "W/");
+    gchar *calculated_etag = balde_response_generate_etag(response, weak_etag);
+    if (g_strcmp0(sent_etag, calculated_etag) == 0) {
         balde_response_truncate_body(response);
         // TODO: Should I use the enum for codes?
         response->status_code = 304;

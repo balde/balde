@@ -442,7 +442,7 @@ void balde_response_set_header(balde_response_t *response, const gchar *name,
 /**
  * Add an etag header to a response.
  */
-void balde_response_add_etag_header(balde_response_t * response,
+void balde_response_add_etag_header(balde_response_t *response,
     gboolean weak);
 
 /**
