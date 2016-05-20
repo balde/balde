@@ -747,12 +747,14 @@ valgrind: all
 			--mode=execute \
 			$(VALGRIND) \
 				--tool=memcheck \
-				--leak-check=full \
 				--leak-resolution=high \
+				--leak-check=yes \
+				--show-leak-kinds=definite \
+				--errors-for-leak-kinds=definite \
+				--error-exitcode=33 \
 				--num-callers=20 \
-				--show-possibly-lost=no" &> /dev/stdout | tee "${top_builddir}/valgrind.output"
-
-	"${abs_top_srcdir}/build-aux/parse-valgrind-results.sh" "${top_builddir}/valgrind.output"
+				--suppressions=\"$(top_srcdir)/build-aux/glib.supp\" \
+		"
 endif
 
 

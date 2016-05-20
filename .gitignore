@@ -38,6 +38,10 @@ Makefile.in
 !/build-aux/git-version-gen
 /.version
 
+# valgrind
+!/build-aux/glib.supp
+/valgrind.output
+
 # doxygen
 /Doxyfile
 /doc/build/
@@ -98,5 +102,3 @@ Makefile.in
 balde-*.tar.*
 
 /build/
-
-/valgrind.output
