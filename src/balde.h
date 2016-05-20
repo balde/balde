@@ -440,9 +440,12 @@ void balde_response_set_header(balde_response_t *response, const gchar *name,
     const gchar *value);
 
 /**
- * Add an etag header to a response.
+ * Sets a response ETag header for the current content of the response.
+ *
+ * This function should be only used when the response content is ready to be
+ * sent to the client, as it can't be overriden later.
  */
-void balde_response_add_etag_header(balde_response_t *response,
+void balde_response_set_etag_header(balde_response_t *response,
     gboolean weak);
 
 /**

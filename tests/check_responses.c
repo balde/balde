@@ -305,14 +305,14 @@ void
 test_balde_response_add_etag(void)
 {
     balde_response_t *res = balde_make_response("quico");
-    balde_response_add_etag_header(res, FALSE);
+    balde_response_set_etag_header(res, FALSE);
     GSList *etag = g_hash_table_lookup(res->priv->headers, "etag");
     g_assert(etag != NULL);
     g_assert_cmpstr("\"15929f6ea6e9a8e093b05cf723d1e424\"", ==, etag->data);
     balde_response_free(res);
 
     res = balde_make_response("quico");
-    balde_response_add_etag_header(res, TRUE);
+    balde_response_set_etag_header(res, TRUE);
     etag = g_hash_table_lookup(res->priv->headers, "etag");
     g_assert(etag != NULL);
     g_assert_cmpstr("W/\"15929f6ea6e9a8e093b05cf723d1e424\"", ==, etag->data);

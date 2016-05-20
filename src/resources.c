@@ -150,7 +150,7 @@ balde_make_response_from_static_resource(balde_app_t *app, balde_request_t *requ
             balde_response_append_body_len(response, resource->content->str,
                 resource->content->len);
 
-            balde_response_add_etag_header(response, TRUE);
+            balde_response_set_etag_header(response, TRUE);
             balde_response_etag_matching(request, response);
 
             if (resource->type != NULL)

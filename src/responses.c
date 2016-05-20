@@ -249,7 +249,7 @@ balde_response_generate_etag(balde_response_t *response, gboolean weak)
 
 
 BALDE_API void
-balde_response_add_etag_header(balde_response_t *response, gboolean weak)
+balde_response_set_etag_header(balde_response_t *response, gboolean weak)
 {
     if (g_hash_table_lookup(response->priv->headers, "etag") != NULL)
         return;  // do not override previously set etag
