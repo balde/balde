@@ -11,5 +11,4 @@ It is designed to be fast, simple, and memory efficient. Most of its architectur
 
 For more information, take a look at:
 
-- http://balde.io/
-- http://docs.balde.io
+- https://balde.rgm.io/

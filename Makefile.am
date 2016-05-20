@@ -783,11 +783,4 @@ doc: clean-local Doxyfile
 	$(DOXYGEN) Doxyfile
 
 docs: doc
-
-if PUBLISH_DOCS
-publish_docs: doc
-	$(GITHUB_PAGES_PUBLISH) --verbose \
-		--cname docs.balde.io \
-		. doc/build/html
-endif
 endif

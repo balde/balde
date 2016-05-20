@@ -1,7 +1,7 @@
 AC_PREREQ([2.69])
 
 AC_INIT([balde], [m4_esyscmd(build-aux/git-version-gen .tarball-version)],
-  [https://github.com/balde/balde], [balde], [http://balde.io])
+  [https://github.com/balde/balde], [balde], [https://balde.rgm.io])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -57,7 +57,6 @@ AS_IF([test "x$enable_doc" != "xno"], [
   ], [
     have_doxygen=yes
   ])
-  AC_PATH_PROG([github_pages_publish], [github-pages-publish])
 ])
 AS_IF([test "x$have_doxygen" = "xyes"], , [
   AS_IF([test "x$enable_doc" = "xyes"], [
@@ -66,13 +65,10 @@ AS_IF([test "x$have_doxygen" = "xyes"], , [
 ])
 
 AM_CONDITIONAL([BUILD_DOCS], [test "x$have_doxygen" = "xyes"])
-AM_CONDITIONAL([PUBLISH_DOCS], [test "x$ac_cv_path_github_pages_publish" != "x"])
 
 DOXYGEN="$ac_cv_path_doxygen"
-GITHUB_PAGES_PUBLISH="$ac_cv_path_github_pages_publish"
 
 AC_SUBST(DOXYGEN)
-AC_SUBST(GITHUB_PAGES_PUBLISH)
 
 AC_ARG_ENABLE([valgrind], AS_HELP_STRING([--disable-valgrind],
               [ignore presence of valgrind]))
