@@ -12,8 +12,6 @@
 #include <glib.h>
 #include "balde.h"
 
-static const gchar *BALDE_RESPONSE_ETAG_HEADER = "ETag";
-
 struct _balde_response_private_t {
     GHashTable *headers;
     GHashTable *template_ctx;
@@ -26,8 +24,6 @@ balde_response_t* balde_make_response_from_gstring(GString *content);
 balde_response_t* balde_make_response_from_exception(GError *error);
 void balde_fix_header_name(gchar *name);
 void balde_header_render(const gchar *key, GSList *value, GString *str);
-gboolean balde_response_remove_header(balde_response_t *response,
-    const gchar *name);
 gchar* balde_response_generate_etag(balde_response_t *response, gboolean weak);
 GString* balde_response_render(balde_response_t *response,
     const gboolean with_body);

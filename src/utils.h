@@ -20,6 +20,5 @@ gint64 balde_timestamp(void);
 gchar* balde_encoded_timestamp(void);
 gboolean balde_validate_timestamp(const gchar* timestamp, gint64 max_delta);
 gboolean balde_constant_time_compare(const gchar *v1, const gchar *v2);
-gboolean balde_header_compare(gconstpointer a, gconstpointer b);
 
 #endif /* _BALDE_UTILS_PRIVATE_H */

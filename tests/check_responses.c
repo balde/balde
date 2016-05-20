@@ -287,11 +287,11 @@ test_response_render(void)
 }
 
 
-void test_balde_response_generate_etag(void)
+void
+test_balde_response_generate_etag(void)
 {
-    gchar* hash;
     balde_response_t *res = balde_make_response("quico");
-    hash = balde_response_generate_etag(res, FALSE);
+    gchar *hash = balde_response_generate_etag(res, FALSE);
     g_assert_cmpstr("\"15929f6ea6e9a8e093b05cf723d1e424\"", ==, hash);
     g_free(hash);
     hash = balde_response_generate_etag(res, TRUE);
@@ -301,29 +301,27 @@ void test_balde_response_generate_etag(void)
 }
 
 
-void test_balde_response_add_etag(void)
+void
+test_balde_response_add_etag(void)
 {
-    GSList* generated_etag;
-    gchar* etag_value;
-
     balde_response_t *res = balde_make_response("quico");
-
     balde_response_add_etag_header(res, FALSE);
-    generated_etag = balde_response_get_header(res, BALDE_RESPONSE_ETAG_HEADER);
-    etag_value = (gchar *) generated_etag->data;
+    GSList *etag = g_hash_table_lookup(res->priv->headers, "etag");
+    g_assert(etag != NULL);
+    g_assert_cmpstr("\"15929f6ea6e9a8e093b05cf723d1e424\"", ==, etag->data);
+    balde_response_free(res);
 
-    g_assert_cmpstr("\"15929f6ea6e9a8e093b05cf723d1e424\"", ==, etag_value);
-
+    res = balde_make_response("quico");
     balde_response_add_etag_header(res, TRUE);
-    generated_etag = balde_response_get_header(res, BALDE_RESPONSE_ETAG_HEADER);
-    etag_value = (gchar *) generated_etag->data;
-
-    g_assert_cmpstr("W/\"15929f6ea6e9a8e093b05cf723d1e424\"", ==, etag_value);
+    etag = g_hash_table_lookup(res->priv->headers, "etag");
+    g_assert(etag != NULL);
+    g_assert_cmpstr("W/\"15929f6ea6e9a8e093b05cf723d1e424\"", ==, etag->data);
     balde_response_free(res);
 }
 
 
-void test_balde_response_etag_matching(void)
+void
+test_balde_response_etag_matching(void)
 {
     g_setenv("HTTP_IF_NONE_MATCH", "\"15929f6ea6e9a8e093b05cf723d1e424\"",
         TRUE);

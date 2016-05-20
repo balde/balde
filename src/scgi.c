@@ -152,8 +152,8 @@ balde_scgi_parse_request(balde_app_t *app, GInputStream *istream)
     }
 
     GString *body = NULL;
-    GHashTable *headers = g_hash_table_new_full(g_str_hash,
-        balde_header_compare, g_free, g_free);
+    GHashTable *headers = g_hash_table_new_full(g_str_hash, g_str_equal,
+        g_free, g_free);
 
     g_hash_table_foreach(env, (GHFunc) balde_filter_headers, headers);
 

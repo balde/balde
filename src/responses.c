@@ -38,29 +38,6 @@ balde_response_set_header(balde_response_t *response, const gchar *name,
 }
 
 
-BALDE_API gboolean
-balde_response_remove_header(balde_response_t *response, const gchar *name)
-{
-    gboolean removed;
-    gchar *l_name = g_ascii_strdown(name, -1);
-    removed = g_hash_table_remove(response->priv->headers, l_name);
-
-    g_free(l_name);
-    return removed;
-}
-
-
-BALDE_API GSList*
-balde_response_get_header(balde_response_t *response, const gchar *name)
-{
-    gchar *l_name = g_ascii_strdown(name, -1);
-    GSList *value = g_hash_table_lookup(response->priv->headers, l_name);
-
-    g_free(l_name);
-    return value;
-}
-
-
 BALDE_API void
 balde_response_append_body(balde_response_t *response, const gchar *content)
 {
@@ -96,8 +73,8 @@ balde_make_response_from_gstring(GString *content)
     balde_response_t *response = g_new(balde_response_t, 1);
     response->priv = g_new(struct _balde_response_private_t, 1);
     response->status_code = 200;
-    response->priv->headers = g_hash_table_new_full(g_str_hash,
-        balde_header_compare, g_free, balde_response_headers_free);
+    response->priv->headers = g_hash_table_new_full(g_str_hash, g_str_equal,
+        g_free, balde_response_headers_free);
     response->priv->template_ctx = g_hash_table_new_full(g_str_hash, g_str_equal,
         g_free, g_free);
     response->priv->body = content;
@@ -278,10 +255,10 @@ balde_response_generate_etag(balde_response_t *response, gboolean weak)
 BALDE_API void
 balde_response_add_etag_header(balde_response_t * response, gboolean weak)
 {
+    if (g_hash_table_lookup(response->priv->headers, "etag") != NULL)
+        return;  // do not override previously set etag
     gchar *hash = balde_response_generate_etag(response, weak);
-    /* The etag will always be replaced. */
-    balde_response_remove_header(response, BALDE_RESPONSE_ETAG_HEADER);
-    balde_response_set_header(response, BALDE_RESPONSE_ETAG_HEADER, hash);
+    balde_response_set_header(response, "Etag", hash);
     g_free(hash);
 }
 
@@ -292,8 +269,7 @@ balde_response_etag_matching(balde_request_t *request,
 {
     gchar *calculated_etag;
     gboolean weak_etag;
-    const gchar *sent_etag = balde_request_get_header(request,
-        BALDE_REQUEST_ETAG_HEADER);
+    const gchar *sent_etag = balde_request_get_header(request, "if-none-match");
     if (sent_etag == NULL)
         return;
     weak_etag = g_ascii_strncasecmp(sent_etag, "W/", 2) == 0 ? TRUE : FALSE;

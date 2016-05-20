@@ -440,13 +440,6 @@ void balde_response_set_header(balde_response_t *response, const gchar *name,
     const gchar *value);
 
 /**
- * Get a response header.
- */
-GSList* balde_response_get_header(balde_response_t *response,
-    const gchar *name);
-
-
-/**
  * Add an etag header to a response.
  */
 void balde_response_add_etag_header(balde_response_t * response,
