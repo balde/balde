@@ -217,6 +217,7 @@ libbalde_template_la_SOURCES = \
 libbalde_template_la_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(GLIB_CFLAGS) \
+	-Wno-unused-function \
 	-I$(top_srcdir)/src/template
 
 libbalde_template_la_LIBADD = \
