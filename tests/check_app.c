@@ -222,9 +222,10 @@ test_app_add_before_request(void)
     g_assert(app->priv->before_requests != NULL);
     g_assert(app->priv->before_requests->next == NULL);
     i = 0;
-    balde_before_request_func_t hook_func = app->priv->before_requests->data;
-    g_assert(hook_func == arcoiro_hook);
-    hook_func(app, NULL);
+    balde_before_request_t *hook = app->priv->before_requests->data;
+    g_assert(hook != NULL);
+    g_assert(hook->before_request_func == arcoiro_hook);
+    hook->before_request_func(app, NULL);
     g_assert(i == 1);
     balde_app_free(app);
 }

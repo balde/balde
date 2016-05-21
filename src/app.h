@@ -36,6 +36,10 @@ typedef struct {
     balde_view_func_t view_func;
 } balde_view_t;
 
+typedef struct {
+    balde_before_request_func_t before_request_func;
+} balde_before_request_t;
+
 typedef GString* (*balde_response_render_t) (balde_response_t*, const gboolean);
 
 balde_app_t* balde_app_copy(balde_app_t *app);

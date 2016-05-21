@@ -60,7 +60,7 @@ balde_log_handler(const gchar *log_domain, GLogLevelFlags log_level,
 {
     GLogLevelFlags wanted_log_level = GPOINTER_TO_INT(user_data);
     if (log_level <= wanted_log_level) {
-        const gchar *level_str;
+        const gchar *level_str = NULL;
         switch (log_level & G_LOG_LEVEL_MASK) {
             case G_LOG_LEVEL_ERROR:
                 return;  // INVALID
@@ -211,7 +211,7 @@ balde_app_free(balde_app_t *app)
         return;
     if (!app->copy) {
         g_slist_free_full(app->priv->views, (GDestroyNotify) balde_app_free_views);
-        g_slist_free(app->priv->before_requests);
+        g_slist_free_full(app->priv->before_requests, g_free);
         g_slist_free_full(app->priv->static_resources, (GDestroyNotify) balde_resource_free);
         g_hash_table_destroy(app->priv->config);
         balde_app_free_user_data(app);
@@ -256,8 +256,10 @@ BALDE_API void
 balde_app_add_before_request(balde_app_t *app, balde_before_request_func_t hook_func)
 {
     BALDE_APP_READ_ONLY(app);
+    balde_before_request_t *func = g_new(balde_before_request_t, 1);
+    func->before_request_func = hook_func;
     G_LOCK(before_requests);
-    app->priv->before_requests = g_slist_append(app->priv->before_requests, hook_func);
+    app->priv->before_requests = g_slist_append(app->priv->before_requests, func);
     G_UNLOCK(before_requests);
 }
 
@@ -467,8 +469,8 @@ balde_app_main_loop(balde_app_t *app, balde_request_env_t *env,
     with_body = ! (request->method & BALDE_HTTP_HEAD);
 
     for (GSList *tmp = app->priv->before_requests; tmp != NULL; tmp = g_slist_next(tmp)) {
-        balde_before_request_func_t hook_func = tmp->data;
-        hook_func(app, request);
+        balde_before_request_t *hook = tmp->data;
+        hook->before_request_func(app, request);
 
         if (app->error != NULL) {
             error_response = balde_make_response_from_exception(app->error);
