@@ -1,0 +1,15 @@
+FROM balde:dev
+
+# build with
+#   docker build -f Dockerfile.hello -t hello:balde .
+
+# run with:
+#    docker run --rm -it -p 80:80 --name hello hello:balde
+# then make requests to http://your-docker-host/
+
+WORKDIR /usr/src/app
+COPY . .
+RUN gcc -o hello $(pkg-config --libs --cflags balde) hello.c
+
+EXPOSE 80
+CMD ["/usr/src/app/hello", "--runserver", "--http-host=0.0.0.0", "--http-port=80"]
