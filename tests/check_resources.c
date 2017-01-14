@@ -16,6 +16,7 @@
 #include "../src/resources.h"
 #include "../src/requests.h"
 #include "../src/responses.h"
+#include "../src/sapi/cgi.h"
 #include "resources.h"
 
 
@@ -92,7 +93,7 @@ test_make_response_from_static_resource(void)
     g_unsetenv("HTTP_IF_NONE_MATCH");
     balde_app_t *app = balde_app_init();
     balde_resources_load(app, resources_get_resource());
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     balde_response_t *response = balde_make_response_from_static_resource(app,
         request, "/static/lol.css");
     g_assert(response != NULL);
@@ -125,7 +126,7 @@ test_make_response_from_static_resource_304(void)
         TRUE);
     balde_app_t *app = balde_app_init();
     balde_resources_load(app, resources_get_resource());
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     balde_response_t *response = balde_make_response_from_static_resource(app,
         request, "/static/lol.css");
     g_assert(response != NULL);
@@ -152,7 +153,7 @@ test_make_response_from_static_resource_404(void)
 {
     g_unsetenv("HTTP_IF_NONE_MATCH");
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     balde_response_t *response = balde_make_response_from_static_resource(app,
         request, "/static/lol.css");
     g_assert(response != NULL);

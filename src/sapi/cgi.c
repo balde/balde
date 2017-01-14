@@ -12,13 +12,13 @@
 
 #include <glib.h>
 #include <stdio.h>
-#include "balde.h"
-#include "app.h"
+#include "../balde.h"
+#include "../app.h"
 #include "cgi.h"
 
 
 guint64
-balde_cgi_parse_content_length(const gchar *str)
+balde_sapi_cgi_parse_content_length(const gchar *str)
 {
     if (str == NULL || str[0] == '\0')
         return 0;
@@ -27,9 +27,9 @@ balde_cgi_parse_content_length(const gchar *str)
 
 
 GString*
-balde_cgi_stdin_read(balde_app_t *app)
+balde_sapi_cgi_stdin_read(balde_app_t *app)
 {
-    guint64 clen = balde_cgi_parse_content_length(g_getenv("CONTENT_LENGTH"));
+    guint64 clen = balde_sapi_cgi_parse_content_length(g_getenv("CONTENT_LENGTH"));
     if (clen == 0)
         return NULL;
     GString *rv = g_string_new("");
@@ -47,7 +47,7 @@ balde_cgi_stdin_read(balde_app_t *app)
 
 
 GHashTable*
-balde_cgi_request_headers(void)
+balde_sapi_cgi_request_headers(void)
 {
     gchar **headers = g_listenv();
     GHashTable *rv = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
@@ -63,7 +63,7 @@ balde_cgi_request_headers(void)
 
 
 balde_request_env_t*
-balde_cgi_parse_request(balde_app_t *app)
+balde_sapi_cgi_parse_request(balde_app_t *app)
 {
     balde_request_env_t *rv = g_new(balde_request_env_t, 1);
     rv->server_name = g_strdup(g_getenv("SERVER_NAME"));
@@ -71,25 +71,41 @@ balde_cgi_parse_request(balde_app_t *app)
     rv->path_info = g_strdup(g_getenv("PATH_INFO"));
     rv->request_method = g_strdup(g_getenv("REQUEST_METHOD"));
     rv->query_string = g_strdup(g_getenv("QUERY_STRING"));
-    rv->headers = balde_cgi_request_headers();
-    rv->body = balde_cgi_stdin_read(app);
+    rv->headers = balde_sapi_cgi_request_headers();
+    rv->body = balde_sapi_cgi_stdin_read(app);
     rv->https = g_getenv("HTTPS") != NULL;
     return rv;
 }
 
 
 void
-balde_cgi_response_print(GString *response)
+balde_sapi_cgi_response_print(GString *response)
 {
     fwrite(response->str, sizeof(gchar), response->len/sizeof(gchar), stdout);
     g_string_free(response, TRUE);
 }
 
 
-void
-balde_cgi_run(balde_app_t *app)
+static gboolean
+balde_sapi_cgi_supported(void)
 {
-    GString *response = balde_app_main_loop(app, NULL,
-        balde_response_render, NULL);
-    balde_cgi_response_print(response);
+    return g_getenv("REQUEST_METHOD") != NULL;
 }
+
+
+gint
+balde_sapi_cgi_run(balde_app_t *app)
+{
+    GString *response = balde_app_main_loop(app,
+        balde_sapi_cgi_parse_request(app), balde_response_render, NULL);
+    balde_sapi_cgi_response_print(response);
+    return 0;
+}
+
+
+balde_sapi_t cgi_sapi = {
+    .name = "cgi",
+    .init = NULL,
+    .supported = balde_sapi_cgi_supported,
+    .run = balde_sapi_cgi_run,
+};

@@ -13,7 +13,7 @@
 #include <glib.h>
 #include <stdio.h>
 #include <string.h>
-#include "../src/cgi.h"
+#include "../src/sapi/cgi.h"
 
 // this thing isn't thread safe, bla, bla, bla, but this is just a test :)
 extern const gchar *query_string;
@@ -30,4 +30,4 @@ getc(FILE *stream)
     return c;
 }
 
-#include "../src/cgi.c"
+#include "../src/sapi/cgi.c"

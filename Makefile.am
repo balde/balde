@@ -122,17 +122,18 @@ include_HEADERS = \
 noinst_HEADERS = \
 	src/balde-private.h \
 	src/app.h \
-	src/cgi.h \
 	src/datetime.h \
 	src/exceptions.h \
-	src/httpd.h \
 	src/multipart.h \
 	src/multipart_parser.h \
 	src/requests.h \
 	src/resources.h \
 	src/responses.h \
 	src/routing.h \
-	src/scgi.h \
+	src/sapi.h \
+	src/sapi/cgi.h \
+	src/sapi/httpd.h \
+	src/sapi/scgi.h \
 	src/sessions.h \
 	src/template/template.h \
 	src/template/parser.h \
@@ -155,19 +156,19 @@ noinst_PROGRAMS =
 
 check_PROGRAMS = \
 	tests/check_app \
-	tests/check_cgi \
 	tests/check_datetime \
 	tests/check_exceptions \
-	tests/check_httpd \
 	tests/check_multipart \
 	tests/check_quickstart \
 	tests/check_requests \
 	tests/check_resources \
 	tests/check_responses \
 	tests/check_routing \
-	tests/check_scgi \
+	tests/check_sapi_cgi \
+	tests/check_sapi_cgi_stdin \
+	tests/check_sapi_httpd \
+	tests/check_sapi_scgi \
 	tests/check_sessions \
-	tests/check_stdin \
 	tests/check_template \
 	tests/check_template_helpers \
 	tests/check_utils
@@ -180,17 +181,18 @@ pkgconfig_DATA = balde.pc
 
 libbalde_la_SOURCES = \
 	src/app.c \
-	src/cgi.c \
 	src/datetime.c \
 	src/exceptions.c \
-	src/httpd.c \
 	src/multipart.c \
 	src/multipart_parser.c \
 	src/requests.c \
 	src/resources.c \
 	src/responses.c \
 	src/routing.c \
-	src/scgi.c \
+	src/sapi.c \
+	src/sapi/cgi.c \
+	src/sapi/httpd.c \
+	src/sapi/scgi.c \
 	src/sessions.c \
 	src/template-helpers.c \
 	src/utils.c
@@ -456,20 +458,6 @@ tests_check_app_LDADD = \
 	$(GLIB_LIBS) \
 	libbalde.la
 
-tests_check_cgi_SOURCES = \
-	tests/check_cgi.c
-
-tests_check_cgi_CFLAGS = \
-	$(GLIB_CFLAGS)
-
-tests_check_cgi_LDFLAGS = \
-	-static \
-	-no-install
-
-tests_check_cgi_LDADD = \
-	$(GLIB_LIBS) \
-	libbalde.la
-
 tests_check_datetime_SOURCES = \
 	tests/check_datetime.c
 
@@ -495,21 +483,6 @@ tests_check_exceptions_LDFLAGS = \
 	-no-install
 
 tests_check_exceptions_LDADD = \
-	$(GLIB_LIBS) \
-	libbalde.la
-
-tests_check_httpd_SOURCES = \
-	tests/check_httpd.c \
-	tests/mock_httpd.c
-
-tests_check_httpd_CFLAGS = \
-	$(GLIB_CFLAGS)
-
-tests_check_httpd_LDFLAGS = \
-	-static \
-	-no-install
-
-tests_check_httpd_LDADD = \
 	$(GLIB_LIBS) \
 	libbalde.la
 
@@ -584,17 +557,61 @@ tests_check_routing_LDADD = \
 	$(GLIB_LIBS) \
 	libbalde.la
 
-tests_check_scgi_SOURCES = \
-	tests/check_scgi.c
+tests_check_sapi_cgi_SOURCES = \
+	tests/check_sapi_cgi.c
 
-tests_check_scgi_CFLAGS = \
+tests_check_sapi_cgi_CFLAGS = \
 	$(GLIB_CFLAGS)
 
-tests_check_scgi_LDFLAGS = \
+tests_check_sapi_cgi_LDFLAGS = \
 	-static \
 	-no-install
 
-tests_check_scgi_LDADD = \
+tests_check_sapi_cgi_LDADD = \
+	$(GLIB_LIBS) \
+	libbalde.la
+
+tests_check_sapi_cgi_stdin_SOURCES = \
+	tests/check_sapi_cgi_stdin.c \
+	tests/mock_sapi_cgi_stdin.c
+
+tests_check_sapi_cgi_stdin_CFLAGS = \
+	$(GLIB_CFLAGS)
+
+tests_check_sapi_cgi_stdin_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_sapi_cgi_stdin_LDADD = \
+	$(GLIB_LIBS) \
+	libbalde.la
+
+tests_check_sapi_httpd_SOURCES = \
+	tests/check_sapi_httpd.c \
+	tests/mock_sapi_httpd.c
+
+tests_check_sapi_httpd_CFLAGS = \
+	$(GLIB_CFLAGS)
+
+tests_check_sapi_httpd_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_sapi_httpd_LDADD = \
+	$(GLIB_LIBS) \
+	libbalde.la
+
+tests_check_sapi_scgi_SOURCES = \
+	tests/check_sapi_scgi.c
+
+tests_check_sapi_scgi_CFLAGS = \
+	$(GLIB_CFLAGS)
+
+tests_check_sapi_scgi_LDFLAGS = \
+	-static \
+	-no-install
+
+tests_check_sapi_scgi_LDADD = \
 	$(GLIB_LIBS) \
 	libbalde.la
 
@@ -610,21 +627,6 @@ tests_check_sessions_LDFLAGS = \
 	-no-install
 
 tests_check_sessions_LDADD = \
-	$(GLIB_LIBS) \
-	libbalde.la
-
-tests_check_stdin_SOURCES = \
-	tests/check_stdin.c \
-	tests/mock_stdin.c
-
-tests_check_stdin_CFLAGS = \
-	$(GLIB_CFLAGS)
-
-tests_check_stdin_LDFLAGS = \
-	-static \
-	-no-install
-
-tests_check_stdin_LDADD = \
 	$(GLIB_LIBS) \
 	libbalde.la
 

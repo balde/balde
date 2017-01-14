@@ -14,6 +14,7 @@
 #include <glib/gstdio.h>
 #include "../src/balde.h"
 #include "../src/app.h"
+#include "../src/sapi/cgi.h"
 #include "utils.h"
 
 
@@ -86,7 +87,7 @@ test_make_request(void)
     g_setenv("SERVER_NAME", "bola", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     g_assert_cmpstr(request->path, ==, "/");
     g_assert_cmpstr(request->server_name, ==, "bola");
     g_assert(request->script_name == NULL);
@@ -115,7 +116,7 @@ test_make_request_without_path_info(void)
     g_unsetenv("PATH_INFO");
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     g_assert(request->path == NULL);
     g_assert(request->script_name == NULL);
     g_assert(request->method == BALDE_HTTP_GET);
@@ -144,7 +145,7 @@ test_make_request_without_path_info_with_script_name(void)
     g_unsetenv("PATH_INFO");
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     g_assert_cmpstr(request->server_name, ==, "bola");
     g_assert_cmpstr(request->path, ==, "/bola/");
     g_assert(request->script_name == NULL);
@@ -247,7 +248,7 @@ test_request_get_header(void)
     g_setenv("HTTP_XD_KKK", "asdf", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     g_assert_cmpstr(balde_request_get_header(request, "Lol-Hehe"), ==, "12345");
     g_assert_cmpstr(balde_request_get_header(request, "XD-KKK"), ==, "asdf");
     g_assert(balde_request_get_header(request, "foo") == NULL);
@@ -262,7 +263,7 @@ test_request_get_arg(void)
     g_setenv("QUERY_STRING", "lol=hehe", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     g_assert_cmpstr(balde_request_get_arg(request, "lol"), == , "hehe");
     g_assert(balde_request_get_header(request, "xd") == NULL);
     balde_request_free(request);
@@ -276,7 +277,7 @@ test_request_get_form(void)
     g_setenv("REQUEST_METHOD", "GET", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     g_assert(request->priv->body == NULL);
     g_assert(request->priv->form == NULL);
     g_assert(balde_request_get_form(request, "lol") == NULL);
@@ -292,7 +293,7 @@ test_request_get_form_with_empty_body(void)
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
     // ommited CONTENT_LENGTH
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     g_assert(request->priv->body == NULL);
     g_assert(g_hash_table_size(request->priv->form) == 0);
     g_assert(balde_request_get_form(request, "lol") == NULL);
@@ -307,7 +308,7 @@ test_request_get_file(void)
     g_setenv("REQUEST_METHOD", "GET", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     g_assert(request->priv->body == NULL);
     g_assert(request->priv->files == NULL);
     g_assert(balde_request_get_file(request, "lol") == NULL);
@@ -323,7 +324,7 @@ test_request_get_file_with_empty_body(void)
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
     // ommited CONTENT_LENGTH
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     g_assert(request->priv->body == NULL);
     g_assert(request->priv->files == NULL);
     g_assert(balde_request_get_file(request, "lol") == NULL);
@@ -336,7 +337,7 @@ void
 test_request_get_view_arg(void)
 {
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     request->priv->view_args = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_replace(request->priv->view_args, g_strdup("foo"), g_strdup("bar"));
     g_assert_cmpstr(balde_request_get_view_arg(request, "foo"), == , "bar");
@@ -350,7 +351,7 @@ void
 test_request_get_cookie(void)
 {
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     g_hash_table_replace(request->priv->cookies, g_strdup("foo"), g_strdup("bar"));
     g_assert_cmpstr(balde_request_get_cookie(request, "foo"), == , "bar");
     g_assert(balde_request_get_cookie(request, "xd") == NULL);
@@ -365,7 +366,7 @@ test_request_get_body(void)
     g_setenv("REQUEST_METHOD", "GET", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     g_assert(balde_request_get_body(request) == NULL);
     balde_request_free(request);
     balde_app_free(app);
@@ -379,7 +380,7 @@ test_request_get_body_with_empty_body(void)
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
     // ommited CONTENT_LENGTH
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     const GString *str = balde_request_get_body(request);
     g_assert(str == NULL);
     balde_request_free(request);

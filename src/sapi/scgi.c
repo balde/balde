@@ -13,12 +13,13 @@
 #include <glib.h>
 #include <gio/gio.h>
 
-#include "balde.h"
-#include "app.h"
+#include "../balde.h"
+#include "../app.h"
+#include "../exceptions.h"
+#include "../requests.h"
+#include "../utils.h"
+#include "../sapi.h"
 #include "cgi.h"
-#include "exceptions.h"
-#include "requests.h"
-#include "utils.h"
 #include "scgi.h"
 
 
@@ -31,7 +32,7 @@ balde_incoming_callback(GThreadedSocketService *service,
     GInputStream *istream = g_io_stream_get_input_stream(G_IO_STREAM(connection));
     balde_app_t *app = user_data;
 
-    balde_request_env_t *env = balde_scgi_parse_request(app, istream);
+    balde_request_env_t *env = balde_sapi_scgi_parse_request(app, istream);
     if (env == NULL)
         balde_abort_set_error(app, 400);
 
@@ -75,7 +76,7 @@ typedef enum {
 
 
 balde_request_env_t*
-balde_scgi_parse_request(balde_app_t *app, GInputStream *istream)
+balde_sapi_scgi_parse_request(balde_app_t *app, GInputStream *istream)
 {
     GDataInputStream *data = g_data_input_stream_new(istream);
 
@@ -163,7 +164,7 @@ balde_scgi_parse_request(balde_app_t *app, GInputStream *istream)
     if (clen_str != NULL) {
         g_hash_table_replace(headers, g_strdup("content-length"),
             g_strdup(clen_str));
-        content_length = balde_cgi_parse_content_length(clen_str);
+        content_length = balde_sapi_cgi_parse_content_length(clen_str);
     }
 
     gchar *ctype_str = g_hash_table_lookup(env, "CONTENT_TYPE");
@@ -224,9 +225,44 @@ balde_scgi_parse_request(balde_app_t *app, GInputStream *istream)
 }
 
 
-void
-balde_scgi_run(balde_app_t *app, const gchar *host, gint16 port,
-    gint max_threads)
+static gboolean runscgi = FALSE;
+static gchar *host = NULL;
+static gint port = 9000;
+static gint max_threads = 10;
+
+static GOptionEntry entries_scgi[] =
+{
+    {"runscgi", 'c', 0, G_OPTION_ARG_NONE, &runscgi, "Listen to SCGI socket.",
+        NULL},
+    {"scgi-host", 0, 0, G_OPTION_ARG_STRING, &host,
+        "Embedded SCGI server host. (default: 127.0.0.1)", "HOST"},
+    {"scgi-port", 0, 0, G_OPTION_ARG_INT, &port,
+        "Embedded SCGI server port. (default: 9000)", "PORT"},
+    {"scgi-max-threads", 0, 0, G_OPTION_ARG_INT, &max_threads,
+        "Embedded SCGI server max threads. (default: 10)", "THREADS"},
+    {NULL}
+};
+
+
+static GOptionGroup*
+balde_sapi_scgi_init(void)
+{
+    GOptionGroup *scgi_group = g_option_group_new("scgi", "SCGI Options:",
+        "Show SCGI help options", NULL, NULL);
+    g_option_group_add_entries(scgi_group, entries_scgi);
+    return scgi_group;
+}
+
+
+static gboolean
+balde_sapi_scgi_supported(void)
+{
+    return runscgi;
+}
+
+
+static gint
+balde_sapi_scgi_run(balde_app_t *app)
 {
     // TODO: add unix socket support
     GError *error = NULL;
@@ -244,7 +280,8 @@ balde_scgi_run(balde_app_t *app, const gchar *host, gint16 port,
         g_object_unref(service);
         g_object_unref(addr_host);
         g_object_unref(address);
-        return;
+        g_free(host);
+        return 3;
     }
     g_signal_connect(service, "run", G_CALLBACK(balde_incoming_callback), app);
     g_socket_service_start(service);
@@ -253,4 +290,14 @@ balde_scgi_run(balde_app_t *app, const gchar *host, gint16 port,
     g_object_unref(address);
     GMainLoop *loop = g_main_loop_new(NULL, FALSE);
     g_main_loop_run(loop);
+    g_free(host);
+    return 0;
 }
+
+
+balde_sapi_t scgi_sapi = {
+    .name = "scgi",
+    .init = balde_sapi_scgi_init,
+    .supported = balde_sapi_scgi_supported,
+    .run = balde_sapi_scgi_run,
+};

@@ -15,6 +15,7 @@
 #include "../src/sessions.h"
 #include "../src/requests.h"
 #include "../src/responses.h"
+#include "../src/sapi/cgi.h"
 
 gint64 timestamp = 1357098400;
 
@@ -142,7 +143,7 @@ test_session_open(void)
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
     balde_app_set_config(app, "SECRET_KEY", "bola");
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     balde_session_open(app, request);
 
     g_assert(app->error == NULL);
@@ -172,7 +173,7 @@ test_session_open_no_secret_key(void)
     g_setenv("PATH_INFO", "/", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     balde_session_open(app, request);
 
     g_assert(app->error != NULL);
@@ -197,7 +198,7 @@ test_session_open_with_cookie(void)
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
     balde_app_set_config(app, "SECRET_KEY", "guda");
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     balde_session_open(app, request);
 
     g_assert(app->error == NULL);
@@ -235,7 +236,7 @@ test_session_open_with_cookie_and_key_length(void)
     balde_app_t *app = balde_app_init();
     balde_app_set_config(app, "SECRET_KEY", "guda-moises");
     balde_app_set_config(app, "SECRET_KEY_LENGTH", "4");
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     balde_session_open(app, request);
 
     g_assert(app->error == NULL);
@@ -274,7 +275,7 @@ test_session_save(void)
     session->key = g_strdup("bola");
     session->max_age = 2678400;
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     request->priv->session = session;
 
     balde_session_save(request, response);
@@ -310,7 +311,7 @@ test_session_save_server_name_with_port(void)
     session->key = g_strdup("bola");
     session->max_age = 2678400;
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     request->priv->session = session;
 
     balde_session_save(request, response);
@@ -346,7 +347,7 @@ test_session_save_with_path(void)
     session->key = g_strdup("bola");
     session->max_age = 2678400;
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     request->priv->session = session;
 
     balde_session_save(request, response);
@@ -382,7 +383,7 @@ test_session_save_with_null_path(void)
     session->key = g_strdup("bola");
     session->max_age = 2678400;
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     request->priv->session = session;
 
     balde_session_save(request, response);
@@ -418,7 +419,7 @@ test_session_save_with_null_domain(void)
     session->key = g_strdup("bola");
     session->max_age = 2678400;
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     request->priv->session = session;
 
     balde_session_save(request, response);
@@ -454,7 +455,7 @@ test_session_save_with_localhost(void)
     session->key = g_strdup("bola");
     session->max_age = 2678400;
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     request->priv->session = session;
 
     balde_session_save(request, response);
@@ -488,7 +489,7 @@ test_session_save_empty(void)
     session->key = g_strdup("bola");
     session->max_age = 2678400;
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     request->priv->session = session;
 
     balde_session_save(request, response);
@@ -514,7 +515,7 @@ test_session_get(void)
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_insert(session->storage, g_strdup("bola"), g_strdup("guda"));
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     request->priv->session = session;
     g_assert_cmpstr(balde_session_get(request, "bola"), ==, "guda");
     g_hash_table_destroy(request->priv->session->storage);
@@ -530,7 +531,7 @@ test_session_get_not_found(void)
     balde_session_t *session = g_new(balde_session_t, 1);
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     request->priv->session = session;
     g_assert(balde_session_get(request, "bola") == NULL);
     g_hash_table_destroy(request->priv->session->storage);
@@ -546,7 +547,7 @@ test_session_set(void)
     balde_session_t *session = g_new(balde_session_t, 1);
     session->storage = NULL;
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     request->priv->session = session;
     balde_session_set(request, "bola", "guda");
     g_assert_cmpint(g_hash_table_size(request->priv->session->storage), ==, 1);
@@ -572,7 +573,7 @@ test_session_delete(void)
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_insert(session->storage, g_strdup("bola"), g_strdup("guda"));
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     request->priv->session = session;
     balde_session_delete(request, "bola");
     g_assert_cmpint(g_hash_table_size(request->priv->session->storage), ==, 0);
@@ -590,7 +591,7 @@ test_session_delete_not_found(void)
     session->storage = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     g_hash_table_insert(session->storage, g_strdup("bola"), g_strdup("guda"));
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     request->priv->session = session;
     balde_session_delete(request, "chunda");
     g_assert_cmpint(g_hash_table_size(request->priv->session->storage), ==, 1);

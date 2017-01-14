@@ -6,18 +6,15 @@
  * See the file COPYING.
  */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif /* HAVE_CONFIG_H */
+#ifndef _BALDE_SAPI_SCGI_PRIVATE_H
+#define _BALDE_SAPI_SCGI_PRIVATE_H
 
 #include <glib.h>
+#include <gio/gio.h>
 
+#include "../balde.h"
 
-// this is a poor man's mock of g_date_time_new_now_utc :)
-GDateTime*
-g_date_time_new_now_utc(void)
-{
-    return g_date_time_new_from_unix_utc(1234567890);
-}
+balde_request_env_t* balde_sapi_scgi_parse_request(balde_app_t *app,
+    GInputStream *istream);
 
-#include "../src/httpd.c"
+#endif /* _BALDE_SAPI_SCGI_PRIVATE_H */

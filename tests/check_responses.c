@@ -14,6 +14,7 @@
 #include <glib/gstdio.h>
 #include "../src/balde.h"
 #include "../src/app.h"
+#include "../src/sapi/cgi.h"
 #include "utils.h"
 
 
@@ -331,7 +332,7 @@ test_balde_response_etag_matching(void)
 
     balde_app_t *app = balde_app_init();
 
-    balde_request_t *req = balde_make_request(app, NULL);
+    balde_request_t *req = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     balde_response_t *res = balde_make_response("quico");
     balde_response_etag_matching(req, res);
     g_assert_cmpstr("", ==, res->priv->body->str);
@@ -342,7 +343,7 @@ test_balde_response_etag_matching(void)
 
     g_setenv("HTTP_IF_NONE_MATCH", "W/\"15929f6ea6e9a8e093b05cf723d1e424\"",
         TRUE);
-    balde_request_t *req2 = balde_make_request(app, NULL);
+    balde_request_t *req2 = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     balde_response_t *res2 = balde_make_response("quico");
     balde_response_etag_matching(req2, res2);
     g_assert_cmpstr("", ==, res2->priv->body->str);

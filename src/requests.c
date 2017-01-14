@@ -14,7 +14,6 @@
 #include <string.h>
 #include "balde.h"
 #include "balde-private.h"
-#include "cgi.h"
 #include "multipart.h"
 #include "routing.h"
 #include "requests.h"
@@ -171,26 +170,23 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
     request->priv->form = NULL;
     request->priv->files = NULL;
     request->priv->session = NULL;
-    balde_request_env_t *env = request_env;
-    if (request_env == NULL)
-        env = balde_cgi_parse_request(app);
-    request->path = env->path_info;
-    request->server_name = env->server_name;
-    request->script_name = env->script_name;
-    if (env->path_info == NULL && env->script_name != NULL) {  // dumb webservers :/
-        request->path = env->script_name;
+    request->path = request_env->path_info;
+    request->server_name = request_env->server_name;
+    request->script_name = request_env->script_name;
+    if (request_env->path_info == NULL && request_env->script_name != NULL) {  // dumb webservers :/
+        request->path = request_env->script_name;
         request->script_name = NULL;
     }
-    request->method = balde_http_method_str2enum(env->request_method);
-    request->https = env->https;
-    request->priv->headers = env->headers;
-    request->priv->args = balde_parse_query_string(env->query_string);
+    request->method = balde_http_method_str2enum(request_env->request_method);
+    request->https = request_env->https;
+    request->priv->headers = request_env->headers;
+    request->priv->args = balde_parse_query_string(request_env->query_string);
     request->priv->cookies = balde_parse_cookies(
         balde_request_get_header(request, "cookie"));
     request->authorization = balde_parse_authorization(
         balde_request_get_header(request, "authorization"));
     if (request->method & (BALDE_HTTP_POST | BALDE_HTTP_PUT | BALDE_HTTP_PATCH)) {
-        request->priv->body = env->body;
+        request->priv->body = request_env->body;
         const gchar *ct = g_hash_table_lookup(request->priv->headers, "content-type");
         if (ct != NULL && g_str_has_prefix(ct, "multipart/form-data;")) {
             gchar *boundary = balde_multipart_parse_boundary(ct);
@@ -210,9 +206,9 @@ balde_make_request(balde_app_t *app, balde_request_env_t *request_env)
             request->priv->form = balde_parse_query_string(tmp);
         }
     }
-    g_free(env->query_string);
-    g_free(env->request_method);
-    g_free(env);
+    g_free(request_env->query_string);
+    g_free(request_env->request_method);
+    g_free(request_env);
     return request;
 }
 

@@ -59,18 +59,18 @@ Makefile.in
 
 # tests
 /tests/check_app
-/tests/check_cgi
 /tests/check_exceptions
 /tests/check_datetime
-/tests/check_httpd
 /tests/check_quickstart
 /tests/check_requests
 /tests/check_resources
 /tests/check_responses
 /tests/check_routing
-/tests/check_scgi
+/tests/check_sapi_cgi
+/tests/check_sapi_cgi_stdin
+/tests/check_sapi_httpd
+/tests/check_sapi_scgi
 /tests/check_sessions
-/tests/check_stdin
 /tests/check_template
 /tests/check_template_helpers
 /tests/check_utils

@@ -13,17 +13,18 @@
 #include <glib.h>
 #include <gio/gio.h>
 
-#include "balde.h"
-#include "app.h"
-#include "datetime.h"
-#include "exceptions.h"
+#include "../balde.h"
+#include "../app.h"
+#include "../datetime.h"
+#include "../exceptions.h"
+#include "../requests.h"
+#include "../responses.h"
+#include "../sapi.h"
 #include "httpd.h"
-#include "requests.h"
-#include "responses.h"
 
 
-balde_httpd_parser_data_t*
-balde_httpd_parse_request(balde_app_t *app, GInputStream *istream)
+balde_sapi_httpd_parser_data_t*
+balde_sapi_httpd_parse_request(balde_app_t *app, GInputStream *istream)
 {
     GDataInputStream *data = g_data_input_stream_new(istream);
     g_data_input_stream_set_newline_type(data, G_DATA_STREAM_NEWLINE_TYPE_ANY);
@@ -102,7 +103,7 @@ balde_httpd_parse_request(balde_app_t *app, GInputStream *istream)
     env->body = body;
     env->https = FALSE;
 
-    balde_httpd_parser_data_t *parser_data = g_new(balde_httpd_parser_data_t, 1);
+    balde_sapi_httpd_parser_data_t *parser_data = g_new(balde_sapi_httpd_parser_data_t, 1);
     parser_data->env = env;
     parser_data->request_line = request_line;
 
@@ -111,7 +112,7 @@ balde_httpd_parse_request(balde_app_t *app, GInputStream *istream)
 
 
 GString*
-balde_httpd_response_render(balde_response_t *response, const gboolean with_body)
+balde_sapi_httpd_response_render(balde_response_t *response, const gboolean with_body)
 {
     if (response == NULL)
         return NULL;
@@ -164,12 +165,12 @@ balde_incoming_callback(GThreadedSocketService *service,
     g_object_unref(remote_socket);
     balde_app_t *app = user_data;
     GInputStream *istream = g_io_stream_get_input_stream(G_IO_STREAM(connection));
-    balde_httpd_parser_data_t *parser_data = balde_httpd_parse_request(app, istream);
+    balde_sapi_httpd_parser_data_t *parser_data = balde_sapi_httpd_parse_request(app, istream);
     if (parser_data == NULL)
         goto point2;
     balde_http_exception_code_t status_code = BALDE_HTTP_INTERNAL_SERVER_ERROR;
     GString *response = balde_app_main_loop(app, parser_data->env,
-        balde_httpd_response_render, &status_code);
+        balde_sapi_httpd_response_render, &status_code);
     GOutputStream *ostream = g_io_stream_get_output_stream(G_IO_STREAM(connection));
     g_output_stream_write_all(ostream, response->str, response->len, NULL, NULL, &error);
     g_string_free(response, TRUE);
@@ -198,9 +199,44 @@ point2:
 }
 
 
-void
-balde_httpd_run(balde_app_t *app, const gchar *host, gint16 port,
-    gint max_threads)
+static gboolean runserver = FALSE;
+static gchar *host = NULL;
+static gint port = 8080;
+static gint max_threads = 10;
+
+static GOptionEntry entries_http[] =
+{
+    {"runserver", 's', 0, G_OPTION_ARG_NONE, &runserver,
+        "Run embedded HTTP server. NOT production ready!", NULL},
+    {"http-host", 0, 0, G_OPTION_ARG_STRING, &host,
+        "Embedded HTTP server host. (default: 127.0.0.1)", "HOST"},
+    {"http-port", 0, 0, G_OPTION_ARG_INT, &port,
+        "Embedded HTTP server port. (default: 8080)", "PORT"},
+    {"http-max-threads", 0, 0, G_OPTION_ARG_INT, &max_threads,
+        "Embedded HTTP server max threads. (default: 10)", "THREADS"},
+    {NULL}
+};
+
+
+static GOptionGroup*
+balde_sapi_httpd_init(void)
+{
+    GOptionGroup *http_group = g_option_group_new("http", "HTTP Options:",
+        "Show HTTP help options", NULL, NULL);
+    g_option_group_add_entries(http_group, entries_http);
+    return http_group;
+}
+
+
+static gboolean
+balde_sapi_httpd_supported(void)
+{
+    return runserver;
+}
+
+
+static gint
+balde_sapi_httpd_run(balde_app_t *app)
 {
     GError *error = NULL;
     const gchar *final_host = host != NULL ? host : "127.0.0.1";
@@ -219,7 +255,8 @@ balde_httpd_run(balde_app_t *app, const gchar *host, gint16 port,
         g_object_unref(service);
         g_object_unref(addr_host);
         g_object_unref(address);
-        return;
+        g_free(host);
+        return 3;
     }
     g_signal_connect(service, "run", G_CALLBACK(balde_incoming_callback), app);
     g_socket_service_start(service);
@@ -228,4 +265,14 @@ balde_httpd_run(balde_app_t *app, const gchar *host, gint16 port,
     g_object_unref(address);
     GMainLoop *loop = g_main_loop_new(NULL, FALSE);
     g_main_loop_run(loop);
+    g_free(host);
+    return 0;
 }
+
+
+balde_sapi_t httpd_sapi = {
+    .name = "httpd",
+    .init = balde_sapi_httpd_init,
+    .supported = balde_sapi_httpd_supported,
+    .run = balde_sapi_httpd_run,
+};

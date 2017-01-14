@@ -14,6 +14,7 @@
 #include "../src/balde.h"
 #include "../src/requests.h"
 #include "../src/responses.h"
+#include "../src/sapi/cgi.h"
 
 
 balde_response_t*
@@ -29,7 +30,7 @@ test_tmpl_url_for(void)
     g_setenv("PATH_INFO", "/", TRUE);
     g_setenv("REQUEST_METHOD", "GET", TRUE);
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     balde_app_add_url_rule(app, "arcoiro", "/arcoiro/<bola>/<guda>/",
         BALDE_HTTP_GET, arcoiro_view);
     balde_app_add_url_rule(app, "arcoiro2", "/arco/<iro>", BALDE_HTTP_GET,
@@ -61,7 +62,7 @@ test_tmpl_url_for_with_script_name(void)
     g_setenv("SCRIPT_NAME", "/foo/bar", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    balde_request_t *request = balde_make_request(app, NULL);
+    balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     balde_app_add_url_rule(app, "arcoiro", "/arcoiro/<bola>/<guda>/",
         BALDE_HTTP_GET, arcoiro_view);
     balde_app_add_url_rule(app, "arcoiro2", "/arco/<iro>", BALDE_HTTP_GET,

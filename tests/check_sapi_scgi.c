@@ -14,8 +14,8 @@
 #include <string.h>
 #include "../src/balde.h"
 #include "../src/app.h"
-#include "../src/scgi.h"
 #include "../src/requests.h"
+#include "../src/sapi/scgi.h"
 
 
 void
@@ -32,7 +32,7 @@ test_scgi_parse_request(void)
         "HTTP_CHUNDA%crs,"                 // 11 + 2 + 1 = 14
         "XD=asd\r\n", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     GInputStream *tmp = g_memory_input_stream_new_from_data(test, 149, NULL);
-    balde_request_env_t *req = balde_scgi_parse_request(app, tmp);
+    balde_request_env_t *req = balde_sapi_scgi_parse_request(app, tmp);
     g_object_unref(tmp);
     g_free(test);
     g_assert(req != NULL);
@@ -65,7 +65,7 @@ test_scgi_parse_request_without_query_string(void)
         "HTTP_CHUNDA%crs,"          // 11 + 2 + 1 = 14
         "XD=asd\r\n", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     GInputStream *tmp = g_memory_input_stream_new_from_data(test, 120, NULL);
-    balde_request_env_t *req = balde_scgi_parse_request(app, tmp);
+    balde_request_env_t *req = balde_sapi_scgi_parse_request(app, tmp);
     g_object_unref(tmp);
     g_free(test);
     g_assert(req != NULL);
@@ -88,8 +88,8 @@ int
 main(int argc, char** argv)
 {
     g_test_init(&argc, &argv, NULL);
-    g_test_add_func("/scgi/parse_request", test_scgi_parse_request);
-    g_test_add_func("/scgi/parse_request_without_query_string",
+    g_test_add_func("/sapi/scgi/parse_request", test_scgi_parse_request);
+    g_test_add_func("/sapi/scgi/parse_request_without_query_string",
         test_scgi_parse_request_without_query_string);
     return g_test_run();
 }

@@ -14,9 +14,9 @@
 #include <string.h>
 #include "../src/balde.h"
 #include "../src/app.h"
-#include "../src/httpd.h"
 #include "../src/requests.h"
 #include "../src/responses.h"
+#include "../src/sapi/httpd.h"
 
 
 void
@@ -32,7 +32,7 @@ test_httpd_parse_request(void)
         "\r\n"
         "XD=asd\r\n";
     GInputStream *tmp = g_memory_input_stream_new_from_data (test, strlen(test), NULL);
-    balde_httpd_parser_data_t *data = balde_httpd_parse_request(app, tmp);
+    balde_sapi_httpd_parser_data_t *data = balde_sapi_httpd_parse_request(app, tmp);
     balde_request_env_t *req = data->env;
     g_object_unref(tmp);
     g_assert(req != NULL);
@@ -67,7 +67,7 @@ test_httpd_parse_request_without_query_string(void)
         "\r\n"
         "XD=asd\r\n";
     GInputStream *tmp = g_memory_input_stream_new_from_data (test, strlen(test), NULL);
-    balde_httpd_parser_data_t *data = balde_httpd_parse_request(app, tmp);
+    balde_sapi_httpd_parser_data_t *data = balde_sapi_httpd_parse_request(app, tmp);
     balde_request_env_t *req = data->env;
     g_object_unref(tmp);
     g_assert(req != NULL);
@@ -92,7 +92,7 @@ void
 test_httpd_response_render(void)
 {
     balde_response_t *res = balde_make_response("lol");
-    GString *out = balde_httpd_response_render(res, TRUE);
+    GString *out = balde_sapi_httpd_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
         "HTTP/1.0 200 OK\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
@@ -111,7 +111,7 @@ test_httpd_response_render_with_custom_mime_type(void)
 {
     balde_response_t *res = balde_make_response("lol");
     balde_response_set_header(res, "content-type", "text/plain");
-    GString *out = balde_httpd_response_render(res, TRUE);
+    GString *out = balde_sapi_httpd_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
         "HTTP/1.0 200 OK\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
@@ -132,7 +132,7 @@ test_httpd_response_render_with_multiple_cookies(void)
     balde_response_set_cookie(res, "bola", "guda", 60, -1, NULL, NULL, FALSE, FALSE);
     balde_response_set_cookie(res, "asd", "qwe", -1, -1, NULL, NULL, FALSE, TRUE);
     balde_response_set_cookie(res, "xd", ":D", -1, -1, "/bola/", NULL, TRUE, FALSE);
-    GString *out = balde_httpd_response_render(res, TRUE);
+    GString *out = balde_sapi_httpd_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
         "HTTP/1.0 200 OK\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
@@ -153,7 +153,7 @@ void
 test_httpd_response_render_without_body(void)
 {
     balde_response_t *res = balde_make_response("lol");
-    GString *out = balde_httpd_response_render(res, FALSE);
+    GString *out = balde_sapi_httpd_response_render(res, FALSE);
     g_assert_cmpstr(out->str, ==,
         "HTTP/1.0 200 OK\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
@@ -173,7 +173,7 @@ test_httpd_response_render_exception(void)
     balde_abort_set_error(app, 404);
     balde_response_t *res = balde_make_response_from_exception(app->error);
     g_assert(res != NULL);
-    GString *out = balde_httpd_response_render(res, TRUE);
+    GString *out = balde_sapi_httpd_response_render(res, TRUE);
     g_assert_cmpstr(out->str, ==,
         "HTTP/1.0 404 NOT FOUND\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
@@ -196,7 +196,7 @@ test_httpd_response_render_exception_without_body(void)
     balde_abort_set_error(app, 404);
     balde_response_t *res = balde_make_response_from_exception(app->error);
     g_assert(res != NULL);
-    GString *out = balde_httpd_response_render(res, FALSE);
+    GString *out = balde_sapi_httpd_response_render(res, FALSE);
     g_assert_cmpstr(out->str, ==,
         "HTTP/1.0 404 NOT FOUND\r\n"
         "Date: Fri, 13 Feb 2009 23:31:30 GMT\r\n"
@@ -214,19 +214,19 @@ int
 main(int argc, char** argv)
 {
     g_test_init(&argc, &argv, NULL);
-    g_test_add_func("/httpd/parse_request", test_httpd_parse_request);
-    g_test_add_func("/httpd/parse_request_without_query_string",
+    g_test_add_func("/sapi/httpd/parse_request", test_httpd_parse_request);
+    g_test_add_func("/sapi/httpd/parse_request_without_query_string",
         test_httpd_parse_request_without_query_string);
-    g_test_add_func("/httpd/response_render", test_httpd_response_render);
-    g_test_add_func("/httpd/response_render_with_custom_mime_type",
+    g_test_add_func("/sapi/httpd/response_render", test_httpd_response_render);
+    g_test_add_func("/sapi/httpd/response_render_with_custom_mime_type",
         test_httpd_response_render_with_custom_mime_type);
-    g_test_add_func("/httpd/response_render_with_multiple_cookies",
+    g_test_add_func("/sapi/httpd/response_render_with_multiple_cookies",
         test_httpd_response_render_with_multiple_cookies);
-    g_test_add_func("/httpd/response_render_without_body",
+    g_test_add_func("/sapi/httpd/response_render_without_body",
         test_httpd_response_render_without_body);
-    g_test_add_func("/httpd/response_render_exception",
+    g_test_add_func("/sapi/httpd/response_render_exception",
         test_httpd_response_render_exception);
-    g_test_add_func("/httpd/response_render_exception_without_body",
+    g_test_add_func("/sapi/httpd/response_render_exception_without_body",
         test_httpd_response_render_exception_without_body);
     return g_test_run();
 }

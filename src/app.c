@@ -17,14 +17,12 @@
 #include "balde.h"
 #include "balde-private.h"
 #include "app.h"
-#include "cgi.h"
-#include "httpd.h"
 #include "exceptions.h"
 #include "resources.h"
 #include "routing.h"
 #include "requests.h"
 #include "responses.h"
-#include "scgi.h"
+#include "sapi.h"
 
 
 static GLogLevelFlags
@@ -313,9 +311,6 @@ static gboolean help = FALSE;
 static gboolean version = FALSE;
 static gchar *log_level = NULL;
 
-static gboolean runserver = FALSE;
-static gboolean runscgi = FALSE;
-
 static GOptionEntry entries[] =
 {
     {"help", 'h', 0, G_OPTION_ARG_NONE, &help,
@@ -325,42 +320,6 @@ static GOptionEntry entries[] =
     {"log-level", 'l', 0, G_OPTION_ARG_STRING, &log_level,
         "Logging level (CRITICAL, WARNING, MESSAGE, INFO, DEBUG). "
         "(default: MESSAGE)", "LEVEL"},
-    {"runserver", 's', 0, G_OPTION_ARG_NONE, &runserver,
-        "Run embedded HTTP server. NOT production ready!", NULL},
-    {"runscgi", 'c', 0, G_OPTION_ARG_NONE, &runscgi, "Listen to SCGI socket.",
-        NULL},
-    {NULL}
-};
-
-
-static gchar *http_host = NULL;
-static gint16 http_port = 8080;
-static guint64 http_max_threads = 10;
-
-static GOptionEntry entries_http[] =
-{
-    {"http-host", 0, 0, G_OPTION_ARG_STRING, &http_host,
-        "Embedded HTTP server host. (default: 127.0.0.1)", "HOST"},
-    {"http-port", 0, 0, G_OPTION_ARG_INT, &http_port,
-        "Embedded HTTP server port. (default: 8080)", "PORT"},
-    {"http-max-threads", 0, 0, G_OPTION_ARG_INT, &http_max_threads,
-        "Embedded HTTP server max threads. (default: 10)", "THREADS"},
-    {NULL}
-};
-
-
-static gchar *scgi_host = NULL;
-static gint16 scgi_port = 9000;
-static guint64 scgi_max_threads = 10;
-
-static GOptionEntry entries_scgi[] =
-{
-    {"scgi-host", 0, 0, G_OPTION_ARG_STRING, &scgi_host,
-        "Embedded SCGI server host. (default: 127.0.0.1)", "HOST"},
-    {"scgi-port", 0, 0, G_OPTION_ARG_INT, &scgi_port,
-        "Embedded SCGI server port. (default: 9000)", "PORT"},
-    {"scgi-max-threads", 0, 0, G_OPTION_ARG_INT, &scgi_max_threads,
-        "Embedded SCGI server max threads. (default: 10)", "THREADS"},
     {NULL}
 };
 
@@ -373,15 +332,7 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
     GOptionContext *context = g_option_context_new("- a balde application ;-)");
     g_option_context_add_main_entries(context, entries, NULL);
 
-    GOptionGroup *http_group = g_option_group_new("http", "HTTP Options:",
-        "Show HTTP help options", NULL, NULL);
-    g_option_group_add_entries(http_group, entries_http);
-    g_option_context_add_group(context, http_group);
-
-    GOptionGroup *scgi_group = g_option_group_new("scgi", "SCGI Options:",
-        "Show SCGI help options", NULL, NULL);
-    g_option_group_add_entries(scgi_group, entries_scgi);
-    g_option_context_add_group(context, scgi_group);
+    balde_sapi_init(context);
 
     g_option_context_set_help_enabled(context, FALSE);
 
@@ -395,17 +346,6 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
         G_LOG_LEVEL_DEBUG, balde_log_handler,
         GINT_TO_POINTER(balde_get_log_level_flag_from_string(log_level)));
 
-    if (runserver && runscgi) {
-        g_printerr("ERROR: --runserver conflicts with --runscgi\n");
-        goto clean;
-    }
-
-    if (http_host != NULL)
-        runserver = TRUE;
-
-    if (scgi_host != NULL)
-        runscgi = TRUE;
-
     if (help) {
         gchar *help_str = g_option_context_get_help(context, FALSE, NULL);
         g_print("%s", help_str);
@@ -414,26 +354,11 @@ balde_app_run(balde_app_t *app, gint argc, gchar **argv)
     else if (version) {
         g_printerr("%s\n", PACKAGE_STRING);
     }
-    else if (runscgi) {
-        balde_scgi_run(app, scgi_host, scgi_port, scgi_max_threads);
-    }
-    else if (runserver) {
-        balde_httpd_run(app, http_host, http_port, http_max_threads);
-    }
-    else if (g_getenv("REQUEST_METHOD") != NULL) {
-        balde_cgi_run(app);
-    }
     else {
-        gchar *help_str = g_option_context_get_help(context, FALSE, NULL);
-        g_printerr("%s", help_str);
-        g_free(help_str);
+        balde_sapi_run(app, context);
     }
 
-clean:
     g_option_context_free(context);
-
-    g_free(http_host);
-    g_free(scgi_host);
     g_free(log_level);
 }
 

@@ -12,7 +12,7 @@
 
 #include <glib.h>
 #include "../src/balde.h"
-#include "../src/cgi.h"
+#include "../src/sapi/cgi.h"
 
 
 void
@@ -21,7 +21,7 @@ test_cgi_parse_headers(void)
     g_setenv("HTTP_LOL_HEHE", "12345", TRUE);
     g_setenv("HTTP_XD_KKK", "asdf", TRUE);
     // FIXME: this thing is too weak :(
-    GHashTable *headers = balde_cgi_request_headers();
+    GHashTable *headers = balde_sapi_cgi_request_headers();
     g_assert(g_hash_table_size(headers) == 2);
     g_assert_cmpstr(g_hash_table_lookup(headers, "lol-hehe"), ==, "12345");
     g_assert_cmpstr(g_hash_table_lookup(headers, "xd-kkk"), ==, "asdf");
@@ -33,6 +33,6 @@ int
 main(int argc, char** argv)
 {
     g_test_init(&argc, &argv, NULL);
-    g_test_add_func("/cgi/parse_headers", test_cgi_parse_headers);
+    g_test_add_func("/sapi/cgi/parse_headers", test_cgi_parse_headers);
     return g_test_run();
 }
