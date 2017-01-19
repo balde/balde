@@ -132,6 +132,7 @@ noinst_HEADERS = \
 	src/routing.h \
 	src/sapi.h \
 	src/sapi/cgi.h \
+	src/sapi/fcgi.h \
 	src/sapi/httpd.h \
 	src/sapi/scgi.h \
 	src/sessions.h \
@@ -191,6 +192,7 @@ libbalde_la_SOURCES = \
 	src/routing.c \
 	src/sapi.c \
 	src/sapi/cgi.c \
+	src/sapi/fcgi.c \
 	src/sapi/httpd.c \
 	src/sapi/scgi.c \
 	src/sessions.c \

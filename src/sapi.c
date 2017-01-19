@@ -13,6 +13,7 @@
 #include <glib.h>
 #include "sapi.h"
 
+extern balde_sapi_t fcgi_sapi;
 extern balde_sapi_t scgi_sapi;
 extern balde_sapi_t httpd_sapi;
 extern balde_sapi_t cgi_sapi;
@@ -21,6 +22,7 @@ extern balde_sapi_t cgi_sapi;
 // *any* new server api should be added here, otherwise it won't get initialized.
 // they should be also sorted by preference. CGI should be always the last one.
 static balde_sapi_t *sapis[] = {
+    &fcgi_sapi,
     &scgi_sapi,
     &httpd_sapi,
     &cgi_sapi,
