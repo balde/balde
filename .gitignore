@@ -40,7 +40,7 @@ Makefile.in
 
 # valgrind
 !/build-aux/glib.supp
-/valgrind.output
+!/build-aux/valgrind.sh
 
 # doxygen
 /Doxyfile

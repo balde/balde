@@ -745,21 +745,8 @@ TESTS = \
 if USE_VALGRIND
 valgrind: all
 	$(MAKE) check TESTS_ENVIRONMENT=" \
-		G_SLICE=always-malloc \
-		G_DEBUG=gc-friendly \
-		LC_ALL=C \
-		$(LIBTOOL) \
-			--mode=execute \
-			$(VALGRIND) \
-				--tool=memcheck \
-				--leak-resolution=high \
-				--leak-check=yes \
-				--show-leak-kinds=definite \
-				--errors-for-leak-kinds=definite \
-				--error-exitcode=33 \
-				--num-callers=20 \
-				--suppressions=\"$(top_srcdir)/build-aux/glib.supp\" \
-		"
+		VALGRIND=$(VALGRIND) \
+		$(top_srcdir)/build-aux/valgrind.sh"
 endif
 
 

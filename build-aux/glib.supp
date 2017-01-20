@@ -1,6 +1,6 @@
 # This GLib suppressions file is known to be used at least by:
 #
-#  - rpm-software-management/libhif
+#  - rpm-software-management/libdnf
 #
 # This file should be treated as canonical.
 {
@@ -117,6 +117,13 @@
    Memcheck:Leak
    ...
    fun:g_queue_new
+   fun:g_main_context_push_thread_default
+}
+{
+   g_main_context_push_thread_default_inlined
+   Memcheck:Leak
+   ...
+   fun:g_slice_alloc0
    fun:g_main_context_push_thread_default
 }
 {
@@ -352,6 +359,13 @@
    fun:__libc_sigaction
    ...
    fun:g_child_watch_finalize
+}
+{
+   g_dbus_worker_new
+   Memcheck:Leak
+   fun:calloc
+   ...
+   fun:_g_dbus_worker_new
 }
 {
    gdbus_shared_thread_func
