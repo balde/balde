@@ -259,7 +259,7 @@ balde_sapi_fcgi_parse_request(GByteArray *params, GByteArray *body)
 
     const char *clen_str = g_hash_table_lookup(rv->headers, "content-length");
     guint64 clen = balde_sapi_cgi_parse_content_length(clen_str);
-    if (clen > 0 || clen <= body->len) {
+    if (clen > 0 && clen <= body->len) {
         rv->body = g_string_new_len((char*) body->data, clen);
     }
 
