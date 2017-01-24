@@ -13,7 +13,17 @@
  */
 
 //! [Hello world]
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <balde.h>
+
+void sig_handler(int sig)
+{
+    printf("SIG: %d\n", sig);
+    exit(sig);
+}
 
 
 balde_response_t*
@@ -26,6 +36,15 @@ hello(balde_app_t *app, balde_request_t *request)
 int
 main(int argc, char **argv)
 {
+    if (signal(SIGINT, sig_handler) == SIG_ERR) {
+        printf("Failed to add SIGINT signal handler\n");
+        exit(-1);
+    }
+    if (signal(SIGTERM, sig_handler) == SIG_ERR) {
+        printf("Failed to add SIGTERM signal handler\n");
+        exit(-1);
+    }
+
     balde_app_t *app = balde_app_init();
     balde_app_add_url_rule(app, "hello", "/", BALDE_HTTP_GET, hello);
     balde_app_run(app, argc, argv);
