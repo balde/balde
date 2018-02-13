@@ -15,6 +15,10 @@ env:
   - TARGET=distcheck
   - TARGET=valgrind
 
+before_script:
+  - git fetch --unshallow
+  - ./autogen.sh
+
 script:
   - ./.travis/build.sh
   - ./.travis/deploy.sh
