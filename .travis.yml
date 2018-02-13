@@ -1,0 +1,20 @@
+sudo: required
+language: c
+compiler:
+  - gcc
+  - clang
+
+addons:
+  apt:
+    packages:
+      - libglib2.0-dev
+      - peg
+      - valgrind
+
+env:
+  - TARGET=distcheck
+  - TARGET=valgrind
+
+script:
+  - ./.travis/build.sh
+  - ./.travis/deploy.sh

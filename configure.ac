@@ -15,7 +15,7 @@ LIBBALDE_REVISION=0
 LIBBALDE_LT_VERSION_INFO="$LIBBALDE_CURRENT:$LIBBALDE_REVISION:$LIBBALDE_AGE"
 AC_SUBST(LIBBALDE_LT_VERSION_INFO)
 
-AM_INIT_AUTOMAKE([1.13 foreign dist-bzip2 dist-xz subdir-objects serial-tests])
+AM_INIT_AUTOMAKE([1.13 foreign dist-bzip2 dist-xz dist-zip subdir-objects serial-tests])
 AC_CONFIG_HEADERS([config.h])
 AM_SILENT_RULES([yes])
 AM_MAINTAINER_MODE([enable])
