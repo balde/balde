@@ -8,8 +8,10 @@ addons:
   apt:
     packages:
       - libglib2.0-dev
+      - libxml2-utils
       - peg
       - valgrind
+      - realpath
 
 env:
   - TARGET=distcheck
