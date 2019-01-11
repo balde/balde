@@ -1,21 +1,46 @@
 dist: xenial
 language: c
 
-compiler:
-  - gcc
-  - clang
-
-addons:
-  apt:
-    packages:
-      - libglib2.0-dev
-      - libxml2-utils
-      - peg
-      - valgrind
-      - realpath
-
-env:
-  - TARGET=distcheck
-  - TARGET=valgrind
+matrix:
+  include:
+    - compiler: gcc
+      env:
+        - TARGET=distcheck
+      addons:
+        apt:
+          packages:
+            - libglib2.0-dev
+            - libxml2-utils
+            - peg
+    - compiler: clang
+      env:
+        - TARGET=distcheck
+        - DISABLE_PUBLISHER=1
+      addons:
+        apt:
+          packages:
+            - libglib2.0-dev
+            - libxml2-utils
+            - peg
+    - compiler: gcc
+      env:
+        - TARGET=valgrind
+      addons:
+        apt:
+          packages:
+            - libglib2.0-dev
+            - libxml2-utils
+            - peg
+            - valgrind
+    - compiler: clang
+      env:
+        - TARGET=valgrind
+      addons:
+        apt:
+          packages:
+            - libglib2.0-dev
+            - libxml2-utils
+            - peg
+            - valgrind
 
 script: curl -sSf https://yatr.rgm.io/run.sh | bash
