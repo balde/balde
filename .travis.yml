@@ -1,5 +1,6 @@
-sudo: required
+dist: xenial
 language: c
+
 compiler:
   - gcc
   - clang
@@ -17,10 +18,4 @@ env:
   - TARGET=distcheck
   - TARGET=valgrind
 
-before_script:
-  - git fetch --unshallow
-  - ./autogen.sh
-
-script:
-  - ./.travis/build.sh
-  - ./.travis/deploy.sh
+script: curl -sSf https://yatr.rgm.io/run.sh | bash
