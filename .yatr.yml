@@ -2,7 +2,6 @@ default_configure_args:
   - "CFLAGS=-O0 -g -Wall"
   - --disable-silent-rules
   - --enable-examples
-  - --enable-http
   - --enable-leg
   - --disable-valgrind
   - --disable-doc
