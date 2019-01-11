@@ -772,7 +772,15 @@ clean-local:
 
 if BUILD_DOCS
 doc: clean-local Doxyfile
+	-$(MKDIR_P) $(top_builddir)/doc/build
 	$(DOXYGEN) Doxyfile
 
 docs: doc
+
+dist-docs: doc
+	cp -r $(top_builddir)/doc/build/html $(top_builddir)/docs
+	tar \
+		-cvJf "$(PACKAGE_TARNAME)-docs-$(PACKAGE_VERSION).tar.xz" \
+		-C $(top_builddir) \
+		docs
 endif

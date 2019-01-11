@@ -42,5 +42,15 @@ matrix:
             - libxml2-utils
             - peg
             - valgrind
+    - compiler: gcc
+      env:
+        - TARGET=dist-docs
+      addons:
+        apt:
+          packages:
+            - libglib2.0-dev
+            - libxml2-utils
+            - peg
+            - doxygen
 
 script: curl -sSf https://yatr.rgm.io/run.sh | bash

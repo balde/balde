@@ -45,6 +45,7 @@ Makefile.in
 # doxygen
 /Doxyfile
 /doc/build/
+/docs/
 
 # installed .m4 files
 /m4/*.m4

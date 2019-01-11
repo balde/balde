@@ -8,6 +8,11 @@ default_configure_args:
   - --disable-doc
 
 targets:
+  dist-docs:
+    configure_args:
+      - --enable-doc
+      - --disable-tests
+    archive_extract_filter: "*.tar.xz"
   valgrind:
     configure_args:
       - --enable-valgrind
