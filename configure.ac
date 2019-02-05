@@ -110,14 +110,14 @@ AC_SUBST(LEG)
 
 # we need to make sure that shared-mime-info is installed, because we need it
 # for accurate mime-type guess
-GLIB_DEP="glib-2.0 >= 2.35, gio-2.0 >= 2.35, shared-mime-info"
+GLIB_DEP="glib-2.0 >= 2.35, gio-2.0 >= 2.35, gio-unix-2.0 >= 2.35, shared-mime-info"
 PC_DEPS="${GLIB_DEP}"
 AC_SUBST(PC_DEPS)
 
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GLIB], [$GLIB_DEP])
 
-GLIB_COMPILE_RESOURCES="`$PKG_CONFIG --variable glib_compile_resources gio-2.0`"
+GLIB_COMPILE_RESOURCES="`$PKG_CONFIG --variable glib_compile_resources gio-2.0 gio-unix-2.0`"
 AC_SUBST(GLIB_COMPILE_RESOURCES)
 
 AC_CHECK_HEADERS([sys/types.h sys/stat.h])

@@ -258,7 +258,7 @@ balde_sapi_httpd_run(balde_app_t *app)
         g_free(host);
         return 3;
     }
-    g_signal_connect(service, "run", G_CALLBACK(balde_incoming_callback), app);
+    g_signal_connect(service, "incoming", G_CALLBACK(balde_incoming_callback), app);
     g_socket_service_start(service);
     g_object_unref(service);
     g_object_unref(addr_host);
