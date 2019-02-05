@@ -604,8 +604,10 @@ static GOptionEntry entries_fcgi[] =
         "Embedded FastCGI server host. (default: 127.0.0.1)", "HOST"},
     {"fcgi-port", 0, 0, G_OPTION_ARG_INT, &port,
         "Embedded FastCGI server port. (default: 9000)", "PORT"},
+    #ifdef WITH_UNIX_SOCKETS
     {"fcgi-socket", 0, 0, G_OPTION_ARG_STRING, &socket,
         "Embedded FastCGI server unix socket.", "SOCKET"},
+    #endif
     {"fcgi-max-threads-server", 0, 0, G_OPTION_ARG_INT, &max_threads_server,
         "Embedded FastCGI max server threads. (default: 10)", "THREADS"},
     {"fcgi-max-threads-app", 0, 0, G_OPTION_ARG_INT, &max_threads_app,
@@ -655,12 +657,16 @@ balde_sapi_fcgi_run(balde_app_t *app)
     GSocketService *service = g_threaded_socket_service_new(max_threads_server);
     GSocketAddress *address = NULL;
     GSocketProtocol protocol = G_SOCKET_PROTOCOL_TCP;
+    #ifdef WITH_UNIX_SOCKETS
     if (socket == NULL)
         address = g_inet_socket_address_new_from_string(final_host, port);
     else {
         address = g_unix_socket_address_new(socket);
         protocol = G_SOCKET_PROTOCOL_DEFAULT;
     }
+    #else
+        address = g_inet_socket_address_new_from_string(final_host, port);
+    #endif
 
     g_socket_listener_add_address(G_SOCKET_LISTENER(service), address,
         G_SOCKET_TYPE_STREAM, protocol, NULL, NULL, &error);

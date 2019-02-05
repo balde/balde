@@ -202,10 +202,12 @@ libbalde_la_SOURCES = \
 libbalde_la_CFLAGS = \
 	-fvisibility=hidden \
 	$(AM_CFLAGS) \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 libbalde_la_LIBADD = \
-	$(GLIB_LIBS)
+	$(GLIB_LIBS) \
+	$(GIO_UNIX_LIBS)
 
 libbalde_la_LDFLAGS = \
 	-version-info $(LIBBALDE_LT_VERSION_INFO)

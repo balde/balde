@@ -108,16 +108,27 @@ AM_CONDITIONAL([USE_LEG], [test "x$have_leg" = "xyes"])
 LEG="$ac_cv_path_leg"
 AC_SUBST(LEG)
 
+AC_ARG_ENABLE([unix-socket], AS_HELP_STRING([--disable-unix-socket], [disable unix-socket support]))
+
+AS_IF([test "x$enable_unix_socket" != "xno"], [
+  PKG_CHECK_MODULES([GIO_UNIX], [gio-unix-2.0 >= 2.35],
+    AC_DEFINE([WITH_UNIX_SOCKETS], [1], [Unix socket support is enabled])
+  )
+  UNIX_SOCKET=enabled
+], [
+  UNIX_SOCKET=disabled
+])
+
 # we need to make sure that shared-mime-info is installed, because we need it
 # for accurate mime-type guess
-GLIB_DEP="glib-2.0 >= 2.35, gio-2.0 >= 2.35, gio-unix-2.0 >= 2.35, shared-mime-info"
+GLIB_DEP="glib-2.0 >= 2.35, gio-2.0 >= 2.35, shared-mime-info"
 PC_DEPS="${GLIB_DEP}"
 AC_SUBST(PC_DEPS)
 
 PKG_PROG_PKG_CONFIG
 PKG_CHECK_MODULES([GLIB], [$GLIB_DEP])
 
-GLIB_COMPILE_RESOURCES="`$PKG_CONFIG --variable glib_compile_resources gio-2.0 gio-unix-2.0`"
+GLIB_COMPILE_RESOURCES="`$PKG_CONFIG --variable glib_compile_resources gio-2.0`"
 AC_SUBST(GLIB_COMPILE_RESOURCES)
 
 AC_CHECK_HEADERS([sys/types.h sys/stat.h])
@@ -140,6 +151,7 @@ AS_ECHO("
         compiler:     ${CC}
         cflags:       ${CFLAGS}
         ldflags:      ${LDFLAGS}
+        unix socket:  ${UNIX_SOCKET}
 
         examples:     ${EXAMPLES}
 

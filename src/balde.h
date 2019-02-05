@@ -11,7 +11,9 @@
 
 #include <glib.h>
 #include <gio/gio.h>
+#ifdef WITH_UNIX_SOCKETS
 #include <gio/gunixsocketaddress.h>
+#endif
 
 
 /**
