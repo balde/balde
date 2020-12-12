@@ -449,7 +449,7 @@ void balde_response_set_etag_header(balde_response_t *response,
     gboolean weak);
 
 /**
- * Check if response matches a sent etag header and change reponse to be blank
+ * Check if response matches a sent etag header and change response to be blank
  * and change response code to 304 Not Modified.
  */
 void balde_response_etag_matching(balde_request_t *request,
