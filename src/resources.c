@@ -103,6 +103,7 @@ balde_resources_load(balde_app_t *app, GResource *resources)
         b = g_resource_lookup_data(resources, resources_list[i], 0, &tmp_error);
         if (tmp_error != NULL) {
             g_propagate_error(&(app->error), tmp_error);
+            g_strfreev(resources_list);
             return;
         }
         data = g_bytes_get_data(b, &size);
