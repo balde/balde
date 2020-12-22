@@ -591,6 +591,7 @@ cleanup:
 
 static gboolean runfcgi = FALSE;
 static gchar *host = NULL;
+static gchar *socket = NULL;
 static gint port = 9000;
 static gint max_threads_server = 10;
 static gint max_threads_app = 10;
@@ -603,6 +604,10 @@ static GOptionEntry entries_fcgi[] =
         "Embedded FastCGI server host. (default: 127.0.0.1)", "HOST"},
     {"fcgi-port", 0, 0, G_OPTION_ARG_INT, &port,
         "Embedded FastCGI server port. (default: 9000)", "PORT"},
+    #ifdef WITH_UNIX_SOCKETS
+    {"fcgi-socket", 0, 0, G_OPTION_ARG_STRING, &socket,
+        "Embedded FastCGI server unix socket.", "SOCKET"},
+    #endif
     {"fcgi-max-threads-server", 0, 0, G_OPTION_ARG_INT, &max_threads_server,
         "Embedded FastCGI max server threads. (default: 10)", "THREADS"},
     {"fcgi-max-threads-app", 0, 0, G_OPTION_ARG_INT, &max_threads_app,
@@ -627,28 +632,50 @@ balde_sapi_fcgi_supported(void)
     return runfcgi;
 }
 
+void
+balde_cleanup_socket(gchar* socket, gboolean failed_to_run) {
+    if (socket == NULL || failed_to_run == TRUE)
+        return;
+    GFile* file = g_file_new_for_path(socket);
+    g_file_delete(file, NULL, NULL);
+    g_object_unref(file);
+}
 
 static gint
 balde_sapi_fcgi_run(balde_app_t *app)
 {
-    // TODO: add unix socket support
     GError *error = NULL;
     const gchar *final_host = host != NULL ? host : "127.0.0.1";
-    g_printerr(" * Running FastCGI on %s:%d (server threads: %d, app threads: %d)\n",
-        final_host, port, max_threads_server, max_threads_app);
+    if (socket == NULL)
+        g_printerr(" * Running FastCGI on %s:%d",
+            final_host, port);
+    else
+        g_printerr(" * Running FastCGI on socket %s", socket);
 
+    g_printerr(" (server threads: %d, app threads: %d)\n",
+        max_threads_server, max_threads_app);
     GSocketService *service = g_threaded_socket_service_new(max_threads_server);
-    GInetAddress* addr_host = g_inet_address_new_from_string(final_host);
-    GSocketAddress *address = g_inet_socket_address_new(addr_host, port);
+    GSocketAddress *address = NULL;
+    GSocketProtocol protocol = G_SOCKET_PROTOCOL_TCP;
+    #ifdef WITH_UNIX_SOCKETS
+    if (socket == NULL)
+        address = g_inet_socket_address_new_from_string(final_host, port);
+    else {
+        address = g_unix_socket_address_new(socket);
+        protocol = G_SOCKET_PROTOCOL_DEFAULT;
+    }
+    #else
+        address = g_inet_socket_address_new_from_string(final_host, port);
+    #endif
 
     g_socket_listener_add_address(G_SOCKET_LISTENER(service), address,
-        G_SOCKET_TYPE_STREAM, G_SOCKET_PROTOCOL_TCP, NULL, NULL, &error);
+        G_SOCKET_TYPE_STREAM, protocol, NULL, NULL, &error);
     if (error != NULL) {
         g_printerr("Failed to listen: %s\n", error->message);
         g_error_free(error);
         g_object_unref(service);
-        g_object_unref(addr_host);
         g_object_unref(address);
+        balde_cleanup_socket(socket, TRUE);
         g_free(host);
         return 3;
     }
@@ -661,8 +688,8 @@ balde_sapi_fcgi_run(balde_app_t *app)
         g_printerr("Failed to create app thread pool: %s\n", error->message);
         g_error_free(error);
         g_object_unref(service);
-        g_object_unref(addr_host);
         g_object_unref(address);
+        balde_cleanup_socket(socket, FALSE);
         g_free(host);
         g_free(ud);
         return 3;
@@ -671,13 +698,13 @@ balde_sapi_fcgi_run(balde_app_t *app)
     g_signal_connect(service, "run", G_CALLBACK(balde_incoming_callback), ud);
     g_socket_service_start(service);
     g_object_unref(service);
-    g_object_unref(addr_host);
     g_object_unref(address);
     GMainLoop *loop = g_main_loop_new(NULL, FALSE);
     g_main_loop_run(loop);
     g_thread_pool_free(ud->pool, TRUE, TRUE);
     g_free(ud);
     g_free(host);
+    balde_cleanup_socket(socket, FALSE);
     return 0;
 }
 

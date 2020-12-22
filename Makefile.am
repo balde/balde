@@ -202,10 +202,12 @@ libbalde_la_SOURCES = \
 libbalde_la_CFLAGS = \
 	-fvisibility=hidden \
 	$(AM_CFLAGS) \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 libbalde_la_LIBADD = \
-	$(GLIB_LIBS)
+	$(GLIB_LIBS) \
+	$(GIO_UNIX_LIBS)
 
 libbalde_la_LDFLAGS = \
 	-version-info $(LIBBALDE_LT_VERSION_INFO)
@@ -450,7 +452,8 @@ tests_check_app_SOURCES = \
 	tests/check_app.c
 
 tests_check_app_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 tests_check_app_LDFLAGS = \
 	-static \
@@ -464,7 +467,8 @@ tests_check_datetime_SOURCES = \
 	tests/check_datetime.c
 
 tests_check_datetime_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 tests_check_datetime_LDFLAGS = \
 	-static \
@@ -478,7 +482,8 @@ tests_check_exceptions_SOURCES = \
 	tests/check_exceptions.c
 
 tests_check_exceptions_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 tests_check_exceptions_LDFLAGS = \
 	-static \
@@ -494,6 +499,7 @@ tests_check_multipart_SOURCES = \
 
 tests_check_multipart_CFLAGS = \
 	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS) \
 	-I$(top_srcdir)/tests
 
 tests_check_multipart_LDFLAGS = \
@@ -514,7 +520,8 @@ tests_check_quickstart_SOURCES = \
 	tests/check_quickstart.c
 
 tests_check_quickstart_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 tests_check_quickstart_LDFLAGS = \
 	-static \
@@ -535,6 +542,7 @@ tests/tests_check_resources-check_resources.$(OBJEXT): tests/resources.c tests/r
 
 tests_check_resources_CFLAGS = \
 	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS) \
 	-I$(top_builddir)/tests
 
 tests_check_resources_LDFLAGS = \
@@ -543,13 +551,15 @@ tests_check_resources_LDFLAGS = \
 
 tests_check_resources_LDADD = \
 	$(GLIB_LIBS) \
+	$(GIO_UNIX_LIBS) \
 	libbalde.la
 
 tests_check_routing_SOURCES = \
 	tests/check_routing.c
 
 tests_check_routing_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 tests_check_routing_LDFLAGS = \
 	-static \
@@ -563,7 +573,8 @@ tests_check_sapi_cgi_SOURCES = \
 	tests/check_sapi_cgi.c
 
 tests_check_sapi_cgi_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 tests_check_sapi_cgi_LDFLAGS = \
 	-static \
@@ -571,6 +582,7 @@ tests_check_sapi_cgi_LDFLAGS = \
 
 tests_check_sapi_cgi_LDADD = \
 	$(GLIB_LIBS) \
+	$(GIO_UNIX_LIBS) \
 	libbalde.la
 
 tests_check_sapi_cgi_stdin_SOURCES = \
@@ -578,7 +590,8 @@ tests_check_sapi_cgi_stdin_SOURCES = \
 	tests/mock_sapi_cgi_stdin.c
 
 tests_check_sapi_cgi_stdin_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 tests_check_sapi_cgi_stdin_LDFLAGS = \
 	-static \
@@ -586,6 +599,7 @@ tests_check_sapi_cgi_stdin_LDFLAGS = \
 
 tests_check_sapi_cgi_stdin_LDADD = \
 	$(GLIB_LIBS) \
+	$(GIO_UNIX_LIBS) \
 	libbalde.la
 
 tests_check_sapi_httpd_SOURCES = \
@@ -593,7 +607,8 @@ tests_check_sapi_httpd_SOURCES = \
 	tests/mock_sapi_httpd.c
 
 tests_check_sapi_httpd_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 tests_check_sapi_httpd_LDFLAGS = \
 	-static \
@@ -601,13 +616,15 @@ tests_check_sapi_httpd_LDFLAGS = \
 
 tests_check_sapi_httpd_LDADD = \
 	$(GLIB_LIBS) \
+	$(GIO_UNIX_LIBS) \
 	libbalde.la
 
 tests_check_sapi_scgi_SOURCES = \
 	tests/check_sapi_scgi.c
 
 tests_check_sapi_scgi_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 tests_check_sapi_scgi_LDFLAGS = \
 	-static \
@@ -615,6 +632,7 @@ tests_check_sapi_scgi_LDFLAGS = \
 
 tests_check_sapi_scgi_LDADD = \
 	$(GLIB_LIBS) \
+	$(GIO_UNIX_LIBS) \
 	libbalde.la
 
 tests_check_sessions_SOURCES = \
@@ -622,7 +640,8 @@ tests_check_sessions_SOURCES = \
 	tests/mock_sessions.c
 
 tests_check_sessions_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 tests_check_sessions_LDFLAGS = \
 	-static \
@@ -630,6 +649,7 @@ tests_check_sessions_LDFLAGS = \
 
 tests_check_sessions_LDADD = \
 	$(GLIB_LIBS) \
+	$(GIO_UNIX_LIBS) \
 	libbalde.la
 
 tests_check_template_SOURCES = \
@@ -638,6 +658,7 @@ tests_check_template_SOURCES = \
 
 tests_check_template_CFLAGS = \
 	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS) \
 	-I$(top_srcdir)/tests
 
 tests_check_template_LDFLAGS = \
@@ -646,6 +667,7 @@ tests_check_template_LDFLAGS = \
 
 tests_check_template_LDADD = \
 	$(GLIB_LIBS) \
+	$(GIO_UNIX_LIBS) \
 	libbalde.la \
 	libbalde_template.la
 
@@ -674,7 +696,8 @@ tests_check_template_helpers_SOURCES = \
 	tests/check_template_helpers.c
 
 tests_check_template_helpers_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 tests_check_template_helpers_LDFLAGS = \
 	-static \
@@ -682,6 +705,7 @@ tests_check_template_helpers_LDFLAGS = \
 
 tests_check_template_helpers_LDADD = \
 	$(GLIB_LIBS) \
+	$(GIO_UNIX_LIBS) \
 	libbalde.la
 
 tests_check_utils_SOURCES = \
@@ -689,7 +713,8 @@ tests_check_utils_SOURCES = \
 	tests/mock_utils.c
 
 tests_check_utils_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 tests_check_utils_LDFLAGS = \
 	-static \
@@ -697,6 +722,7 @@ tests_check_utils_LDFLAGS = \
 
 tests_check_utils_LDADD = \
 	$(GLIB_LIBS) \
+	$(GIO_UNIX_LIBS) \
 	libbalde.la
 
 tests_check_requests_SOURCES = \
@@ -705,6 +731,7 @@ tests_check_requests_SOURCES = \
 
 tests_check_requests_CFLAGS = \
 	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS) \
 	-I$(top_srcdir)/tests
 
 tests_check_requests_LDFLAGS = \
@@ -713,6 +740,7 @@ tests_check_requests_LDFLAGS = \
 
 tests_check_requests_LDADD = \
 	$(GLIB_LIBS) \
+	$(GIO_UNIX_LIBS) \
 	libbalde.la
 
 tests_check_responses_SOURCES = \
@@ -720,7 +748,8 @@ tests_check_responses_SOURCES = \
 	tests/mock_responses.c
 
 tests_check_responses_CFLAGS = \
-	$(GLIB_CFLAGS)
+	$(GLIB_CFLAGS) \
+	$(GIO_UNIX_CFLAGS)
 
 tests_check_responses_LDFLAGS = \
 	-static \
@@ -728,6 +757,7 @@ tests_check_responses_LDFLAGS = \
 
 tests_check_responses_LDADD = \
 	$(GLIB_LIBS) \
+	$(GIO_UNIX_LIBS) \
 	libbalde.la
 
 tests/resources.c: tests/resources.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies --sourcedir $(top_srcdir)/tests/static $(top_srcdir)/tests/resources.xml)
