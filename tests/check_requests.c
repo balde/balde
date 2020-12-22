@@ -292,7 +292,7 @@ test_request_get_form_with_empty_body(void)
     g_setenv("REQUEST_METHOD", "POST", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    // ommited CONTENT_LENGTH
+    // omitted CONTENT_LENGTH
     balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     g_assert(request->priv->body == NULL);
     g_assert(g_hash_table_size(request->priv->form) == 0);
@@ -323,7 +323,7 @@ test_request_get_file_with_empty_body(void)
     g_setenv("REQUEST_METHOD", "POST", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    // ommited CONTENT_LENGTH
+    // omitted CONTENT_LENGTH
     balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     g_assert(request->priv->body == NULL);
     g_assert(request->priv->files == NULL);
@@ -379,7 +379,7 @@ test_request_get_body_with_empty_body(void)
     g_setenv("REQUEST_METHOD", "POST", TRUE);
     // FIXME: this thing is too weak :(
     balde_app_t *app = balde_app_init();
-    // ommited CONTENT_LENGTH
+    // omitted CONTENT_LENGTH
     balde_request_t *request = balde_make_request(app, balde_sapi_cgi_parse_request(app));
     const GString *str = balde_request_get_body(request);
     g_assert(str == NULL);

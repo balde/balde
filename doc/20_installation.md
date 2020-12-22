@@ -30,7 +30,7 @@ Configuring Build System
 
 *balde* releases comes with a ``configure`` script, that accepts several command-line options (or arguments), to allow you to customize your *balde* installation:
 
-- ``--enable-examples``: This option enables the ``Makefile`` rules that builds the balde examples. Examples are *NEVER* installed to the system, but building them is useful to play with them in the local direcoty.
+- ``--enable-examples``: This option enables the ``Makefile`` rules that builds the balde examples. Examples are *NEVER* installed to the system, but building them is useful to play with them in the local directory.
 - ``--disable-http``: This option disables the embedded HTTP server, that can be used during the development phase of your application. This is enabled by default, use the option to disable it if not needed, e.g. in production environment. See @ref application-cli for usage details.
 - ``--disable-doc``: This option disables the ``Makefile`` rules that are used to build this documentation. Documentation building rules are enabled by default, but depends on [Doxygen](http://www.doxygen.org) being installed on your system. Normal users should not need to change this.
 

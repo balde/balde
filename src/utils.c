@@ -91,7 +91,7 @@ balde_validate_timestamp(const gchar* timestamp, gint64 max_delta)
     gchar *endptr;
     gint64 old = g_ascii_strtoll(ts, &endptr, 10);
     if (strlen(endptr)){
-        // something wrong ocurred during convertion!
+        // something wrong occurred during conversion!
         g_free(ts);
         return FALSE;
     }
