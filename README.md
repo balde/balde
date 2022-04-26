@@ -3,7 +3,7 @@ balde
 
 [![Build Status](https://travis-ci.org/balde/balde.svg?branch=master)](https://travis-ci.org/balde/balde)
 
-This is *balde*, a microframework for C based on GLib and bad intentions.
+This is *balde*, a microframework for C based on GLib.
 
 It is designed to be fast, simple, and memory efficient. Most of its architecture is based on other microframeworks, like Flask, and it can run on any web server that supports CGI and/or FastCGI.
 

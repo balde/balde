@@ -1,5 +1,5 @@
 /*
- * balde: A microframework for C based on GLib and bad intentions.
+ * balde: A microframework for C based on GLib.
  * Copyright (C) 2013-2015 Rafael G. Martins <rafael@rafaelmartins.eng.br>
  *
  * This program can be distributed under the terms of the LGPL-2 License.
