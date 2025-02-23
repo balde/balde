@@ -506,7 +506,7 @@ balde_response_t* balde_make_response_len(const gchar *content, const gssize len
 /**
  * Sets a template variable.
  *
- * The template variable name *IS* case-sensitive.
+ * The template variable name IS case-sensitive.
  *
  */
 void balde_response_set_tmpl_var(balde_response_t *response, const gchar* name,
@@ -516,7 +516,7 @@ void balde_response_set_tmpl_var(balde_response_t *response, const gchar* name,
 /**
  * Gets a template variable.
  *
- * The template variable name *IS* case-sensitive.
+ * The template variable name IS case-sensitive.
  *
  */
 const gchar* balde_response_get_tmpl_var(balde_response_t *response,
@@ -526,7 +526,7 @@ const gchar* balde_response_get_tmpl_var(balde_response_t *response,
 /**
  * Gets a template variable and returns an empty string, if not found.
  *
- * The template variable name *IS* case-sensitive.
+ * The template variable name IS case-sensitive.
  *
  */
 const gchar* balde_response_get_tmpl_var_or_empty(balde_response_t *response,
@@ -575,7 +575,7 @@ const gchar* balde_request_get_header(balde_request_t *request,
 /**
  * Gets a query string argument.
  *
- * The argument name *IS* case-sensitive.
+ * The argument name IS case-sensitive.
  *
  */
 const gchar* balde_request_get_arg(balde_request_t *request, const gchar *name);
@@ -584,7 +584,7 @@ const gchar* balde_request_get_arg(balde_request_t *request, const gchar *name);
 /**
  * Gets a form input value.
  *
- * The form input name *IS* case-sensitive, and the function will always return
+ * The form input name IS case-sensitive, and the function will always return
  * NULL for HTTP methods that does not accepts request body.
  *
  */
@@ -594,7 +594,7 @@ const gchar* balde_request_get_form(balde_request_t *request, const gchar *name)
 /**
  * Gets a file uploaded.
  *
- * The form input name name *IS* case-sensitive, and the function will always
+ * The form input name name IS case-sensitive, and the function will always
  * return NULL for HTTP methods that does not accepts request body.
  *
  */
@@ -604,7 +604,7 @@ const balde_file_t* balde_request_get_file(balde_request_t *request, const gchar
 /**
  * Gets a view argument.
  *
- * The argument name *IS* case-sensitive.
+ * The argument name IS case-sensitive.
  *
  */
 const gchar* balde_request_get_view_arg(balde_request_t *request,
@@ -743,4 +743,4 @@ void balde_resources_load(balde_app_t *app, GResource *resources);
 gchar* balde_tmpl_url_for(balde_app_t *app, balde_request_t *request,
     const gchar *endpoint, gboolean external, ...);
 
-#endif /* _BALDE_H */
+#endif
